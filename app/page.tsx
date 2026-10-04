@@ -11,6 +11,12 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { FAQ } from "@/components/home/FAQ";
 import { CTA } from "@/components/home/CTA";
 import { faqs } from "@/data/faqs";
+import { RecruitmentSection } from "@/components/home/RecruitmentSection";
+import { metadata as makeMetadata } from "@/lib/seo";
+export const metadata = makeMetadata(
+  "LoL, Valorant & TFT Gaming Services",
+  "Explore League of Legends, Valorant and Teamfight Tactics rank progression, duo play and personal coaching. Build a service plan or apply to join our team.",
+);
 export default function Home() {
   return (
     <>
@@ -22,6 +28,7 @@ export default function Home() {
       <TrophyBreak />
       <Reviews />
       <BoosterSection />
+      <RecruitmentSection />
       <SecuritySection />
       <HowItWorks />
       <FAQ />

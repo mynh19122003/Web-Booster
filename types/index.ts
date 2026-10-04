@@ -5,5 +5,9 @@ export type Game = {
   genre: string;
   color: string;
   symbol: string;
+  logo: string;
+  image: string;
+  video: string;
+  videoEmbed?: string;
   services: string[];
 };

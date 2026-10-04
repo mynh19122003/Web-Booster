@@ -1,8 +1,7 @@
 "use client";
 import { ArrowUpRight, Radio, TrendingUp } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 export function OrderTracking() {
-  const reduced = useReducedMotion();
   return (
     <section className="section tracking-section">
       <div className="container split-section">
@@ -61,7 +60,7 @@ export function OrderTracking() {
           </div>
           <div className="progress-track">
             <motion.div
-              initial={{ width: reduced ? "68%" : 0 }}
+            initial={{ width: 0 }}
               whileInView={{ width: "68%" }}
               viewport={{ once: true }}
               transition={{ duration: 1.4 }}

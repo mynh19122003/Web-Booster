@@ -1,11 +1,29 @@
 "use client";
 import { useEffect } from "react";
 import { useStore } from "@/store/useStore";
-export function GameSync({ slug, queue }: { slug?: string; queue?: string }) {
+import { initialRanks, servicesFor } from "@/lib/service-options";
+export function GameSync({
+  slug,
+  queue,
+  service,
+}: {
+  slug?: string;
+  queue?: string;
+  service?: string;
+}) {
   const set = useStore((s) => s.set);
   useEffect(() => {
-    if (slug) set({ game: slug });
-    if (queue) set({ queue });
-  }, [slug, queue, set]);
+    const game = slug ?? useStore.getState().game;
+    const requested = service ?? useStore.getState().service;
+    const selected = servicesFor(game).some((s) => s.slug === requested)
+      ? requested
+      : "rank-boost";
+    set({
+      game,
+      service: selected,
+      queue: queue ?? (selected === "duo-boost" ? "Duo" : "Solo"),
+      ...initialRanks(game),
+    });
+  }, [slug, queue, service, set]);
   return null;
 }

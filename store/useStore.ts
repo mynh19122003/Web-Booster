@@ -10,9 +10,17 @@ type Order = {
   region: string;
   role: string;
   champions: string;
+  service?: string;
+  units?: number;
 };
 type State = {
   game: string;
+  service: string;
+  units: number;
+  currency: "USD" | "EUR";
+  usdPerEur: number | null;
+  rateDate: string;
+  rateState: "loading" | "live" | "cached" | "unavailable";
   current: number;
   target: number;
   queue: string;
@@ -25,8 +33,14 @@ type State = {
 };
 export const useStore = create<State>((set) => ({
   game: "league-of-legends",
-  current: 3,
-  target: 6,
+  service: "rank-boost",
+  units: 1,
+  currency: "USD",
+  usdPerEur: null,
+  rateDate: "",
+  rateState: "loading",
+  current: 12,
+  target: 24,
   queue: "Solo",
   region: "EUW",
   role: "Mid",

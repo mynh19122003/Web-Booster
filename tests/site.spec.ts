@@ -56,19 +56,31 @@ test("Game navigation, configuration, saved plan, support and routes", async ({
     .click();
   await expect(page).toHaveURL(/games\/valorant/);
   await expect(page.locator("#game")).toHaveValue("valorant");
-  await page.getByRole("slider", { name: "CURRENT RANK" }).fill("2");
-  await page.getByRole("slider", { name: "DESIRED RANK" }).fill("7");
-  await page.getByRole("button", { name: "Duo", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Current rank: Silver", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Current rank: Silver 2", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Desired rank: Immortal", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Duo boost", exact: true }).click();
   await page.getByLabel("REGION", { exact: true }).selectOption("NA");
   await page.getByRole("button", { name: "Review your plan" }).click();
-  await expect(page.getByRole("dialog")).toContainText("$108.09");
-  await page.getByRole("button", { name: "Save demo plan" }).click();
-  await expect(page.getByRole("status")).toContainText("Saved on this device");
+  await expect(page.getByRole("dialog")).toContainText("Silver 2 → Immortal 1");
+  await page.getByRole("dialog").getByLabel("Full name").fill("Test Player");
+  await page
+    .getByRole("dialog")
+    .getByLabel("Email", { exact: true })
+    .fill("player@example.com");
+  await page.getByRole("button", { name: "Save service request" }).click();
+  await expect(page.getByRole("dialog").getByRole("status")).toContainText("Saved on this browser");
   await page.keyboard.press("Escape");
   await page.reload();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Saved plans" }).click();
   await page.getByRole("button", { name: "Load saved plan" }).click();
-  await expect(page.getByRole("dialog")).toContainText("Silver → Master");
+  await expect(page.getByRole("dialog")).toContainText("Silver 2 → Immortal 1");
   await page.getByRole("button", { name: "Close dialog" }).click();
   await page.goto("/support");
   await page.getByLabel("Your email").fill("player@example.com");
@@ -104,9 +116,9 @@ test("Mobile navigation, search, interactive demos, and reduced motion", async (
   await page.getByRole("button", { name: "Toggle navigation" }).click();
   await page
     .locator("#games-menu")
-    .getByRole("link", { name: /Rocket League/ })
+    .getByRole("link", { name: /Teamfight Tactics/ })
     .click();
-  await expect(page).toHaveURL(/rocket-league/);
+  await expect(page).toHaveURL(/teamfight-tactics/);
   await page.getByRole("button", { name: "Search games" }).click();
   await page.getByLabel("Find your game").fill("zzzz");
   await expect(page.getByText("No games found.")).toBeVisible();

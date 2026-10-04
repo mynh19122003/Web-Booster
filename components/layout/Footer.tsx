@@ -43,7 +43,10 @@ export function Footer() {
         </div>
         <div>
           <h3>Company</h3>
+          <Link href="/about">About / Business information</Link>
           <Link href="/boosters">Meet the pros</Link>
+          <Link href="/careers">Join our team</Link>
+          <Link href="/admin">Admin workspace</Link>
           <Link href="/reviews">Our community</Link>
           <Link href="/blog">
             Insights <ArrowUpRight size={12} />
@@ -52,9 +55,12 @@ export function Footer() {
         <div>
           <h3>Support & legal</h3>
           <Link href="/support">Help center</Link>
+          <Link href="/contact">Contact</Link>
           <Link href="/#faq">FAQs</Link>
           <Link href="/legal/privacy">Privacy policy</Link>
           <Link href="/legal/terms">Terms of service</Link>
+          <Link href="/legal/refund">Refund policy</Link>
+          <Link href="/legal/delivery-service">Delivery / service policy</Link>
         </div>
       </div>
       <div className="container footer-bottom">

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
@@ -11,13 +12,12 @@ import {
   Hexagon,
 } from "lucide-react";
 import { games } from "@/data/games";
-import { useStore } from "@/store/useStore";
+import { CurrencySwitch } from "@/components/ui/Currency";
 export function Header() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const set = useStore((s) => s.set);
   useEffect(() => {
     const scroll = () => setScrolled(window.scrollY > 30);
     scroll();
@@ -44,7 +44,7 @@ export function Header() {
           </span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
-          <Link href="/#services">Services</Link>
+          <Link href="/services">Services</Link>
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -55,6 +55,7 @@ export function Header() {
           <Link href="/boosters">Our pros</Link>
           <Link href="/reviews">Reviews</Link>
           <Link href="/blog">Insights</Link>
+          <Link href="/careers">Careers</Link>
         </nav>
         <div className="nav-actions">
           <button
@@ -67,19 +68,14 @@ export function Header() {
           >
             <Search size={18} />
           </button>
-          <span className="locale" title="English · prices in US dollars">
-            EN / USD
-          </span>
-          <button
+          <CurrencySwitch compact />
+          <Link
             className="login"
-            aria-label="Log in"
-            onClick={() => set({ modal: "account" })}
+            aria-label="Sign in or create an account"
+            href="/login"
           >
             <UserRound size={16} />
-            <span>Log in</span>
-          </button>
-          <Link className="button small" href="/#configure">
-            Get started <ArrowUpRight size={15} />
+            <span>Sign in</span>
           </Link>
           <button
             className="icon-button mobile-menu"
@@ -94,7 +90,7 @@ export function Header() {
       {open && (
         <div className="mega-menu" id="games-menu">
           <div className="mobile-links">
-            <Link href="/#services" onClick={() => setOpen(false)}>
+            <Link href="/services" onClick={() => setOpen(false)}>
               Services
             </Link>
             <Link href="/boosters" onClick={() => setOpen(false)}>
@@ -106,6 +102,9 @@ export function Header() {
             <Link href="/blog" onClick={() => setOpen(false)}>
               Insights
             </Link>
+            <Link href="/careers" onClick={() => setOpen(false)}>
+              Careers
+            </Link>
           </div>
           <p className="eyebrow">YOUR GAME. YOUR NEXT LEVEL.</p>
           <div className="mega-grid">
@@ -115,8 +114,8 @@ export function Header() {
                 href={`/games/${g.slug}`}
                 onClick={() => setOpen(false)}
               >
-                <span style={{ color: g.color }} className="game-symbol">
-                  {g.symbol}
+                <span className="game-symbol" aria-hidden="true">
+                  <Image src={g.logo} alt="" fill sizes="60px" />
                 </span>
                 <span>
                   {g.name}

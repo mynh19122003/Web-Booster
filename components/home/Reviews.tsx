@@ -7,7 +7,10 @@ function Counter({ value }: { value: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
   useEffect(() => {
-    if (reduced) return;
+    if (reduced) {
+      const frame = requestAnimationFrame(() => setN(value));
+      return () => cancelAnimationFrame(frame);
+    }
     let frame = 0;
     const obs = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
@@ -27,10 +30,9 @@ function Counter({ value }: { value: number }) {
       cancelAnimationFrame(frame);
     };
   }, [value, reduced]);
-  return <span ref={ref}>{reduced ? value : n}</span>;
+  return <span ref={ref}>{n}</span>;
 }
 export function Reviews() {
-  const reduced = useReducedMotion();
   return (
     <section className="section reviews-section" id="reviews">
       <div className="container">
@@ -70,7 +72,7 @@ export function Reviews() {
           </div>
         </div>
       </div>
-      <div className={`reviews-marquee ${reduced ? "reduce" : ""}`}>
+      <div className="reviews-marquee">
         <motion.div className="reviews-track">
           {[...reviews, ...reviews].map((r, i) => (
             <article

@@ -5,15 +5,15 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://localhost:3000",
     channel:
       process.env.PLAYWRIGHT_BROWSER === "chromium" ? undefined : "msedge",
     headless: true,
     launchOptions: { args: ["--enable-unsafe-swiftshader"] },
   },
   webServer: {
-    command: "npm run start -- --hostname 127.0.0.1",
-    url: "http://127.0.0.1:3000",
+    command: "npm run start -- --hostname localhost",
+    url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 60000,
   },
