@@ -8,6 +8,5 @@ export type Game = {
   logo: string;
   image: string;
   video: string;
-  videoEmbed?: string;
   services: string[];
 };

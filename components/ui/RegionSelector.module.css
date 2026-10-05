@@ -1,0 +1,27 @@
+.field { min-width: 0; }
+.label { display: block; color: #aaa; font-size: 11px; font-weight: 500; }
+.trigger { display: flex; align-items: center; gap: 9px; width: 100%; height: 48px; margin-top: 10px; padding: 0 12px; border: 1px solid #e67e22; border-radius: 8px; background: #0e0e10; color: #fff; font-size: 13px; font-weight: 500; text-align: left; }
+.trigger > svg { flex-shrink: 0; color: #aaa; }
+.value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flag { flex-shrink: 0; object-fit: cover; border-radius: 2px; }
+.modal { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 20px; margin: auto; border: 1px solid #e67e22; border-radius: 8px; background: #121212; color: #fff; overflow: auto; overscroll-behavior: contain; }
+.modal::backdrop { background: #000a; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.header h2 { margin: 0; font-size: 20px; }
+.close { display: grid; place-items: center; width: 44px; height: 44px; color: #aaa; }
+.search { display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #444; border-radius: 6px; color: #aaa; }
+.search input { width: 100%; min-width: 0; height: 46px; padding: 0; border: 0; background: transparent; color: #fff; font-size: 14px; }
+.search:focus-within { border-color: #e67e22; }
+.search input:focus { outline: none; }
+.list { display: grid; gap: 4px; margin-top: 12px; }
+.option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px 12px; border: 1px solid transparent; border-radius: 6px; color: #fff; text-align: left; }
+.option:hover { background: #ffffff0a; }
+.option[aria-pressed="true"] { background: #e67e2218; border-color: #e67e22; }
+.option > svg { color: #e67e22; flex-shrink: 0; }
+.name { flex: 1; font-size: 14px; font-weight: 500; }
+.name small { display: block; margin-top: 3px; font-size: 11px; color: #aaa; }
+.empty { padding: 24px 0; text-align: center; color: #aaa; }
+.trigger:focus-visible, .option:focus-visible, .close:focus-visible { outline: 2px solid #e67e22; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .modal { width: 100%; max-width: none; max-height: 85dvh; margin: auto 0 0; border-radius: 8px 8px 0 0; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+}

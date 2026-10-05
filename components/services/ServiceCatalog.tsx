@@ -43,7 +43,8 @@ export function ServiceCatalog() {
           <Image
             src={selected.image}
             alt={`${selected.name} artwork`}
-            fill
+            width={1920}
+            height={1080}
             unoptimized
             sizes="100vw"
           />

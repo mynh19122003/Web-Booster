@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -15,6 +16,8 @@ import { initialRanks, ranksFor, servicesFor } from "@/lib/service-options";
 import { RankPicker } from "@/components/services/RankPicker";
 import { estimateQuote } from "@/lib/quote";
 import { CurrencySwitch, useMoney } from "@/components/ui/Currency";
+import { RegionSelector } from "@/components/ui/RegionSelector";
+import { regions } from "@/data/regions";
 
 const icons = {
   "rank-boost": Trophy,
@@ -22,16 +25,15 @@ const icons = {
   coaching: GraduationCap,
   placements: Target,
 };
-const regionFlags: Record<string, string> = {
-  EUW: "🇪🇺",
-  EUNE: "🇪🇺",
-  NA: "🇺🇸",
-  OCE: "🇦🇺",
-  KR: "🇰🇷",
-  SEA: "🇸🇬",
-};
 export function ServiceConfigurator() {
   const s = useStore();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
   const money = useMoney();
   const ranks = ranksFor(s.game);
   const choices = servicesFor(s.game);
@@ -50,8 +52,11 @@ export function ServiceConfigurator() {
   );
   const unitService =
     service.slug === "coaching" || service.slug === "placements";
+  function reviewPlan() {
+    s.set({ current, target, service: service.slug, queue, modal: "checkout" });
+  }
   return (
-    <section className="section" id="configure">
+    <section ref={sectionRef} className="section compact-config" id="configure">
       <div className="container">
         <div className="section-heading" data-reveal>
           <div>
@@ -179,20 +184,7 @@ export function ServiceConfigurator() {
                 </div>
               )}
               <div className="config-options">
-                <label>
-                  REGION
-                  <select
-                    aria-label="REGION"
-                    value={s.region}
-                    onChange={(e) => s.set({ region: e.target.value })}
-                  >
-                    {["EUW", "EUNE", "NA", "OCE", "KR", "SEA"].map((r) => (
-                      <option key={r} value={r}>
-                        {regionFlags[r]} {r}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <RegionSelector options={regions} value={s.region} onChange={(region) => s.set({ region })} />
                 {s.game === "league-of-legends" && (
                   <label>
                     ROLE
@@ -214,6 +206,8 @@ export function ServiceConfigurator() {
                   <strong>{queue}</strong>
                 </div>
               </div>
+              <details className="optional-preferences">
+              <summary>Optional preferences{s.champions ? " · Added" : ""}</summary>
               <label className="champion-label">
                 {s.game === "valorant"
                   ? "PREFERRED AGENTS"
@@ -228,10 +222,12 @@ export function ServiceConfigurator() {
                   maxLength={120}
                 />
               </label>
+              </details>
             </div>
             <div className="price-summary">
               <span className="eyebrow">YOUR NEXT LEVEL</span>
               <CurrencySwitch />
+              <p className="plan-selection">{games.find((game) => game.slug === s.game)?.name}<br />{unitService ? `${s.units} ${service.slug === "coaching" ? "hours" : "matches"}` : `${ranks[current]} → ${ranks[target]}`}<br />{s.region} · {queue}{s.game === "league-of-legends" ? ` · ${s.role}` : ""}</p>
               <div
                 className="price converted-price"
                 aria-live="polite"
@@ -240,13 +236,6 @@ export function ServiceConfigurator() {
                 {money.format(price)}
                 <small>{money.currency}</small>
               </div>
-              <p className="rate-note">
-                {money.usdPerEur
-                  ? `1 EUR = ${money.usdPerEur.toFixed(4)} USD · ${money.rateDate}${money.rateState === "cached" ? " · cached rate" : ""}`
-                  : money.rateState === "loading"
-                    ? "Loading exchange rate..."
-                    : "Exchange rate unavailable. USD prices remain available."}
-              </p>
               <div className="summary-row">
                 <span>Estimated delivery</span>
                 <strong>
@@ -260,15 +249,7 @@ export function ServiceConfigurator() {
               <button
                 className="button"
                 disabled={money.amount(price) === null}
-                onClick={() =>
-                  s.set({
-                    current,
-                    target,
-                    service: service.slug,
-                    queue,
-                    modal: "checkout",
-                  })
-                }
+                onClick={reviewPlan}
               >
                 Review your plan <ArrowUpRight size={17} />
               </button>
@@ -279,6 +260,10 @@ export function ServiceConfigurator() {
           </div>
         </div>
       </div>
+      {inView && !s.modal && <div className="mobile-plan-bar">
+        <div><strong>{money.format(price)}</strong><span>{s.region} · {unitService ? service.name : `${ranks[current]} → ${ranks[target]}`}</span></div>
+        <button className="button" disabled={money.amount(price) === null} onClick={reviewPlan}>Review plan <ArrowUpRight size={16} /></button>
+      </div>}
     </section>
   );
 }

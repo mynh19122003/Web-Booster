@@ -2,6 +2,8 @@
 
 Source: https://www.riotgames.com/en/press
 
+- Riot Games: official off-white logomark from the Riot Logos for Web archive, `riot-games-mark.png`.
+
 - League of Legends: user-provided League crest, `league-of-legends-mark.png`.
 - VALORANT: custom vector mark based on the user-provided reference; the referenced preview had a stock watermark and was not reused.
 - Teamfight Tactics: user-provided transparent icon, `teamfight-tactics-source.png`.

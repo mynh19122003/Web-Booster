@@ -7,7 +7,7 @@ import { useStore } from "@/store/useStore";
 import { initialRanks, serviceSlug, servicesFor } from "@/lib/service-options";
 import { useEffect, useRef } from "react";
 
-type PreviewMedia = HTMLVideoElement | HTMLIFrameElement;
+type PreviewMedia = HTMLVideoElement;
 
 function stopPreview(media: PreviewMedia | null) {
   if (!media) return;
@@ -16,22 +16,10 @@ function stopPreview(media: PreviewMedia | null) {
   if (media instanceof HTMLVideoElement) {
     media.pause();
     media.currentTime = 0;
-  } else {
-    media.src = "about:blank";
   }
 }
 
 function startPreview(card: HTMLElement) {
-  const frame = card.querySelector<HTMLIFrameElement>("iframe.game-preview");
-  if (frame) {
-    if (frame.dataset.loading || frame.dataset.playing) return;
-    const src = frame.dataset.previewSrc;
-    if (!src) return;
-    frame.dataset.loading = "true";
-    frame.src = src;
-    return;
-  }
-
   const video = card.querySelector<HTMLVideoElement>("video.game-preview");
   if (!video || !video.paused) return;
   void video.play().then(
@@ -52,7 +40,7 @@ export function GameServices() {
   useEffect(() => {
     const stopAll = () => {
         track.current
-          ?.querySelectorAll<PreviewMedia>("video.game-preview, iframe.game-preview")
+          ?.querySelectorAll<PreviewMedia>("video.game-preview")
           .forEach(stopPreview);
     };
     const onVisibilityChange = () => {
@@ -115,7 +103,7 @@ export function GameServices() {
               onPointerLeave={(event) =>
                 stopPreview(
                   event.currentTarget.querySelector<PreviewMedia>(
-                    "video.game-preview, iframe.game-preview",
+                    "video.game-preview",
                   ),
                 )
               }
@@ -124,7 +112,7 @@ export function GameServices() {
                 if (!event.currentTarget.contains(event.relatedTarget)) {
                   stopPreview(
                     event.currentTarget.querySelector<PreviewMedia>(
-                      "video.game-preview, iframe.game-preview",
+                      "video.game-preview",
                     ),
                   );
                 }
@@ -154,42 +142,17 @@ export function GameServices() {
                   sizes="(max-width: 600px) 85vw, (max-width: 1000px) 50vw, 33vw"
                   className="game-cover"
                 />
-                {g.videoEmbed ? (
-                  <iframe
-                    className="game-preview"
-                    src="about:blank"
-                    data-preview-src={g.videoEmbed}
-                    title={`${g.name} cinematic preview`}
-                    aria-hidden="true"
-                    tabIndex={-1}
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    onLoad={(event) => {
-                      const frame = event.currentTarget;
-                      const card = frame.closest(".game-card");
-                      if (
-                        frame.src !== "about:blank" &&
-                        card?.matches(":hover, :focus-within") &&
-                        !document.hidden
-                      ) {
-                        delete frame.dataset.loading;
-                        frame.dataset.playing = "true";
-                      }
-                    }}
-                  />
-                ) : (
-                  <video
-                    className="game-preview"
-                    src={g.video}
-                    poster={g.image}
-                    muted
-                    loop
-                    playsInline
-                    preload="none"
-                    aria-hidden="true"
-                    onError={(event) => stopPreview(event.currentTarget)}
-                  />
-                )}
+                <video
+                  className="game-preview"
+                  src={g.video}
+                  poster={g.image}
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                  aria-hidden="true"
+                  onError={(event) => stopPreview(event.currentTarget)}
+                />
                 <span className="game-number" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>

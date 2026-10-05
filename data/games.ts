@@ -5,8 +5,6 @@ export const games: Game[] = [
     name: "League of Legends",
     image: "/images/games/league-of-legends.webp",
     video: "/images/games/league-of-legends.webm",
-    videoEmbed:
-      "https://www.youtube-nocookie.com/embed/e3D7Fj1PsWk?autoplay=1&mute=1&controls=0&loop=1&playlist=e3D7Fj1PsWk&playsinline=1&rel=0&modestbranding=1",
     short: "LEAGUE OF LEGENDS",
     genre: "MOBA",
     color: "#c39762",

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import type { CSSProperties } from "react";
 import { gameRanks, rankLevelsFor } from "@/lib/service-options";
 export function RankPicker({
@@ -27,10 +27,12 @@ export function RankPicker({
   return (
     <fieldset className="rank-picker">
       <legend>{label}</legend>
-      <div className="rank-selected">
+      <details className="rank-disclosure">
+      <summary className="rank-selected">
         <RankEmblem game={game} tier={selected.tier} src={selected.icon} />
         <strong>{selected.label}</strong>
-      </div>
+        <ChevronDown size={18} className="rank-disclosure-chevron" />
+      </summary>
       <div className="rank-grid" role="group" aria-label={`${label} tier`}>
         {tiers.map((tier) => {
           const candidates = levels
@@ -93,6 +95,7 @@ export function RankPicker({
           ))}
         </div>
       )}
+      </details>
     </fieldset>
   );
 }
@@ -110,7 +113,7 @@ const leagueScale: Record<string, number> = {
   Grandmaster: 1.97,
   Challenger: 1.91,
 };
-function RankEmblem({
+export function RankEmblem({
   game,
   tier,
   src,

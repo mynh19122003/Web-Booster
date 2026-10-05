@@ -16,15 +16,16 @@ export function RecruitmentSection() {
           </p>
           <ul className="recruitment-benefits">
             <li>
-              <Trophy size={18} /> High-rank players and experienced coaches
+              <Trophy size={18} /> Players and coaches across LoL, Valorant and TFT
             </li>
             <li>
-              <Clock3 size={18} /> Share your availability
+              <Clock3 size={18} /> Include your available hours and time zone
             </li>
             <li>
-              <Users size={18} /> Player-focused communication
+              <Users size={18} /> Share your rank and relevant experience
             </li>
           </ul>
+          <p className="recruitment-context">No minimum rank or regional restrictions are published yet. This application is a local preview.</p>
           <Link className="text-link" href="/careers">
             View recruitment <ArrowUpRight size={17} />
           </Link>

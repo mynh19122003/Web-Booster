@@ -5,7 +5,6 @@ import { OrderTracking } from "@/components/home/OrderTracking";
 import { FeatureShowcase } from "@/components/home/FeatureShowcase";
 import { TrophyBreak } from "@/components/home/TrophyBreak";
 import { Reviews } from "@/components/home/Reviews";
-import { BoosterSection } from "@/components/home/BoosterSection";
 import { SecuritySection } from "@/components/home/SecuritySection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { FAQ } from "@/components/home/FAQ";
@@ -27,7 +26,6 @@ export default function Home() {
       <FeatureShowcase />
       <TrophyBreak />
       <Reviews />
-      <BoosterSection />
       <RecruitmentSection />
       <SecuritySection />
       <HowItWorks />

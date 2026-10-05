@@ -6,6 +6,8 @@ import { ranksFor } from "@/lib/service-options";
 
 export type ApplicationStatus = "New" | "Reviewing" | "Accepted" | "Declined";
 export type RequestStatus = "New" | "Contacted" | "Completed" | "Cancelled";
+export type StaffRole = "admin" | "employee";
+export type StaffMember = { id: string; name: string; email: string; role: StaffRole; active: boolean };
 export type Application = {
   id: string;
   createdAt: string;
@@ -34,12 +36,14 @@ export type ServiceRequest = {
   region: string;
   role: string;
   champions: string;
+  assignedTo?: string;
   status: RequestStatus;
 };
 const event = "ascend-records-changed";
 const keys = {
   applications: "ascend-applications-v1",
   requests: "ascend-requests-v1",
+  staff: "ascend-staff-v1",
 };
 const empty: never[] = [];
 const snapshots = new Map<string, { raw: string | null; value: unknown[] }>();
@@ -100,6 +104,10 @@ function validRequest(value: unknown) {
     )
   );
 }
+function validStaff(value: unknown): value is StaffMember {
+  return object(value) && typeof value.id === "string" && typeof value.name === "string" && typeof value.email === "string" && ["admin", "employee"].includes(String(value.role)) && typeof value.active === "boolean";
+}
+const defaultStaff: StaffMember[] = [{ id: "staff-admin", name: "Admin", email: "admin@ascend.local", role: "admin", active: true }];
 const readApplications = () =>
   read<Application>(keys.applications, validApplication);
 const readRequests = () => read<ServiceRequest>(keys.requests, validRequest);
@@ -120,6 +128,32 @@ export function useApplications() {
 }
 export function useRequests() {
   return useSyncExternalStore(subscribe, readRequests, () => empty);
+}
+export function useStaff() {
+  return useSyncExternalStore(subscribe, readStaff, () => defaultStaff);
+}
+function readStaff() {
+  const stored = read<StaffMember>(keys.staff, validStaff);
+  return stored.length ? stored : defaultStaff;
+}
+export function addStaff(value: Omit<StaffMember, "id" | "active">) {
+  const member: StaffMember = { ...value, id: `STAFF-${crypto.randomUUID().slice(0, 8).toUpperCase()}`, active: true };
+  if (!validStaff(member)) throw new Error("Invalid staff member");
+  write(keys.staff, [member, ...readStaff()]);
+  return member;
+}
+export function updateStaffRole(id: string, role: StaffRole) {
+  write(keys.staff, readStaff().map((member) => member.id === id ? { ...member, role } : member));
+}
+export function updateStaff(id: string, value: Pick<StaffMember, "name" | "email" | "role">) {
+  write(keys.staff, readStaff().map((member) => member.id === id ? { ...member, ...value } : member));
+}
+export function deleteStaff(id: string) {
+  if (id === "staff-admin") throw new Error("The default admin cannot be deleted.");
+  write(keys.staff, readStaff().filter((member) => member.id !== id));
+}
+export function assignRequest(id: string, assigneeId: string) {
+  write(keys.requests, readRequests().map((request) => request.id === id ? { ...request, assignedTo: assigneeId || undefined } : request));
 }
 export function addApplication(
   value: Omit<Application, "id" | "createdAt" | "status">,

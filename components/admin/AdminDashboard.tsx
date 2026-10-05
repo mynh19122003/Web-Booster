@@ -13,6 +13,11 @@ import {
   X,
   Hexagon,
   CheckCircle2,
+  Moon,
+  Sun,
+  Plus,
+  ExternalLink,
+  Pencil,
 } from "lucide-react";
 import { games } from "@/data/games";
 import { services } from "@/data/services";
@@ -26,9 +31,15 @@ import {
   type ServiceRequest,
   type ApplicationStatus,
   type RequestStatus,
+  useStaff,
+  addStaff,
+  updateStaff,
+  deleteStaff,
+  assignRequest,
+  type StaffRole,
 } from "@/lib/local-records";
-import { CurrencySwitch, useMoney } from "@/components/ui/Currency";
-type Tab = "overview" | "requests" | "applications";
+import { useMoney } from "@/components/ui/Currency";
+type Tab = "overview" | "requests" | "applications" | "staff";
 const applicationStatuses: ApplicationStatus[] = [
   "New",
   "Reviewing",
@@ -53,6 +64,7 @@ function date(value: string) {
 export function AdminDashboard() {
   const applications = useApplications();
   const requests = useRequests();
+  const staff = useStaff();
   const money = useMoney();
   const [tab, setTab] = useState<Tab>("overview");
   const [query, setQuery] = useState("");
@@ -65,6 +77,14 @@ export function AdminDashboard() {
     Application | ServiceRequest | null
   >(null);
   const [notice, setNotice] = useState("");
+  const [darkMode, setDarkMode] = useState(() => typeof window !== "undefined" && localStorage.getItem("ascend-admin-theme") === "dark");
+  const [staffName, setStaffName] = useState("");
+  const [staffEmail, setStaffEmail] = useState("");
+  const [staffRole, setStaffRole] = useState<StaffRole>("employee");
+  const [editingStaff, setEditingStaff] = useState<string | null>(null);
+  function toggleTheme() {
+    setDarkMode((current) => { const next = !current; localStorage.setItem("ascend-admin-theme", next ? "dark" : "light"); return next; });
+  }
   const kind = tab === "applications" ? "applications" : "requests";
   const statuses =
     kind === "applications" ? applicationStatuses : requestStatuses;
@@ -114,7 +134,7 @@ export function AdminDashboard() {
         ? "Service requests"
         : "Recruitment";
   return (
-    <div className="admin-shell">
+    <div className={`admin-shell ${darkMode ? "admin-dark" : ""}`}>
       <aside className="admin-sidebar">
         <Link href="/" className="admin-brand">
           <Hexagon size={26} /> ASCEND
@@ -130,6 +150,7 @@ export function AdminDashboard() {
                 Icon: ClipboardList,
               },
               { id: "applications", label: "Recruitment", Icon: Users },
+              { id: "staff", label: "Staff", Icon: Users },
             ] as const
           ).map(({ id, label, Icon }) => (
             <button
@@ -158,7 +179,7 @@ export function AdminDashboard() {
           <span>Admin / {title}</span>
           <div>
             <span className="local-notice">Local preview</span>
-            <CurrencySwitch compact />
+            <button className="admin-theme-toggle" type="button" onClick={toggleTheme} aria-label={darkMode ? "Use light mode" : "Use dark mode"} title={darkMode ? "Light mode" : "Dark mode"}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button>
           </div>
         </header>
         <div className="admin-body">
@@ -176,7 +197,21 @@ export function AdminDashboard() {
               Export
             </button>
           </div>
-          {tab === "overview" ? (
+          {tab === "staff" ? (
+            <section className="admin-staff-panel">
+              <div className="admin-section-heading"><div><h2>Team members</h2><p>Assign requests without sharing customer game credentials.</p></div></div>
+              <div className="staff-metrics"><div><span>Total staff</span><strong>{staff.length}</strong></div><div><span>Admins</span><strong>{staff.filter((member) => member.role === "admin").length}</strong></div><div><span>Employees</span><strong>{staff.filter((member) => member.role === "employee").length}</strong></div></div>
+              <form className="staff-form" onSubmit={(event) => { event.preventDefault(); if (!staffName.trim() || !staffEmail.trim()) return; if (editingStaff) updateStaff(editingStaff, { name: staffName.trim(), email: staffEmail.trim(), role: staffRole }); else addStaff({ name: staffName.trim(), email: staffEmail.trim(), role: staffRole }); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); setEditingStaff(null); setNotice(editingStaff ? "Staff member updated." : "Staff member added."); }}>
+                <input aria-label="Staff name" value={staffName} onChange={(event) => setStaffName(event.target.value)} placeholder="Full name" required />
+                <input aria-label="Staff email" type="email" value={staffEmail} onChange={(event) => setStaffEmail(event.target.value)} placeholder="Email address" required />
+                <select aria-label="Staff role" value={staffRole} onChange={(event) => setStaffRole(event.target.value as StaffRole)}><option value="employee">Employee</option><option value="admin">Admin</option></select>
+                <button className="admin-button" type="submit">{editingStaff ? "Save changes" : <><Plus size={16} /> Add staff</>}</button>
+              </form>
+              <div className="staff-list">{staff.map((member) => <div className="staff-row" key={member.id}><span className="user-avatar">{member.name.charAt(0).toUpperCase()}</span><span><strong>{member.name}</strong><small>{member.email} · {member.role}</small></span><div className="staff-actions"><button type="button" aria-label={`Edit ${member.name}`} title="Edit staff member" onClick={() => { setEditingStaff(member.id); setStaffName(member.name); setStaffEmail(member.email); setStaffRole(member.role); }}><Pencil size={15} /></button><button type="button" aria-label={`Delete ${member.name}`} title="Delete staff member" disabled={member.id === "staff-admin"} onClick={() => { if (window.confirm(`Delete ${member.name}?`)) { deleteStaff(member.id); setNotice("Staff member deleted."); } }}><Trash2 size={15} /></button></div></div>)}</div>
+              {editingStaff && <button className="text-link" type="button" onClick={() => { setEditingStaff(null); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); }}>Cancel editing</button>}
+              <p className="admin-notice">Role permissions are a local preview. Production use needs server-side authentication and authorization.</p>
+            </section>
+          ) : tab === "overview" ? (
             <>
               <div className="admin-metrics">
                 <div>
@@ -315,6 +350,7 @@ export function AdminDashboard() {
                           : "Service / estimate"}
                       </th>
                       <th>Received</th>
+                      {kind === "requests" && <th>Assigned to</th>}
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -339,6 +375,7 @@ export function AdminDashboard() {
                           )}
                         </td>
                         <td>{date(r.createdAt)}</td>
+                        {kind === "requests" && <td><select aria-label={`Assignee for ${r.name}`} value={"rank" in r ? "" : r.assignedTo ?? ""} onChange={(event) => assignRequest(r.id, event.target.value)}><option value="">Unassigned</option>{staff.filter((member) => member.active).map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></td>}
                         <td>
                           <select
                             aria-label={`Status for ${r.name}`}
@@ -352,6 +389,7 @@ export function AdminDashboard() {
                         </td>
                         <td>
                           <div className="admin-row-actions">
+                            {kind === "requests" && <a className="admin-row-action-link" aria-label={`Open Riot login for ${r.name}`} title="Open official Riot login" href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={17} /></a>}
                             <button
                               aria-label={`View ${r.name}`}
                               title="View details"
@@ -393,7 +431,7 @@ export function AdminDashboard() {
               {notice}
             </p>
           )}
-          <p className="admin-local-footer">
+            <p className="admin-local-footer">
             Browser storage only · no shared database or authenticated admin
             account
           </p>
@@ -507,6 +545,8 @@ function RecordDetails({
             </dd>
             <dt>Preferences</dt>
             <dd>{record.champions || "None"}</dd>
+            <dt>Game access</dt>
+            <dd><a className="admin-game-login" href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={14} /> Open Riot login</a><small>Opens the official login page. Customer game passwords are never shown or stored.</small></dd>
           </>
         )}
       </dl>

@@ -8,9 +8,7 @@ export function BoosterSection() {
         <div className="section-heading" data-reveal>
           <div>
             <p className="eyebrow">THE PEOPLE BEHIND THE PROGRESS</p>
-            <h2>
-              Meet your <span className="muted">unfair advantage.</span>
-            </h2>
+            <h2>Meet our pros.</h2>
           </div>
           <p>
             Exceptional skill. A human connection.

@@ -4,6 +4,7 @@ import { ArrowUpRight, CheckCircle2, RotateCcw } from "lucide-react";
 import { games } from "@/data/games";
 import { ranksFor } from "@/lib/service-options";
 import { addApplication } from "@/lib/local-records";
+import Link from "next/link";
 
 export function RecruitmentForm() {
   const [game, setGame] = useState(games[0].slug);
@@ -20,13 +21,12 @@ export function RecruitmentForm() {
     if (
       name.length < 2 ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      !/^[+\d\s().-]{7,25}$/.test(phone) ||
-      phone.replace(/\D/g, "").length < 7 ||
+      (phone !== "" && (!/^[+\d\s().-]{7,25}$/.test(phone) || phone.replace(/\D/g, "").length < 7)) ||
       !ranksFor(game).includes(rank) ||
       values.get("consent") !== "on"
     ) {
       setError(
-        "Please enter a valid name, email, phone number and rank, and confirm your consent.",
+        "Check your name, email and rank, confirm consent, and use a valid phone number if provided.",
       );
       return;
     }
@@ -37,7 +37,7 @@ export function RecruitmentForm() {
         phone,
         game,
         rank,
-        message: String(values.get("message") || "").trim(),
+        message: [String(values.get("message") || "").trim(), values.get("availability") ? `Availability: ${values.get("availability")}` : "", values.get("profile") ? `Profile: ${values.get("profile")}` : ""].filter(Boolean).join("\n"),
       });
       setSavedId(application.id);
       setError("");
@@ -68,9 +68,10 @@ export function RecruitmentForm() {
     );
   return (
     <form className="recruitment-form" onSubmit={submit}>
+      <div className="recruitment-form-heading"><h3>Apply to join</h3><p>Required fields are marked with an asterisk (*).</p></div>
       <div className="form-grid">
-        <label>
-          Full name
+        <label className="application-wide">
+          Full name *
           <input
             name="name"
             autoComplete="name"
@@ -80,8 +81,8 @@ export function RecruitmentForm() {
             maxLength={80}
           />
         </label>
-        <label>
-          Email
+        <label className="application-wide">
+          Email *
           <input
             name="email"
             type="email"
@@ -92,19 +93,7 @@ export function RecruitmentForm() {
           />
         </label>
         <label>
-          Phone number
-          <input
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            placeholder="+84 ..."
-            required
-            minLength={7}
-            maxLength={25}
-          />
-        </label>
-        <label>
-          Game
+          Game *
           <select
             name="game"
             aria-label="Game"
@@ -119,7 +108,7 @@ export function RecruitmentForm() {
           </select>
         </label>
         <label>
-          Current rank
+          Current rank *
           <select
             name="rank"
             aria-label="Current rank"
@@ -135,20 +124,23 @@ export function RecruitmentForm() {
             ))}
           </select>
         </label>
+        <label>Availability <span className="field-optional">Optional</span><input name="availability" placeholder="e.g. Weekday evenings, UTC+7" maxLength={160} /></label>
+        <label>Phone number <span className="field-optional">Optional</span><input name="phone" type="tel" autoComplete="tel" placeholder="+84 ..." pattern="[+0-9\s().\-]{7,25}" minLength={7} maxLength={25} /></label>
+        <label className="application-wide">Player profile <span className="field-optional">Optional</span><input name="profile" type="url" placeholder="https://" maxLength={500} /></label>
       </div>
       <label>
-        Experience <span className="field-optional">optional</span>
+        <span>Experience <span className="field-optional">Optional</span></span>
         <textarea
           name="message"
           rows={3}
-          placeholder="Coaching experience, availability, or a profile link"
+          placeholder="Tell us about your playing or coaching experience"
           maxLength={1200}
         />
       </label>
       <label className="consent-label">
         <input type="checkbox" name="consent" required />
         <span>
-          I agree to have my contact details saved for application review.
+          I agree to save my details for application review. * Read our <Link href="/legal/privacy">Privacy Policy</Link>.
         </span>
       </label>
       <div className="form-submit">
@@ -156,7 +148,7 @@ export function RecruitmentForm() {
           Save application <ArrowUpRight size={17} />
         </button>
         <span className="local-notice">
-          Local preview · saved on this browser
+          Saved in this browser only. Not sent to a recruitment team.
         </span>
       </div>
       {error && (
