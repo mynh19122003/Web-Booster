@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
@@ -9,15 +11,52 @@ import {
   X,
   UserRound,
   Hexagon,
+  LogOut,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { games } from "@/data/games";
-import { useStore } from "@/store/useStore";
+import { CurrencySwitch } from "@/components/ui/Currency";
 export function Header() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const set = useStore((s) => s.set);
+  const [user, setUser] = useState<{ name: string } | null>(null);
+  const [userMenu, setUserMenu] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() =>
+    typeof window !== "undefined" &&
+    window.localStorage.getItem("ascend-theme") === "light"
+      ? "light"
+      : "dark",
+  );
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result) => {
+        if (active) setUser(result.user ?? null);
+      })
+      .catch(() => {
+        if (active) setUser(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("ascend-theme");
+    const initialTheme = savedTheme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = initialTheme;
+  }, []);
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    window.localStorage.setItem("ascend-theme", nextTheme);
+  }
   useEffect(() => {
     const scroll = () => setScrolled(window.scrollY > 30);
     scroll();
@@ -29,6 +68,7 @@ export function Header() {
       if (e.key === "Escape") {
         setOpen(false);
         setSearch(false);
+        setUserMenu(false);
       }
     };
     window.addEventListener("keydown", escape);
@@ -44,7 +84,7 @@ export function Header() {
           </span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
-          <Link href="/#services">Services</Link>
+          <Link href="/services">Services</Link>
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -55,6 +95,7 @@ export function Header() {
           <Link href="/boosters">Our pros</Link>
           <Link href="/reviews">Reviews</Link>
           <Link href="/blog">Insights</Link>
+          <Link href="/careers">Careers</Link>
         </nav>
         <div className="nav-actions">
           <button
@@ -67,20 +108,60 @@ export function Header() {
           >
             <Search size={18} />
           </button>
-          <span className="locale" title="English · prices in US dollars">
-            EN / USD
-          </span>
-          <button
-            className="login"
-            aria-label="Log in"
-            onClick={() => set({ modal: "account" })}
-          >
-            <UserRound size={16} />
-            <span>Log in</span>
-          </button>
-          <Link className="button small" href="/#configure">
-            Get started <ArrowUpRight size={15} />
-          </Link>
+          <CurrencySwitch compact />
+          {user ? (
+            <div className="user-menu-wrap">
+              <button
+                className="login user-menu-trigger"
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={userMenu}
+                onClick={() => setUserMenu(!userMenu)}
+              >
+                <span className="user-avatar" aria-hidden="true">
+                  {user.name.trim().charAt(0).toUpperCase()}
+                </span>
+                <span>{user.name}</span>
+              </button>
+              {userMenu && (
+                <div className="user-menu" role="menu">
+                  <Link
+                    href="/account"
+                    role="menuitem"
+                    onClick={() => setUserMenu(false)}
+                  >
+                    <UserRound size={15} /> Account
+                  </Link>
+                  <button type="button" role="menuitem" onClick={toggleTheme}>
+                    {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+                    {theme === "dark" ? "Light mode" : "Dark mode"}
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={async () => {
+                      await fetch("/api/auth/logout", { method: "POST" });
+                      setUser(null);
+                      setUserMenu(false);
+                      router.push("/login");
+                      router.refresh();
+                    }}
+                  >
+                    <LogOut size={15} /> Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              className="login"
+              aria-label="Sign in or create an account"
+              href="/login"
+            >
+              <UserRound size={16} />
+              <span>Sign in</span>
+            </Link>
+          )}
           <button
             className="icon-button mobile-menu"
             aria-label="Toggle navigation"
@@ -94,7 +175,7 @@ export function Header() {
       {open && (
         <div className="mega-menu" id="games-menu">
           <div className="mobile-links">
-            <Link href="/#services" onClick={() => setOpen(false)}>
+            <Link href="/services" onClick={() => setOpen(false)}>
               Services
             </Link>
             <Link href="/boosters" onClick={() => setOpen(false)}>
@@ -106,6 +187,9 @@ export function Header() {
             <Link href="/blog" onClick={() => setOpen(false)}>
               Insights
             </Link>
+            <Link href="/careers" onClick={() => setOpen(false)}>
+              Careers
+            </Link>
           </div>
           <p className="eyebrow">YOUR GAME. YOUR NEXT LEVEL.</p>
           <div className="mega-grid">
@@ -115,8 +199,8 @@ export function Header() {
                 href={`/games/${g.slug}`}
                 onClick={() => setOpen(false)}
               >
-                <span style={{ color: g.color }} className="game-symbol">
-                  {g.symbol}
+                <span className="game-symbol" aria-hidden="true">
+                  <Image src={g.logo} alt="" fill sizes="60px" />
                 </span>
                 <span>
                   {g.name}

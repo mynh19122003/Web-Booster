@@ -19,8 +19,8 @@ export const boosters = [
   },
   {
     name: "VEX",
-    game: "Counter-Strike 2",
-    rank: "GLOBAL ELITE",
+    game: "Teamfight Tactics",
+    rank: "CHALLENGER",
     win: "86%",
     orders: "2,104",
     rating: "4.97",

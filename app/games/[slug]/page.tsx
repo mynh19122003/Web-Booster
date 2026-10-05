@@ -35,7 +35,7 @@ export default async function GamePage({
       <PageIntro
         eyebrow={`${game.genre} / YOUR NEXT CHAPTER`}
         title={game.name}
-        description={`${game.services.join(", ")}. Find your next milestone with a plan built around you. Ranks and estimates use a shared illustrative model in this demo.`}
+        description={`${game.services.join(", ")}. Choose a service, set your goal and build a plan around your play.`}
         path={`/games/${slug}`}
       />
       <ServiceConfigurator />
