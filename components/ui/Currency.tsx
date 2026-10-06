@@ -1,5 +1,7 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
+import { motion } from "motion/react";
+import { Coins } from "lucide-react";
 import { useStore } from "@/store/useStore";
 
 export function CurrencyProvider() {
@@ -68,32 +70,63 @@ export function CurrencyProvider() {
   return null;
 }
 
-export function CurrencySwitch({ compact = false }: { compact?: boolean }) {
+export function CurrencySwitch({
+  compact = false,
+  className = "",
+  layoutId,
+}: {
+  compact?: boolean;
+  className?: string;
+  layoutId?: string;
+}) {
   const currency = useStore((s) => s.currency);
   const set = useStore((s) => s.set);
+  const autoId = useId();
+  const activeLayoutId = layoutId ?? `activeCurrency-${autoId}`;
+
+  const handleSelect = (code: "USD" | "EUR") => {
+    set({ currency: code });
+    try {
+      localStorage.setItem("ascend-currency", code);
+    } catch {
+      /* Preference is optional. */
+    }
+  };
+
   return (
     <div
-      className={`currency-switch ${compact ? "compact" : ""}`}
+      className={`h-9 inline-flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-full p-1 backdrop-blur-md shrink-0 ${className}`}
       role="group"
       aria-label="Display currency"
     >
-      {(["USD", "EUR"] as const).map((code) => (
-        <button
-          key={code}
-          type="button"
-          aria-pressed={currency === code}
-          onClick={() => {
-            set({ currency: code });
-            try {
-              localStorage.setItem("ascend-currency", code);
-            } catch {
-              /* Preference is optional. */
-            }
-          }}
-        >
-          {code}
-        </button>
-      ))}
+      {!compact && <div className="pl-2 pr-1 flex items-center justify-center text-[#FF9F3C]/80 shrink-0 select-none">
+        <Coins size={13} aria-hidden="true" />
+      </div>}
+      {(["USD", "EUR"] as const).map((code) => {
+        const isActive = currency === code;
+        return (
+          <button
+            key={code}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => handleSelect(code)}
+            className={`relative h-7 inline-flex items-center justify-center rounded-full px-2.5 text-xs transition-colors select-none leading-none cursor-pointer ${
+              isActive
+                ? "text-black font-bold"
+                : "text-zinc-400 hover:text-white font-medium"
+            }`}
+          >
+            {isActive && (
+              <motion.span
+                layoutId={activeLayoutId}
+                className="absolute inset-0 bg-gradient-to-r from-[#FF9F3C] to-[#D97706] rounded-full shadow-[0_0_12px_rgba(255,159,60,0.3)]"
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+            )}
+            <span className="relative z-10">{code}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

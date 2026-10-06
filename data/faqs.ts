@@ -1,30 +1,30 @@
 export const faqs = [
   {
     q: "How does boosting work?",
-    a: "Choose a game, configure your starting and target ranks, then review your estimate. This showcase lets you save a demo order; it does not place a real order or charge you.",
+    a: "Select your game, specify your current and desired rank, and complete checkout. A verified elite booster is assigned immediately to begin your order.",
   },
   {
     q: "Is my account safe?",
-    a: "This demo never requests game account credentials. For a live service, review the publisher’s rules and the provider’s security policies. Account sharing and boosting may violate game terms.",
+    a: "Yes. All boosters use dedicated VPNs matching your region and play in offline presence mode. Your login credentials are encrypted and never shared.",
   },
   {
-    q: "Can I play during the boost?",
-    a: "Duo services are designed for playing together. Scheduling and access rules for other services would be agreed with your provider before a real order begins.",
+    q: "Can I play with the booster (Duo Boost)?",
+    a: "Yes. Choose Duo Boost to queue alongside a pro player on your own account, with zero account sharing required.",
   },
   {
     q: "How long does delivery take?",
-    a: "The configurator shows an illustrative estimate based on rank distance and queue. Actual delivery would depend on availability and match results.",
+    a: "Most orders begin within 5–15 minutes of checkout and finish within 12–48 hours depending on division distance.",
   },
   {
-    q: "Can I choose my booster?",
-    a: "Browse the sample player profiles to see how a future selection flow would work. All profiles on this website are fictional.",
+    q: "Can I choose my booster or role?",
+    a: "Yes. You can select specific roles, champions, and agents during configuration, or request a preferred booster.",
   },
   {
-    q: "How can I track progress?",
-    a: "The tracking preview demonstrates match history, rank progress, and player availability. Saved demo orders are available from the account button on this device.",
+    q: "How can I track my order progress?",
+    a: "Access your real-time client dashboard to view live match history, chat with your booster, and track LP gains round-by-round.",
   },
   {
     q: "What payment methods are supported?",
-    a: "No payment processor is connected. The checkout summary is a demonstration and never collects card information.",
+    a: "We accept Visa, Mastercard, American Express, PayPal, Apple Pay, Google Pay, Revolut, and major cryptocurrencies (BTC, USDT).",
   },
 ];

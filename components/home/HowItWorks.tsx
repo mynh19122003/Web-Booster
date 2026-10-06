@@ -1,6 +1,6 @@
 export function HowItWorks() {
   return (
-    <section className="section steps">
+    <section id="how-it-works" className="section steps">
       <div className="container">
         <p className="eyebrow">LESS FRICTION. MORE PROGRESSION.</p>
         <h2>
@@ -22,7 +22,7 @@ export function HowItWorks() {
             [
               "03",
               "Enjoy the climb",
-              "Save your demo plan and explore the tracking experience.",
+              "Track match progress live while our elite pros secure your wins.",
             ],
           ].map(([n, title, text]) => (
             <article key={n}>

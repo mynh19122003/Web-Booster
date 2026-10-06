@@ -4,7 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { ArrowUpRight, Eye, EyeOff, Hexagon } from "lucide-react";
+import { ArrowUpRight, Eye, EyeOff } from "lucide-react";
+import { AscendLogo } from "@/components/ui/AscendLogo";
+import { BackToHomeButton } from "@/components/ui/BackToHomeButton";
 
 type Mode = "login" | "register";
 
@@ -50,10 +52,13 @@ export function AuthPanel({ initialMode, googleConfigured, error }: { initialMod
   }
 
   return (
-    <main className="auth-page" id="main">
-      <div className="auth-layout">
+    <main className="auth-page min-h-screen relative flex items-center justify-center p-4 sm:p-8 md:p-12" id="main">
+      <BackToHomeButton />
+      <div className="auth-layout shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden backdrop-blur-xl border border-white/10">
         <aside className="auth-aside">
-          <Link className="auth-brand" href="/" aria-label="ASCEND home"><Hexagon size={29} /><span>ASCEND<span className="logo-dot">®</span></span></Link>
+          <Link className="auth-brand" href="/" aria-label="ASCEND home">
+            <AscendLogo variant="horizontal" size="md" />
+          </Link>
           <div className="auth-aside-copy">
             <p className="eyebrow">YOUR ASCEND SPACE</p>
             <h1>Every plan,<br />in your corner.</h1>

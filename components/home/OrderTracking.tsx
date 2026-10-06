@@ -71,9 +71,9 @@ export function OrderTracking() {
         <div className="dashboard" data-reveal>
           <div className="dashboard-head">
             <span>
-              <span className="status-dot" /> {demo.points >= 200 ? "TARGET REACHED" : "CLIMB IN PROGRESS"}
+              <span className="status-dot" /> {demo.points >= 200 ? "ORDER COMPLETED" : "LIVE CLIMB IN PROGRESS"}
             </span>
-            <span className="demo-tag">DEMO #AS-5821</span>
+            <span className="demo-tag">ORDER #AS-5821</span>
           </div>
           <div className="dashboard-ranks">
             <div>
@@ -123,19 +123,19 @@ export function OrderTracking() {
               <strong>
                 NOVA <span className="status-dot" />
               </strong>
-              <small>Your pro · {game === "valorant" ? "Radiant" : "Challenger"}</small>
+              <small>Assigned Pro · {game === "valorant" ? "Radiant" : "Challenger"}</small>
             </div>
             <div>
-              <small>DEMO STATUS</small>
-              <strong>{demo.points >= 200 ? "Completed" : paused ? "Paused" : "Playing"}</strong>
+              <small>STATUS</small>
+              <strong>{demo.points >= 200 ? "Completed" : paused ? "Paused" : "In Match"}</strong>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 16 }}>
-            <small style={{ flex: 1, color: "#aaa" }}>Simulated matches · Starting rank {game === "valorant" ? "Ascendant III" : "Gold II"}</small>
-            <button type="button" aria-label={paused ? "Play demo" : "Pause demo"} title={paused ? "Play demo" : "Pause demo"} onClick={() => setPaused(!paused)} style={{ width: 44, height: 44 }} disabled={demo.points >= 200}>{paused ? <Play size={18} /> : <Pause size={18} />}</button>
-            <button type="button" aria-label="Restart demo" title="Restart demo" onClick={() => { setDemo(initialDemo); setPaused(false); }} style={{ width: 44, height: 44 }}><RotateCcw size={18} /></button>
+            <small style={{ flex: 1, color: "#aaa" }}>Live tracking simulation · Starting rank {game === "valorant" ? "Ascendant III" : "Gold II"}</small>
+            <button type="button" aria-label={paused ? "Resume simulation" : "Pause simulation"} title={paused ? "Resume simulation" : "Pause simulation"} onClick={() => setPaused(!paused)} style={{ width: 44, height: 44 }} disabled={demo.points >= 200}>{paused ? <Play size={18} /> : <Pause size={18} />}</button>
+            <button type="button" aria-label="Reset simulation" title="Reset simulation" onClick={() => { setDemo(initialDemo); setPaused(false); }} style={{ width: 44, height: 44 }}><RotateCcw size={18} /></button>
           </div>
-          <div className="tracking-game-switch" role="group" aria-label="Demo game">
+          <div className="tracking-game-switch" role="group" aria-label="Tracking game">
             {[{ code: "league-of-legends", name: "League of Legends" }, { code: "valorant", name: "Valorant" }].map((option) => <button key={option.code} type="button" aria-pressed={game === option.code} onClick={() => { setGame(option.code); setDemo(initialDemo); setPaused(false); }}>{option.name}</button>)}
           </div>
         </div>

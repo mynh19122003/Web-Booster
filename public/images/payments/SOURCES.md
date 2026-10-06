@@ -1,10 +1,9 @@
-# Payment brand logos
+# Payment artwork
 
-The logos are local SVG assets so they remain sharp at every display size. Their colors are muted with CSS to match the dark ASCEND footer.
+Visa, Mastercard, American Express, Google Pay, Apple Pay, PayPal, JCB and Discover use vector logo artwork from the installed `@iconify/json` Logos collection. All added white background rectangles have been removed. Brand symbol colors are preserved; dark neutral lettering uses white for contrast on the dark canvas. Visa uses a white wordmark. These are local vectors rather than remote image requests.
 
-- Visa, Mastercard, American Express, Google Pay, Apple Pay, Bitcoin, PayPal, JCB, and Discover: [Simple Icons](https://github.com/simple-icons/simple-icons), served as monochrome SVGs by [Simple Icons CDN](https://cdn.simpleicons.org/).
-- Bancontact and EPS: [Datatrans payment-logos](https://github.com/datatrans/payment-logos), `assets/apm/bancontact.svg` and `assets/apm/eps.svg`. The tile backgrounds were removed to make the marks transparent.
-- paysafecard: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Paysafecard_logo.svg), sourced from the brand's press artwork. The SVG wordmark is recolored by the footer's grayscale treatment.
-- Revolut: official retail wordmark from the [Revolut logo package](https://developer.revolut.com/docs/resources/open-banking-logo-guidelines).
+Bancontact and EPS retain the existing Datatrans payment-logos vectors. Paysafecard retains its Wikimedia press-artwork wordmark. Revolut retains its retail wordmark from the Revolut developer logo package, rendered in white. All marks float on transparent canvases. No grayscale, invert or brightness filter is applied.
 
-All brand marks remain the property of their respective owners. The site preview does not process payments; showing these marks does not mean the methods are currently accepted.
+Reference guidelines: [Mastercard Brand Center](https://www.mastercard.com/brandcenter/us/en/brand-requirements/mastercard.html), [Google Pay brand guidelines](https://developers.google.com/pay/api/web/guides/brand-guidelines), and [Revolut logo guidelines](https://developer.revolut.com/docs/resources/open-banking-logo-guidelines).
+
+Brand marks belong to their respective owners. Their display does not implement payment processing.

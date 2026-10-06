@@ -52,23 +52,23 @@ export function GameServices() {
     };
   }, []);
   return (
-    <section className="section services-section" id="services">
+    <section className="section services-section relative overflow-hidden" id="services">
+      {/* Volcanic & Ember Ambient Glow for Depth */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[850px] h-[360px] bg-gradient-to-r from-[#D97706]/15 via-[#FF9F3C]/12 to-[#D97706]/15 rounded-full blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 -left-24 w-[450px] h-[450px] bg-[#D97706]/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="absolute bottom-10 -right-24 w-[500px] h-[450px] bg-[#FF9F3C]/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+
       <div className="container">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow">01 / CHOOSE YOUR ARENA</p>
+            <p className="eyebrow text-[#FF9F3C]">CHOOSE YOUR GAME</p>
             <h2>
-              Different games.
+              Select your arena.
               <br />
-              <span className="muted">Same ambition.</span>
+              <span className="muted">Start climbing today.</span>
             </h2>
           </div>
           <div>
-            <p>
-              Your next milestone starts here.
-              <br />
-              Expert services for the games you live for.
-            </p>
             <div className="carousel-controls">
               <button
                 aria-label="Previous games"
@@ -86,7 +86,7 @@ export function GameServices() {
               >
                 <ArrowRight size={17} />
               </button>
-              <span>EXPLORE THE LINEUP</span>
+              <span>EXPLORE ALL GAMES</span>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function GameServices() {
           {games.map((g, i) => (
             <article
               key={g.slug}
-              className={`game-card ${selected === g.slug ? "selected" : ""}`}
+              className="game-card group relative bg-white/[0.03] border border-white/[0.08] shadow-none transition-all duration-300 hover:bg-white/[0.05] hover:border-[#FF9F3C]/50 hover:shadow-[0_0_25px_rgba(255,159,60,0.2)] hover:-translate-y-1 rounded-xl overflow-hidden"
               style={{ "--game-color": g.color } as React.CSSProperties}
               onPointerEnter={(event) => {
                 if (event.pointerType === "mouse")
@@ -121,7 +121,7 @@ export function GameServices() {
               <button
                 title={`Select ${g.name}`}
                 aria-pressed={selected === g.slug}
-                className="game-art"
+                className="game-art focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F3C]"
                 onClick={() =>
                   set({
                     game: g.slug,
@@ -153,22 +153,23 @@ export function GameServices() {
                   aria-hidden="true"
                   onError={(event) => stopPreview(event.currentTarget)}
                 />
-                <span className="game-number" aria-hidden="true">
+                <span className="game-number bg-[#0F0F10]/90 text-[#F5D7A1] border border-white/10 font-mono font-bold tracking-widest px-2.5 py-0.5 rounded shadow-sm" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="game-category" aria-hidden="true">
+                <span className="game-category bg-[#0F0F10]/90 text-[#FF9F3C] border border-[#FF9F3C]/20 font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded shadow-sm" aria-hidden="true">
                   {g.genre}
                 </span>
-                <span className="game-wordmark">{g.short}</span>
+                <span className="game-wordmark text-[#F5D7A1]/80 font-bold uppercase">{g.short}</span>
               </button>
               <div className="game-card-info">
                 <div>
-                  <h3>{g.name}</h3>
-                  <span>{g.services.length} ways to level up</span>
+                  <h3 className="text-white font-bold text-lg group-hover:text-[#F5D7A1] transition-colors">{g.name}</h3>
+                  <span className="text-xs text-[#FF9F3C] font-medium">Rank & Duo Boost</span>
                 </div>
                 <Link
                   href={`/games/${g.slug}`}
                   aria-label={`Explore ${g.name}`}
+                  className="text-zinc-400 group-hover:text-[#FF9F3C] transition-colors"
                 >
                   <ArrowUpRight size={21} />
                 </Link>
@@ -178,6 +179,7 @@ export function GameServices() {
                   <Link
                     href={`/services/${serviceSlug(s)}?game=${g.slug}#configure`}
                     key={s}
+                    className="bg-[#1F1F23]/80 hover:bg-[#FF9F3C]/20 text-zinc-200 hover:text-[#FF9F3C] border border-white/5 hover:border-[#FF9F3C]/40 text-xs font-semibold px-2.5 py-1 rounded transition-colors backdrop-blur-sm"
                   >
                     {s}
                   </Link>
@@ -188,9 +190,9 @@ export function GameServices() {
         </div>
         <div className="service-foot">
           <span>
-            <span className="status-dot" /> YOUR NEXT CHAPTER IS ONE CLICK AWAY
+            <span className="status-dot !bg-[#FF9F3C] !shadow-[0_0_8px_#FF9F3C]" /> YOUR NEXT CHAPTER IS ONE CLICK AWAY
           </span>
-          <Link href="/services">
+          <Link href="/services" className="hover:text-[#FF9F3C] transition-colors">
             Discover all services <ArrowUpRight size={15} />
           </Link>
         </div>
