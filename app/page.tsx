@@ -1,5 +1,4 @@
 import { Hero } from "@/components/home/Hero";
-import { HeroTrustRibbon } from "@/components/home/HeroTrustRibbon";
 import { GameServices } from "@/components/home/GameServices";
 import { ServiceConfigurator } from "@/components/home/ServiceConfigurator";
 import { OrderTracking } from "@/components/home/OrderTracking";

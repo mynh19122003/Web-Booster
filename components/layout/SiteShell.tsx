@@ -13,7 +13,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
   const isAdminRoute = path === "/admin" || path.startsWith("/admin/");
 
-  if (isAdminRoute || isAuthRoute)
+  const isEmployeeRoute = path === "/employee" || path.startsWith("/employee/");
+
+  if (isAdminRoute || isAuthRoute || isEmployeeRoute)
     return (
       <>
         <CurrencyProvider />
