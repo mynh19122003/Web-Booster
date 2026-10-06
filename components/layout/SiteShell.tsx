@@ -10,7 +10,10 @@ import { InitialLoader } from "@/components/ui/InitialLoader";
 import { CurrencyProvider } from "@/components/ui/Currency";
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  if (path === "/admin" || path.startsWith("/admin/"))
+  const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
+  const isAdminRoute = path === "/admin" || path.startsWith("/admin/");
+
+  if (isAdminRoute || isAuthRoute)
     return (
       <>
         <CurrencyProvider />

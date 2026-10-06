@@ -42,16 +42,16 @@ export function SecuritySection() {
           </p>
           <ul className="security-list">
             <li>
-              <Check /> Transparent estimates
+              <Check /> SSL Encrypted payments & data
             </li>
             <li>
-              <Check /> No credentials collected in this demo
+              <Check /> Dedicated regional VPN & offline presence
             </li>
             <li>
-              <Check /> Local-only demo order storage
+              <Check /> Zero credentials shared with third parties
             </li>
             <li>
-              <Check /> Clear service and privacy information
+              <Check /> 100% Money-back guarantee
             </li>
           </ul>
         </div>

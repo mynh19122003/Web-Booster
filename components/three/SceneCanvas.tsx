@@ -60,7 +60,7 @@ export default function SceneCanvas() {
     >
       <Canvas
         dpr={mobile ? 1 : [1, 1.25]}
-        camera={{ position: [0, 0, 12], fov: 40 }}
+        camera={{ position: [0, 0, 10], fov: 40 }}
         gl={{ antialias: !mobile, alpha: true, powerPreference: "low-power" }}
         frameloop={!visible || !active ? "never" : "demand"}
         onCreated={({ gl }) => {

@@ -11,7 +11,6 @@ import {
   Eye,
   Trash2,
   X,
-  Hexagon,
   CheckCircle2,
   Moon,
   Sun,
@@ -19,6 +18,7 @@ import {
   ExternalLink,
   Pencil,
 } from "lucide-react";
+import { AscendLogo } from "@/components/ui/AscendLogo";
 import { games } from "@/data/games";
 import { services } from "@/data/services";
 import {
@@ -136,8 +136,8 @@ export function AdminDashboard() {
   return (
     <div className={`admin-shell ${darkMode ? "admin-dark" : ""}`}>
       <aside className="admin-sidebar">
-        <Link href="/" className="admin-brand">
-          <Hexagon size={26} /> ASCEND
+        <Link href="/" className="admin-brand flex items-center gap-2">
+          <AscendLogo variant="horizontal" size="sm" showTagline={false} />
         </Link>
         <span className="admin-caption">WORKSPACE</span>
         <nav aria-label="Admin navigation">

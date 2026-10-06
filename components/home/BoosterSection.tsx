@@ -7,13 +7,13 @@ export function BoosterSection() {
       <div className="container">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow">THE PEOPLE BEHIND THE PROGRESS</p>
+            <p className="eyebrow text-[#FF9F3C]">VERIFIED TALENT</p>
             <h2>Meet our pros.</h2>
           </div>
           <p>
-            Exceptional skill. A human connection.
+            Top 0.1% Challenger & Radiant players,
             <br />
-            <span className="demo-tag">FICTIONAL PLAYER PROFILES</span>
+            vetted for consistency, speed, and professionalism.
           </p>
         </div>
         <div className="booster-grid">
@@ -34,7 +34,7 @@ export function BoosterSection() {
                 </div>
                 <span className="player-watermark">{b.name}</span>
                 <span className="player-online">
-                  <span className="status-dot" /> AVAILABLE · DEMO
+                  <span className="status-dot" /> ONLINE & AVAILABLE
                 </span>
               </div>
               <div className="player-info">

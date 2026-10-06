@@ -73,7 +73,10 @@ export function HeroScene({
       top: bounds.current[index].top - scroll,
       height: bounds.current[index].height,
     };
-    const px = mobile ? size.width * 0.55 : size.width * 0.745;
+    const anchor = index === 0
+      ? document.getElementById("hero-artifact-anchor")?.getBoundingClientRect()
+      : undefined;
+    const px = anchor ? anchor.left + anchor.width / 2 : mobile ? size.width * 0.55 : size.width * 0.745;
     const offset =
       index === 0
         ? mobile
@@ -86,19 +89,19 @@ export function HeroScene({
           : mobile
             ? 460
             : rect.height * 0.5;
-    const py = rect.top + offset;
+    const py = anchor ? anchor.top + anchor.height / 2 : rect.top + offset;
     root.current.position.set(
       (px / size.width - 0.5) * viewport.width,
       (0.5 - py / size.height) * viewport.height,
       0,
     );
     const scale =
-      (((mobile
-        ? Math.min(size.width * 0.8, 350)
-        : Math.min(size.width * 0.43, 610)) /
+      (((anchor ? Math.min(anchor.width * 1.05, 680) : mobile
+        ? Math.min(size.width * 0.85, 380)
+        : Math.min(size.width * 0.48, 680)) /
         size.width) *
         viewport.width) /
-      5.7;
+      4.2;
     root.current.scale.setScalar(scale);
     fragment.current = index === 1 ? assembly.current : 0;
     const time = clock.elapsedTime;

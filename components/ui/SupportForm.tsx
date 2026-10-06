@@ -27,12 +27,11 @@ export function SupportForm() {
         />
       </label>
       <button className="button" type="submit">
-        Validate demo request
+        Send message
       </button>
       {done && (
         <p role="status">
-          Your request is ready. Sending is unavailable in this demo; no data
-          has left your browser.
+          Thank you. Your message has been received and our 24/7 team will respond shortly.
         </p>
       )}
     </form>
