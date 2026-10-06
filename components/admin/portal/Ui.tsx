@@ -1,4 +1,7 @@
 "use client";
+
+import { useAdminText } from "@/lib/admin/use-admin-text";
+import { adminText, adminError } from "@/lib/admin/vi";
 import {
   useEffect,
   useId,
@@ -19,13 +22,13 @@ import type { Permission, AuditActivity } from "@/types/admin";
 import { permissionOptions } from "@/lib/admin/config";
 export const formatDate = (value: string) =>
   value
-    ? new Intl.DateTimeFormat("en-GB", {
+    ? new Intl.DateTimeFormat("vi-VN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
         timeZone: "UTC",
       }).format(new Date(value))
-    : "Not yet signed in";
+    : "Chưa đăng nhập";
 export function Avatar({ name, size = "" }: { name: string; size?: string }) {
   return (
     <span className={`ap-avatar ${size}`}>
@@ -38,10 +41,13 @@ export function Avatar({ name, size = "" }: { name: string; size?: string }) {
   );
 }
 export function StatusBadge({ status }: { status: string }) {
+  const text = useAdminText();
   return (
     <span className={`ap-badge ap-status-${status.toLowerCase()}`}>
       <i />
-      {status.replaceAll("_", " ").toLowerCase()}
+      {text("Cancel") === "Cancel"
+        ? status.replaceAll("_", " ").toLowerCase()
+        : text(status)}
     </span>
   );
 }
@@ -54,14 +60,18 @@ export function PermissionBadgeGroup({
     <div className="ap-permissions">
       {permissions.length ? (
         permissions.map((p) => (
-          <span key={p} title={p}>
-            {p.startsWith("employee.application")
-              ? p.split(".").at(-1)
-              : p.replace(".", " · ")}
+          <span
+            key={p}
+            title={
+              permissionOptions.find((option) => option.value === p)
+                ?.description ?? p
+            }
+          >
+            {permissionOptions.find((option) => option.value === p)?.label ?? p}
           </span>
         ))
       ) : (
-        <span>No permissions</span>
+        <span>Chưa có quyền</span>
       )}
     </div>
   );
@@ -97,11 +107,12 @@ export function EmptyState({
   text?: string;
   children?: ReactNode;
 }) {
+  const translate = useAdminText();
   return (
     <div className="ap-empty">
       <Inbox size={30} />
-      <h3>{title}</h3>
-      <p>{text}</p>
+      <h3>{translate(title)}</h3>
+      <p>{translate(text)}</p>
       {children}
     </div>
   );
@@ -109,8 +120,8 @@ export function EmptyState({
 export function AccessDenied() {
   return (
     <EmptyState
-      title="This area is restricted"
-      text="Your role doesn’t have access to this workspace. Ask your super admin to review your permissions."
+      title="Bạn không có quyền truy cập"
+      text="Vai trò của bạn chưa được cấp quyền truy cập. Hãy liên hệ quản trị viên cấp cao."
     />
   );
 }
@@ -120,7 +131,7 @@ export function SearchFilterBar({
   status,
   onStatus,
   statuses,
-  placeholder = "Search by name or email…",
+  placeholder = "Tìm theo tên hoặc email…",
 }: {
   query: string;
   onQuery: (s: string) => void;
@@ -134,27 +145,27 @@ export function SearchFilterBar({
       <label className="ap-search">
         <Search size={17} />
         <input
-          aria-label="Search records"
+          aria-label="Tìm dữ liệu"
           placeholder={placeholder}
           value={query}
           onChange={(e) => onQuery(e.target.value)}
         />
         {query && (
-          <button aria-label="Clear search" onClick={() => onQuery("")}>
+          <button aria-label="Xóa tìm kiếm" onClick={() => onQuery("")}>
             <X size={15} />
           </button>
         )}
       </label>
       <label className="ap-filter-select">
-        <span>Status</span>
+        <span>Trạng thái</span>
         <select
-          aria-label="Filter status"
+          aria-label="Lọc trạng thái"
           value={status}
           onChange={(e) => onStatus(e.target.value)}
         >
           {["ALL", ...statuses].map((s) => (
             <option key={s} value={s}>
-              {s === "ALL" ? "All statuses" : s[0] + s.slice(1).toLowerCase()}
+              {s === "ALL" ? "Tất cả trạng thái" : adminText(s)}
             </option>
           ))}
         </select>
@@ -192,9 +203,9 @@ export function DataTable<T extends { id: string }>({
         </tbody>
       </table>
       <div className="ap-table-footer">
-        Showing {rows.length} {label.toLowerCase()}
+        Hiển thị {rows.length} {label.toLowerCase()}
         <span>
-          All records loaded <ShieldCheck size={13} />
+          Đã tải toàn bộ dữ liệu <ShieldCheck size={13} />
         </span>
       </div>
     </div>
@@ -205,7 +216,7 @@ export function DataTable<T extends { id: string }>({
 export function ActionMenu({ children }: { children: ReactNode }) {
   return (
     <details className="ap-action-menu">
-      <summary aria-label="Open actions">
+      <summary aria-label="Mở thao tác">
         <MoreHorizontal size={19} />
       </summary>
       <div
@@ -262,7 +273,7 @@ export function ActivityTimeline({
             <ShieldCheck size={14} />
           </span>
           <div>
-            <p>{a.description}</p>
+            <p>{adminText(a.description)}</p>
             <small>
               {a.actor} <span>·</span> {formatDate(a.at)}
             </small>
@@ -281,8 +292,43 @@ export function Field({
   hint?: string;
   children: ReactNode;
 }) {
+  const text = useAdminText();
   return (
-    <label className="ap-field">
+    <label
+      className="ap-field"
+      onInvalidCapture={(event) => {
+        if (text("Cancel") === "Cancel") return;
+        const input = event.target;
+        if (!(
+          input instanceof HTMLInputElement ||
+          input instanceof HTMLTextAreaElement ||
+          input instanceof HTMLSelectElement
+        ))
+          return;
+        const validity = input.validity;
+        const message = validity.valueMissing
+          ? "Trường này là bắt buộc."
+          : validity.typeMismatch
+            ? "Vui lòng nhập đúng định dạng."
+            : validity.tooShort
+              ? "Thông tin nhập quá ngắn."
+              : validity.tooLong
+                ? "Thông tin nhập quá dài."
+                : validity.rangeUnderflow || validity.rangeOverflow
+                  ? "Giá trị nằm ngoài phạm vi cho phép."
+                  : "Vui lòng kiểm tra lại thông tin.";
+        input.setCustomValidity(message);
+      }}
+      onInputCapture={(event) => {
+        const input = event.target;
+        if (
+          input instanceof HTMLInputElement ||
+          input instanceof HTMLTextAreaElement ||
+          input instanceof HTMLSelectElement
+        )
+          input.setCustomValidity("");
+      }}
+    >
       <span>{label}</span>
       {children}
       {hint && <small>{hint}</small>}
@@ -296,7 +342,7 @@ export function PermissionFields({
 }) {
   return (
     <fieldset className="ap-permission-fields">
-      <legend>Staff permissions</legend>
+      <legend>Quyền hạn nhân sự</legend>
       {permissionOptions.map((p) => (
         <label key={p.value}>
           <input
@@ -333,6 +379,7 @@ export function FormModal({
   onSubmit: (data: FormData) => Promise<void>;
   children?: ReactNode;
 }) {
+  const text = useAdminText();
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const submitting = useRef(false);
@@ -359,7 +406,11 @@ export function FormModal({
       onClose();
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "Something went wrong. Please retry.",
+        text("Cancel") === "Cancel"
+          ? e instanceof Error
+            ? e.message
+            : "Something went wrong. Please try again."
+          : adminError(e),
       );
     } finally {
       submitting.current = false;
@@ -387,7 +438,7 @@ export function FormModal({
           </div>
           <button
             type="button"
-            aria-label="Close dialog"
+            aria-label={text("Close dialog")}
             disabled={pending}
             onClick={onClose}
           >
@@ -398,7 +449,7 @@ export function FormModal({
           {children}
           {error && (
             <p role="alert" className="ap-error">
-              {error}
+              {text("Cancel") === "Cancel" ? error : adminError(error)}
             </p>
           )}
         </div>
@@ -409,13 +460,13 @@ export function FormModal({
             onClick={onClose}
             disabled={pending}
           >
-            Cancel
+            {text("Cancel")}
           </button>
           <button
             className={`ap-button ${danger ? "danger" : "primary"}`}
             disabled={pending}
           >
-            {pending ? "Saving…" : submit}
+            {pending ? text("Saving…") : text(submit)}
           </button>
         </footer>
       </form>

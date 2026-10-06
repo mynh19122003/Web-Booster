@@ -1,4 +1,6 @@
 "use client";
+
+import { adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +22,7 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
         <Link href="/" className="ap-brand">
           <span className="ap-mark">A</span>
           <span>
-            ASCEND<small>A HIGHER STANDARD</small>
+            ASCEND<small>TIÊU CHUẨN CAO HƠN</small>
           </span>
         </Link>
         <div className="ap-auth-art" aria-hidden="true">
@@ -28,38 +30,38 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
           <div className="ap-orbit two" />
           <div className="ap-orbit three" />
           <span className="ap-art-a">A</span>
-          <span className="ap-art-label">PRECISION. PEOPLE. PROGRESS.</span>
+          <span className="ap-art-label">CHÍNH XÁC. CON NGƯỜI. TIẾN BỘ.</span>
         </div>
         <div className="ap-auth-copy">
-          <span className="ap-eyebrow">THE PEOPLE BEHIND THE PROGRESS</span>
+          <span className="ap-eyebrow">ĐỘI NGŨ TẠO NÊN THÀNH CÔNG</span>
           <h1>
-            Great teams.
-            <br />
-            Greater possibilities.
+            Đội ngũ vững mạnh. <br />
+            Tiềm năng rộng mở.{" "}
           </h1>
           <p>
-            Your command center for talent, trust, and the next level of gaming
-            services.
+            Trung tâm quản lý nhân tài, xây dựng niềm tin và nâng tầm dịch vụ
+            trò chơi.{" "}
           </p>
         </div>
         <footer>
           <span>© 2026 ASCEND</span>
           <span>
-            <ShieldCheck size={14} /> A workspace built on trust
+            <ShieldCheck size={14} /> Không gian làm việc xây dựng trên niềm
+            tin{" "}
           </span>
         </footer>
       </aside>
       <section className="ap-auth-form">
         <div className="ap-auth-top">
-          <span>TEAM WORKSPACE</span>
+          <span>KHÔNG GIAN ĐỘI NGŨ</span>
           <Link href="/">
-            Back to website <ArrowUpRight size={14} />
+            Quay lại trang web <ArrowUpRight size={14} />
           </Link>
         </div>
         <div className="ap-auth-form-inner">{children}</div>
         <p className="ap-auth-bottom">
-          <LockKeyhole size={13} /> Admin access is reserved for invited team
-          members.
+          <LockKeyhole size={13} /> Trang quản trị chỉ dành cho thành viên được
+          mời.{" "}
         </p>
       </section>
     </div>
@@ -83,7 +85,9 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
       router.push("/admin");
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "Sign-in unavailable. Please retry.",
+        e instanceof Error
+          ? e.message
+          : "Không thể đăng nhập. Vui lòng thử lại.",
       );
     } finally {
       setPending(false);
@@ -94,19 +98,19 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
       <span className="ap-auth-icon">
         <ShieldCheck size={24} />
       </span>
-      <div className="ap-eyebrow">WELCOME BACK</div>
-      <h2>Your workspace awaits.</h2>
+      <div className="ap-eyebrow">CHÀO MỪNG TRỞ LẠI</div>
+      <h2>Đăng nhập vào trang quản trị.</h2>
       <p className="ap-auth-description">
-        Sign in to manage your team and keep things moving.
+        Đăng nhập để quản lý đội ngũ và theo dõi hoạt động.{" "}
       </p>
       {changed && (
         <p className="ap-success">
-          Demo password updated. All previous sessions were revoked. Sign in
-          again.
+          Đã cập nhật mật khẩu dùng thử và thu hồi các phiên trước. Vui lòng
+          đăng nhập lại.{" "}
         </p>
       )}
       <div className="ap-demo-switch">
-        <span>EXPLORE AS</span>
+        <span>DÙNG THỬ VỚI VAI TRÒ</span>
         <div>
           {(["owner", "staff", "viewer"] as const).map((m) => (
             <button
@@ -125,16 +129,16 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
               }}
             >
               {m === "owner"
-                ? "Super admin"
+                ? "Quản trị viên cấp cao"
                 : m === "staff"
-                  ? "Staff"
-                  : "View-only staff"}
+                  ? "Nhân sự quản trị"
+                  : "Nhân sự chỉ xem"}
             </button>
           ))}
         </div>
       </div>
       <form onSubmit={login}>
-        <Field label="Email address">
+        <Field label="Địa chỉ email">
           <input
             type="email"
             name="email"
@@ -144,19 +148,19 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
             autoComplete="username"
           />
         </Field>
-        <Field label="Password">
+        <Field label="Mật khẩu">
           <span className="ap-password-input">
             <input
               type={show ? "text" : "password"}
               name="password"
               minLength={8}
               required
-              placeholder="Any demo password, 8+ characters"
+              placeholder="Mật khẩu dùng thử, ít nhất 8 ký tự"
               autoComplete="current-password"
             />
             <button
               type="button"
-              aria-label={show ? "Hide password" : "Show password"}
+              aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
               onClick={() => setShow(!show)}
             >
               {show ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -164,36 +168,35 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
           </span>
         </Field>
         <div className="ap-login-help">
-          <span>Demo session · this tab only</span>
+          <span>Phiên dùng thử · chỉ trong thẻ này</span>
           <button type="button" onClick={() => setHelp(!help)}>
-            Forgot password?
+            Quên mật khẩu?{" "}
           </button>
         </div>
         {help && (
           <p className="ap-info-strip">
-            Password recovery is not connected yet. Contact your workspace
-            owner. For this demo, use any 8+ character password.
+            Chưa kết nối chức năng khôi phục mật khẩu. Hãy liên hệ quản trị
+            viên. Bản dùng thử chấp nhận mật khẩu từ 8 ký tự.{" "}
           </p>
         )}
         {error && (
           <p className="ap-error" role="alert">
-            {error}
+            {adminError(error)}
           </p>
         )}
         <button className="ap-button primary full" disabled={pending}>
-          {pending ? "Opening workspace…" : "Sign in to workspace"}
+          {pending ? "Đang đăng nhập…" : "Đăng nhập"}
           <ArrowRight size={17} />
         </button>
       </form>
       <p className="ap-demo-disclaimer">
-        You’re exploring a local demo. Use made-up credentials.
-        <br />
-        No backend requests or real emails are sent.
+        Bạn đang dùng bản thử cục bộ. Hãy sử dụng thông tin giả lập. <br />
+        Không gửi yêu cầu tới máy chủ hay email thật.{" "}
       </p>
       <div className="ap-auth-invitation">
-        Joining the team?{" "}
+        Bạn muốn gia nhập đội ngũ?{" "}
         <Link href="/admin/accept-invitation?token=demo-invitation">
-          Preview an invitation <ArrowUpRight size={14} />
+          Xem trước lời mời <ArrowUpRight size={14} />
         </Link>
       </div>
     </AuthFrame>
@@ -221,9 +224,7 @@ export function AcceptInvitationPage({ token }: { token: string }) {
       );
       setSuccess(true);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Unable to accept this invitation.",
-      );
+      setError(adminError(e));
     } finally {
       setPending(false);
     }
@@ -233,13 +234,13 @@ export function AcceptInvitationPage({ token }: { token: string }) {
       {success ? (
         <div className="ap-accept-success">
           <CheckCircle2 size={52} />
-          <h2>You’re part of the team.</h2>
+          <h2>Bạn đã gia nhập đội ngũ.</h2>
           <p>
-            Your staff account is ready. Sign in using the Staff demo mode to
-            explore your workspace.
+            Tài khoản đã sẵn sàng. Đăng nhập với vai trò nhân sự quản trị dùng
+            thử để khám phá.{" "}
           </p>
           <Link className="ap-button primary full" href="/admin/login">
-            Continue to sign in <ArrowRight size={17} />
+            Tiếp tục đăng nhập <ArrowRight size={17} />
           </Link>
         </div>
       ) : (
@@ -247,22 +248,22 @@ export function AcceptInvitationPage({ token }: { token: string }) {
           <span className="ap-auth-icon">
             <MailIcon />
           </span>
-          <div className="ap-eyebrow">A NEW CHAPTER</div>
-          <h2>You’ve been invited.</h2>
+          <div className="ap-eyebrow">KHỞI ĐẦU MỚI</div>
+          <h2>Bạn đã nhận được lời mời.</h2>
           <p className="ap-auth-description">
-            Join the ASCEND team. Set up your password to get started.
+            Gia nhập đội ngũ ASCEND. Thiết lập mật khẩu để bắt đầu.{" "}
           </p>
           <form onSubmit={accept}>
-            <Field label="Invitation token">
+            <Field label="Mã lời mời">
               <input
                 name="token"
                 defaultValue={token}
                 required
-                placeholder="Paste the token from your invitation"
+                placeholder="Dán mã trong lời mời của bạn"
               />
             </Field>
             <div className="ap-form-grid">
-              <Field label="Password">
+              <Field label="Mật khẩu">
                 <input
                   name="password"
                   type="password"
@@ -272,7 +273,7 @@ export function AcceptInvitationPage({ token }: { token: string }) {
                   autoComplete="new-password"
                 />
               </Field>
-              <Field label="Confirm password">
+              <Field label="Xác nhận mật khẩu">
                 <input
                   name="confirmation"
                   type="password"
@@ -282,10 +283,11 @@ export function AcceptInvitationPage({ token }: { token: string }) {
               </Field>
             </div>
             <p className="ap-form-hint">
-              12+ characters, uppercase, lowercase, number and symbol.
+              Ít nhất 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc
+              biệt.{" "}
             </p>
             <div className="ap-form-grid">
-              <Field label="Phone (optional)">
+              <Field label="Số điện thoại (không bắt buộc)">
                 <input
                   name="phone"
                   type="tel"
@@ -293,15 +295,15 @@ export function AcceptInvitationPage({ token }: { token: string }) {
                   placeholder="+84"
                 />
               </Field>
-              <Field label="Country">
+              <Field label="Quốc gia">
                 <select name="country">
-                  <option value="VN">Vietnam</option>
-                  <option value="US">United States</option>
-                  <option value="GB">United Kingdom</option>
+                  <option value="VN">Việt Nam</option>
+                  <option value="US">Hoa Kỳ</option>
+                  <option value="GB">Vương quốc Anh</option>
                 </select>
               </Field>
             </div>
-            <Field label="Timezone">
+            <Field label="Múi giờ">
               <select name="timezone">
                 <option>Asia/Ho_Chi_Minh</option>
                 <option>America/New_York</option>
@@ -310,21 +312,20 @@ export function AcceptInvitationPage({ token }: { token: string }) {
             </Field>
             {error && (
               <p className="ap-error" role="alert">
-                {error}
+                {adminError(error)}
               </p>
             )}
             <button className="ap-button primary full" disabled={pending}>
-              {pending ? "Setting up your account…" : "Accept invitation"}
+              {pending ? "Đang thiết lập tài khoản…" : "Chấp nhận lời mời"}
               <ArrowRight size={16} />
             </button>
           </form>
           <p className="ap-demo-disclaimer">
-            Demo onboarding. No real password is stored.
-            <br />
-            Invitation links expire after 24 hours and can only be used once.
+            Quy trình gia nhập dùng thử. Không lưu mật khẩu thật. <br />
+            Lời mời hết hạn sau 24 giờ và chỉ dùng được một lần.{" "}
           </p>
           <Link className="ap-text-link" href="/admin/login">
-            Already have an account? Sign in →
+            Đã có tài khoản? Đăng nhập →{" "}
           </Link>
         </>
       )}

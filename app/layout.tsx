@@ -18,6 +18,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 import { SiteShell } from "@/components/layout/SiteShell";
+import { SkipLink } from "@/components/admin/SkipLink";
 import { metadata as makeMetadata, siteUrl } from "@/lib/seo";
 export const metadata: Metadata = { ...metadataBase() };
 function metadataBase(): Metadata {
@@ -42,9 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${rajdhani.variable} ${plusJakartaSans.variable}`}>
       <body className="font-body text-zinc-300 antialiased leading-relaxed">
-        <a className="skip-link" href="#main">
-          Skip to content
-        </a>
+        <SkipLink />
         <SiteShell>{children}</SiteShell>
         <script
           type="application/ld+json"

@@ -1,4 +1,7 @@
 "use client";
+
+import { useAdminText } from "@/lib/admin/use-admin-text";
+import { adminText, adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -24,11 +27,11 @@ import {
 } from "../portal/Ui";
 import { useNotice } from "../portal/AdminShell";
 export const money = (amount: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "USD" }).format(
     amount,
   );
 export const dateTime = (date: string) =>
-  new Intl.DateTimeFormat("en-GB", {
+  new Intl.DateTimeFormat("vi-VN", {
     month: "short",
     day: "2-digit",
     hour: "2-digit",
@@ -39,16 +42,17 @@ export function usePermission(permission: Permission) {
   return can(permission);
 }
 export function LoadingPanel() {
+  const text = useAdminText();
   return (
     <div
       className="op-loading"
       role="status"
-      aria-label="Loading workspace data"
+      aria-label={text("Loading workspace data")}
     >
       {[0, 1, 2, 3].map((i) => (
         <div className="ap-skeleton" key={i} />
       ))}
-      <span>Loading your workspace…</span>
+      <span>{text("Loading your workspace…")}</span>
     </div>
   );
 }
@@ -59,11 +63,15 @@ export function ErrorPanel({
   error: string;
   retry: () => void;
 }) {
+  const text = useAdminText();
   return (
     <div className="ap-panel">
-      <EmptyState title="We couldn’t load this workspace" text={error}>
+      <EmptyState
+        title={text("We couldn’t load this workspace")}
+        text={text("Cancel") === "Cancel" ? error : adminError(error)}
+      >
         <button className="ap-button" onClick={retry}>
-          Try again
+          {text("Try again")}{" "}
         </button>
       </EmptyState>
     </div>
@@ -76,16 +84,17 @@ export function OrderProgressBar({
   value: number;
   label?: string;
 }) {
+  const text = useAdminText();
   return (
     <div className="op-progress">
       <div>
-        <span>{label}</span>
+        <span>{text(label)}</span>
         <strong>{value}%</strong>
       </div>
       <div
         className="op-progress-track"
         role="progressbar"
-        aria-label={label}
+        aria-label={text(label)}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={value}
@@ -96,6 +105,7 @@ export function OrderProgressBar({
   );
 }
 export function OfferCountdown({ expiresAt }: { expiresAt: string }) {
+  const text = useAdminText();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -106,8 +116,8 @@ export function OfferCountdown({ expiresAt }: { expiresAt: string }) {
     <span className="op-countdown">
       <Clock3 size={13} />
       {seconds
-        ? `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")} remaining`
-        : "Offer expired"}
+        ? `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")} ${text("remaining")}`
+        : text("Offer expired")}
     </span>
   );
 }
@@ -141,7 +151,8 @@ export function EmployeeCandidateCard({
         <div>
           <strong>{employee.name}</strong>
           <small>
-            {employee.type} · {employee.online ? "Online" : "Offline"}
+            {adminText(employee.type)} ·{" "}
+            {employee.online ? "Trực tuyến" : "Ngoại tuyến"}
           </small>
         </div>
         <Check className="op-selected-check" size={18} />
@@ -149,26 +160,26 @@ export function EmployeeCandidateCard({
       <p>{employee.games.join(" · ")}</p>
       <div className="op-candidate-facts">
         <span>
-          Capability<strong>{employee.rank}</strong>
+          Khả năng xử lý hạng<strong>{employee.rank}</strong>
         </span>
         <span>
-          Workload
+          Khối lượng công việc{" "}
           <strong>
             {active} / {employee.maxActiveOrders}
           </strong>
         </span>
         <span>
-          Success<strong>{employee.successRate}%</strong>
+          Tỷ lệ thành công<strong>{employee.successRate}%</strong>
         </span>
         <span>
-          Avg. completion<strong>{employee.averageHours}h</strong>
+          Thời gian hoàn thành TB<strong>{employee.averageHours} giờ</strong>
         </span>
       </div>
       {disabled && (
         <small className="op-unavailable-badge">
           {active >= employee.maxActiveOrders
-            ? "At capacity"
-            : "Unavailable for this order"}
+            ? "Đã đủ số đơn"
+            : "Không phù hợp đơn này"}
         </small>
       )}
     </label>
@@ -203,22 +214,22 @@ export function AssignEmployeeModal({
       className="op-assign-modal"
       title={
         order.employeeId
-          ? `Reassign #${order.id}`
-          : `Assign employee · #${order.id}`
+          ? `Phân công lại #${order.id}`
+          : `Phân công nhân viên · #${order.id}`
       }
       description={
         order.employeeId
-          ? "Confirm a new employee below. The previous assignment will end and a new 15-minute offer will be sent."
-          : "Choose the right person. The employee must accept before work begins."
+          ? "Chọn nhân viên mới bên dưới. Phân công cũ sẽ kết thúc và đề nghị mới có hiệu lực 15 phút sẽ được gửi."
+          : "Chọn nhân viên phù hợp. Nhân viên phải nhận đề nghị trước khi bắt đầu."
       }
-      submit={order.employeeId ? "Confirm reassignment" : "Send offer"}
+      submit={order.employeeId ? "Xác nhận phân công lại" : "Gửi đề nghị"}
       onClose={onClose}
       onSubmit={async () => {
-        if (!selected) throw new Error("Choose an employee first.");
+        if (!selected) throw new Error("Vui lòng chọn nhân viên trước.");
         await (order.employeeId
           ? orderService.reassignEmployee(order.id, selected)
           : orderService.assignEmployee(order.id, selected));
-        notice("Offer sent. Waiting for employee response.");
+        notice("Đã gửi đề nghị. Đang chờ nhân viên phản hồi.");
       }}
     >
       <div className="op-assignment-target">
@@ -231,47 +242,47 @@ export function AssignEmployeeModal({
         </span>
         <StatusBadge status={order.status} />
       </div>
-      <Field label="Search employees">
+      <Field label="Tìm nhân viên">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name…"
+          placeholder="Tìm theo tên…"
         />
       </Field>
       <div className="op-filter-grid">
-        <Field label="Game">
+        <Field label="Trò chơi">
           <select value={game} onChange={(e) => setGame(e.target.value)}>
-            <option value="ALL">All games</option>
+            <option value="ALL">Tất cả trò chơi</option>
             {["League of Legends", "Valorant", "Teamfight Tactics"].map((g) => (
               <option key={g}>{g}</option>
             ))}
           </select>
         </Field>
-        <Field label="Rank capability">
+        <Field label="Khả năng xử lý hạng">
           <select value={rank} onChange={(e) => setRank(e.target.value)}>
-            <option value="ALL">All ranks</option>
+            <option value="ALL">Tất cả hạng</option>
             {employees.map((e) => (
               <option key={e.id}>{e.rank}</option>
             ))}
           </select>
         </Field>
-        <Field label="Availability">
+        <Field label="Tình trạng sẵn sàng">
           <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
           >
-            <option value="ALL">Any availability</option>
-            <option value="ONLINE">Online</option>
-            <option value="OFFLINE">Offline</option>
+            <option value="ALL">Mọi tình trạng</option>
+            <option value="ONLINE">Trực tuyến</option>
+            <option value="OFFLINE">Ngoại tuyến</option>
           </select>
         </Field>
-        <Field label="Workload">
+        <Field label="Khối lượng công việc">
           <select
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
           >
-            <option value="ALL">All workloads</option>
-            <option value="OPEN">Has capacity</option>
+            <option value="ALL">Tất cả khối lượng công việc</option>
+            <option value="OPEN">Còn khả năng nhận đơn</option>
           </select>
         </Field>
       </div>
@@ -292,8 +303,8 @@ export function AssignEmployeeModal({
         ))}
         {!candidates.length && (
           <EmptyState
-            title="No matching employees"
-            text="Adjust the filters to see more candidates."
+            title="Không tìm thấy nhân viên phù hợp"
+            text="Điều chỉnh bộ lọc để xem thêm nhân viên."
           />
         )}
       </div>
@@ -320,13 +331,13 @@ export function OrderActions({
   );
   const controls = (
     <>
-      {compact && <Link href={`/admin/orders/${order.id}`}>View order</Link>}
+      {compact && <Link href={`/admin/orders/${order.id}`}>Xem đơn hàng</Link>}
       {assign && !terminal && (
         <button
           className={!compact ? "ap-button primary" : ""}
           onClick={() => setAction("assign")}
         >
-          {order.employeeId ? "Reassign" : "Assign employee"}
+          {order.employeeId ? "Phân công lại" : "Phân công nhân viên"}
         </button>
       )}
       {chat && (
@@ -334,7 +345,7 @@ export function OrderActions({
           className={!compact ? "ap-button" : ""}
           href={`/admin/chat?order=${order.id}`}
         >
-          Open chat
+          Mở trò chuyện{" "}
         </Link>
       )}
       {edit && ["PENDING", "CONFIRMED"].includes(order.status) && (
@@ -342,7 +353,7 @@ export function OrderActions({
           className={!compact ? "ap-button" : ""}
           onClick={() => setAction("review")}
         >
-          Review order
+          Xác nhận đơn{" "}
         </button>
       )}
       {edit && order.status === "IN_PROGRESS" && (
@@ -351,13 +362,13 @@ export function OrderActions({
             className={!compact ? "ap-button" : ""}
             onClick={() => setAction("pause")}
           >
-            Pause
+            Tạm dừng{" "}
           </button>
           <button
             className={!compact ? "ap-button" : ""}
             onClick={() => setAction("complete")}
           >
-            Complete
+            Hoàn thành{" "}
           </button>
         </>
       )}
@@ -366,7 +377,7 @@ export function OrderActions({
           className={!compact ? "ap-button" : ""}
           onClick={() => setAction("start")}
         >
-          {order.status === "PAUSED" ? "Resume" : "Start work"}
+          {order.status === "PAUSED" ? "Tiếp tục" : "Bắt đầu làm việc"}
         </button>
       )}
       {cancel &&
@@ -375,17 +386,17 @@ export function OrderActions({
             className={!compact ? "ap-button danger" : ""}
             onClick={() => setAction("cancel")}
           >
-            Cancel order
+            Hủy đơn{" "}
           </button>
         )}
     </>
   );
   const labels = {
-    pause: "Pause order",
-    cancel: "Cancel order",
-    complete: "Complete order",
-    start: "Start work",
-    review: "Review order",
+    pause: "Tạm dừng đơn",
+    cancel: "Hủy đơn",
+    complete: "Hoàn thành đơn",
+    start: "Bắt đầu làm việc",
+    review: "Xác nhận đơn",
   };
   return (
     <div
@@ -401,14 +412,14 @@ export function OrderActions({
           title={`${labels[action]} #${order.id}?`}
           description={
             action === "cancel"
-              ? "This action may require a refund. The demo will close active offers; no payment is changed."
+              ? "Thao tác có thể cần hoàn tiền. Bản dùng thử chỉ đóng đề nghị đang hoạt động, không thay đổi thanh toán."
               : action === "pause"
-                ? "Work will pause until an admin resumes the order."
+                ? "Công việc sẽ tạm dừng cho tới khi quản trị viên tiếp tục đơn."
                 : action === "complete"
-                  ? "Mark the target as reached and release this employee’s workload."
+                  ? "Xác nhận đã đạt mục tiêu và giải phóng khối lượng công việc của nhân viên."
                   : action === "review"
-                    ? "Confirm the order details and move it to the assignment queue."
-                    : "Move this accepted assignment into active work."
+                    ? "Xác nhận thông tin đơn và chuyển sang hàng chờ phân công."
+                    : "Chuyển phân công đã nhận sang trạng thái đang thực hiện."
           }
           submit={labels[action]}
           danger={action === "cancel"}
@@ -424,77 +435,79 @@ export function OrderActions({
               await orderService.completeOrder(order.id);
             if (action === "start") await orderService.startOrder(order.id);
             if (action === "review") await orderService.reviewOrder(order.id);
-            notice("Order updated in this demo workspace.");
+            notice("Đã cập nhật đơn trong hệ thống dùng thử.");
           }}
         >
           {action === "review" ? (
             <dl className="op-review-summary">
               <div>
-                <dt>Customer</dt>
+                <dt>Khách hàng</dt>
                 <dd>
                   {order.customer.name}
                   <small>{order.customer.email}</small>
                 </dd>
               </div>
               <div>
-                <dt>Game</dt>
+                <dt>Trò chơi</dt>
                 <dd>{order.game}</dd>
               </div>
               <div>
-                <dt>Service</dt>
-                <dd>{order.service}</dd>
+                <dt>Dịch vụ</dt>
+                <dd>{adminText(order.service)}</dd>
               </div>
               <div>
-                <dt>Current</dt>
+                <dt>Hiện tại</dt>
                 <dd>{order.currentRank}</dd>
               </div>
               <div>
-                <dt>Target</dt>
+                <dt>Mục tiêu</dt>
                 <dd>{order.targetRank}</dd>
               </div>
               <div>
-                <dt>Region</dt>
-                <dd>{order.region}</dd>
+                <dt>Khu vực</dt>
+                <dd>{adminText(order.region)}</dd>
               </div>
               <div>
-                <dt>Price</dt>
+                <dt>Giá</dt>
                 <dd>{money(order.amount)}</dd>
               </div>
               <div>
-                <dt>Options</dt>
+                <dt>Tùy chọn</dt>
                 <dd>
-                  {[order.priority, order.queue, ...order.options].join(" / ")}
+                  {[order.priority, order.queue, ...order.options]
+                    .map(adminText)
+                    .join(" / ")}
                 </dd>
               </div>
               <div>
-                <dt>Submitted</dt>
+                <dt>Ngày gửi</dt>
                 <dd>{dateTime(order.createdAt)}</dd>
               </div>
             </dl>
           ) : (
             <dl className="op-review-summary">
               <div>
-                <dt>Customer</dt>
+                <dt>Khách hàng</dt>
                 <dd>{order.customer.name}</dd>
               </div>
               <div>
-                <dt>Service</dt>
+                <dt>Dịch vụ</dt>
                 <dd>
-                  {order.game} / {order.service}
+                  {order.game} / {adminText(order.service)}
                 </dd>
               </div>
               <div>
-                <dt>Current</dt>
+                <dt>Hiện tại</dt>
                 <dd>{order.currentRank}</dd>
               </div>
               <div>
-                <dt>Target</dt>
+                <dt>Mục tiêu</dt>
                 <dd>{order.targetRank}</dd>
               </div>
             </dl>
           )}
           {action === "cancel" && (
-            <Field label="Cancellation reason">
+            <Field label="Lý do hủy đơn">
               <textarea
                 name="reason"
                 required
@@ -510,6 +523,7 @@ export function OrderActions({
   );
 }
 export function OrderTimeline({ orderId }: { orderId: string }) {
+  const text = useAdminText();
   const events = useOperations((s) => s.events)
     .filter((e) => e.orderId === orderId)
     .toSorted((a, b) => Date.parse(b.at) - Date.parse(a.at));
@@ -521,10 +535,10 @@ export function OrderTimeline({ orderId }: { orderId: string }) {
             <ShieldCheck size={14} />
           </span>
           <div>
-            <strong>{e.title}</strong>
-            <p>{e.detail}</p>
+            <strong>{text(e.title)}</strong>
+            <p>{text(e.detail)}</p>
             <small>
-              {e.actor} · {dateTime(e.at)}
+              {text(e.actor)} · {dateTime(e.at)}
             </small>
           </div>
         </div>
@@ -552,7 +566,7 @@ export function OrderCard({
         <div>
           <strong>{order.customer.name}</strong>
           <small>
-            {order.game} · {order.service}
+            {order.game} · {adminText(order.service)}
           </small>
         </div>
       </div>

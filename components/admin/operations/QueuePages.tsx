@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { Inbox, ArrowRight, Clock3 } from "lucide-react";
 import { useOperations } from "@/lib/admin/operations-store";
@@ -34,48 +36,46 @@ export function IncomingOrdersPage() {
   if (load.error) return <ErrorPanel {...load} />;
   const sections = [
     {
-      title: "New orders",
+      title: "Đơn mới",
       status: "PENDING",
-      description: "Fresh requests, ready for a first look.",
+      description: "Yêu cầu mới, sẵn sàng kiểm tra.",
     },
     {
-      title: "Needs review",
+      title: "Cần xét duyệt",
       status: "CONFIRMED",
-      description: "Payment confirmed. Check the details.",
+      description: "Đã xác nhận thanh toán. Hãy kiểm tra thông tin.",
     },
     {
-      title: "Waiting assignment",
+      title: "Chờ phân công",
       status: "WAITING_ASSIGNMENT",
-      description: "Reviewed and ready for the right employee.",
+      description: "Đã duyệt và sẵn sàng phân công nhân viên phù hợp.",
     },
   ];
   return (
     <>
       <PageHeader
-        eyebrow="THE ORDER INBOX"
-        title="Incoming orders"
-        description="A clear queue. A great first impression."
+        eyebrow="HỘP THƯ ĐƠN HÀNG"
+        title="Đơn mới"
+        description="Hàng chờ rõ ràng. Trải nghiệm khởi đầu tốt."
       >
         <span className="ap-date">
           <Inbox size={16} />
           {
             orders.filter((o) => incomingStatuses.includes(o.status)).length
           }{" "}
-          waiting
+          đang chờ{" "}
         </span>
         <Link className="ap-button" href="/admin/orders">
-          All orders <ArrowRight size={16} />
+          Tất cả đơn hàng <ArrowRight size={16} />
         </Link>
       </PageHeader>
       <div className="op-info-banner">
         <Clock3 size={18} />
         <span>
-          Every great experience starts here.
-          <small>
-            Review new orders and offer them to an available specialist.
-          </small>
+          Trải nghiệm tốt bắt đầu từ đây.{" "}
+          <small>Duyệt đơn mới và gửi đề nghị tới nhân viên sẵn sàng. </small>
         </span>
-        <span className="ap-demo-tag">DEMO QUEUE</span>
+        <span className="ap-demo-tag">HÀNG CHỜ DÙNG THỬ</span>
       </div>
       <div className="op-queue-grid">
         {sections.map((section) => {
@@ -93,42 +93,42 @@ export function IncomingOrdersPage() {
                 <OrderCard order={o} key={o.id}>
                   <div className="op-queue-facts">
                     <span>
-                      Preferred region<strong>{o.region}</strong>
+                      Khu vực ưu tiên<strong>{adminText(o.region)}</strong>
                     </span>
                     <span>
-                      Current LP<strong>{o.currentLP} LP</strong>
+                      LP hiện tại<strong>{o.currentLP} LP</strong>
                     </span>
                     <span>
-                      Price<strong>{money(o.amount)}</strong>
+                      Giá<strong>{money(o.amount)}</strong>
                     </span>
                   </div>
                   <div className="op-option-tags">
                     {o.options.map((option) => (
-                      <span key={option}>{option}</span>
+                      <span key={option}>{adminText(option)}</span>
                     ))}
                   </div>
                   <p className="op-received">
                     <Clock3 size={13} />
-                    Received{" "}
+                    Đã nhận{" "}
                     {Math.max(
                       1,
                       Math.round(
                         (Date.now() - Date.parse(o.createdAt)) / 60000,
                       ),
                     )}{" "}
-                    minutes ago
+                    phút trước{" "}
                   </p>
                   <OrderActions order={o} />
                   <Link className="ap-text-link" href={`/admin/orders/${o.id}`}>
-                    Review details →
+                    Xem chi tiết →{" "}
                   </Link>
                 </OrderCard>
               ))}
               {!queue.length && (
                 <div className="ap-panel">
                   <EmptyState
-                    title="You’re all caught up."
-                    text="No new orders are waiting for review."
+                    title="Bạn đã xử lý hết."
+                    text="Hiện không có đơn mới chờ duyệt."
                   />
                 </div>
               )}
@@ -148,29 +148,32 @@ export function AssignmentsPage() {
   if (load.error) return <ErrorPanel {...load} />;
   const lanes = [
     {
-      title: "Unassigned",
+      title: "Chưa phân công",
       statuses: ["PENDING", "CONFIRMED", "WAITING_ASSIGNMENT"],
     },
-    { title: "Pending offers", statuses: ["OFFERED"] },
-    { title: "Accepted", statuses: ["ACCEPTED"] },
-    { title: "Active work", statuses: ["IN_PROGRESS", "PAUSED", "DISPUTED"] },
+    { title: "Đề nghị đang chờ", statuses: ["OFFERED"] },
+    { title: "Đã nhận việc", statuses: ["ACCEPTED"] },
+    {
+      title: "Đang thực hiện",
+      statuses: ["IN_PROGRESS", "PAUSED", "DISPUTED"],
+    },
   ];
   return (
     <>
       <PageHeader
-        eyebrow="PEOPLE × PROGRESS"
-        title="Assignments"
-        description="The right specialist. The right order. Full visibility."
+        eyebrow="NHÂN SỰ × TIẾN ĐỘ"
+        title="Phân công"
+        description="Đúng nhân viên, đúng đơn hàng. Theo dõi rõ ràng."
       >
         <Link className="ap-button" href="/employee/orders/available">
-          Employee preview <ArrowRight size={16} />
+          Xem thử nhân viên <ArrowRight size={16} />
         </Link>
       </PageHeader>
       <div className="op-info-banner">
-        <span className="op-step">1</span> Offer <ArrowRight size={16} />
-        <span className="op-step">2</span> Employee accepts{" "}
+        <span className="op-step">1</span> Gửi đề nghị <ArrowRight size={16} />
+        <span className="op-step">2</span> Nhân viên nhận việc{" "}
         <ArrowRight size={16} />
-        <span className="op-step">3</span> Work begins
+        <span className="op-step">3</span> Bắt đầu thực hiện{" "}
       </div>
       <div className="op-assignment-board">
         {lanes.map((lane) => {
@@ -192,17 +195,17 @@ export function AssignmentsPage() {
                     {employee && (
                       <p className="op-assignee">
                         <span className="ap-online" />
-                        {employee.name} · {employee.type.toLowerCase()}
+                        {employee.name} · {adminText(employee.type)}
                       </p>
                     )}
                     {offer ? (
                       <div className="op-offer-state">
-                        <strong>Waiting for employee response…</strong>
+                        <strong>Đang chờ nhân viên phản hồi…</strong>
                         <OfferCountdown expiresAt={offer.expiresAt} />
                         <Link
                           href={`/employee/orders/${o.id}?employee=${offer.employeeId}`}
                         >
-                          Preview accept / decline →
+                          Xem thử nhận / từ chối →{" "}
                         </Link>
                       </div>
                     ) : (
@@ -214,8 +217,8 @@ export function AssignmentsPage() {
               })}
               {!items.length && (
                 <EmptyState
-                  title="Clear for now"
-                  text="Orders appear here as they move forward."
+                  title="Hiện chưa có đơn"
+                  text="Đơn sẽ xuất hiện tại đây khi chuyển trạng thái."
                 />
               )}
             </section>
@@ -224,8 +227,8 @@ export function AssignmentsPage() {
       </div>
       <section className="ap-panel op-history-panel">
         <div className="ap-panel-heading">
-          <h2>Recent assignment decisions</h2>
-          <span className="op-muted">Offers are kept in the history</span>
+          <h2>Lịch sử phân công gần đây</h2>
+          <span className="op-muted">Đề nghị được lưu trong lịch sử</span>
         </div>
         <div className="op-history-list">
           {assignments
@@ -239,7 +242,7 @@ export function AssignmentsPage() {
                   {employees.find((e) => e.id === a.employeeId)?.name}
                 </strong>
                 <StatusBadge status={a.status} />
-                <span>{a.reason ?? "Employee response recorded"}</span>
+                <span>{a.reason ?? "Đã ghi nhận phản hồi nhân viên"}</span>
                 <small>{dateTime(a.respondedAt ?? a.offeredAt)}</small>
               </div>
             ))}

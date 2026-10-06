@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -43,24 +45,24 @@ export function ApplicationsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="FIND YOUR NEXT MVP"
-        title="Employee applications"
-        description="Meet the talent ready to take ASCEND to the next level."
+        eyebrow="TÌM KIẾM NHÂN TÀI"
+        title="Hồ sơ ứng tuyển"
+        description="Khám phá các ứng viên sẵn sàng cùng ASCEND phát triển."
       >
         <span className="ap-date">
           <ClipboardCheck size={17} />{" "}
-          {applications.filter((a) => a.status === "PENDING").length} awaiting
-          review
+          {applications.filter((a) => a.status === "PENDING").length} đang chờ
+          duyệt{" "}
         </span>
       </PageHeader>
-      <div className="ap-tabs" role="group" aria-label="Application status">
+      <div className="ap-tabs" role="group" aria-label="Trạng thái hồ sơ">
         {["ALL", "PENDING", "APPROVED", "REJECTED"].map((s) => (
           <button
             key={s}
             className={status === s ? "active" : ""}
             onClick={() => setStatus(s)}
           >
-            {s === "ALL" ? "All applications" : s[0] + s.slice(1).toLowerCase()}
+            {s === "ALL" ? "Tất cả hồ sơ" : adminText(s)}
             <span>
               {applications.filter((a) => s === "ALL" || a.status === s).length}
             </span>
@@ -74,14 +76,14 @@ export function ApplicationsPage() {
           status={status}
           onStatus={setStatus}
           statuses={["PENDING", "APPROVED", "REJECTED"]}
-          placeholder="Search name, email or Riot ID…"
+          placeholder="Tìm theo tên, email hoặc Riot ID…"
         />
         <DataTable
-          label="Applications"
+          label="Hồ sơ ứng tuyển"
           rows={rows}
           columns={[
             {
-              label: "Applicant",
+              label: "Ứng viên",
               render: (a) => (
                 <div className="ap-person">
                   <Avatar name={a.fullName} />
@@ -93,15 +95,15 @@ export function ApplicationsPage() {
               ),
             },
             {
-              label: "Position",
+              label: "Vị trí ứng tuyển",
               render: (a) => (
                 <span className="ap-position">
-                  {a.positionApplied.toLowerCase()}
+                  {adminText(a.positionApplied)}
                 </span>
               ),
             },
             {
-              label: "Riot ID / Rank",
+              label: "Riot ID / Hạng",
               render: (a) => (
                 <div className="ap-cell-stack">
                   {a.riotId}
@@ -110,16 +112,16 @@ export function ApplicationsPage() {
               ),
             },
             {
-              label: "Status",
+              label: "Trạng thái",
               render: (a) => <StatusBadge status={a.status} />,
             },
-            { label: "Submitted", render: (a) => formatDate(a.submittedAt) },
+            { label: "Ngày gửi", render: (a) => formatDate(a.submittedAt) },
             {
-              label: "Review",
+              label: "Xem hồ sơ",
               render: (a) => (
                 <Link
                   className="ap-icon-button"
-                  aria-label={`Review ${a.fullName}`}
+                  aria-label={`Xem hồ sơ ${a.fullName}`}
                   href={`/admin/employee-applications/${a.id}`}
                 >
                   <ArrowUpRight size={18} />
@@ -143,30 +145,30 @@ export function ApplicationDetail({ id }: { id: string }) {
   if (!a)
     return (
       <EmptyState
-        title="Application not found"
-        text="This application may no longer be available."
+        title="Không tìm thấy hồ sơ"
+        text="Hồ sơ này có thể không còn tồn tại."
       >
         <Link className="ap-button" href="/admin/employee-applications">
-          Back to applications
+          Quay lại danh sách hồ sơ{" "}
         </Link>
       </EmptyState>
     );
   return (
     <>
       <Link className="ap-back" href="/admin/employee-applications">
-        <ArrowLeft size={15} /> All applications
+        <ArrowLeft size={15} /> Tất cả hồ sơ{" "}
       </Link>
       <PageHeader
-        eyebrow={`APPLICATION / ${a.id.toUpperCase()}`}
+        eyebrow={`HỒ SƠ / ${a.id.toUpperCase()}`}
         title={a.fullName}
-        description={`Submitted ${formatDate(a.submittedAt)} · ${a.positionApplied.toLowerCase()} position`}
+        description={`Ngày gửi ${formatDate(a.submittedAt)} · Vị trí ${adminText(a.positionApplied)}`}
       >
         <StatusBadge status={a.status} />
         {a.status === "PENDING" && (
           <>
             {can("employee.application.reject") && (
               <button className="ap-button" onClick={() => setDialog("reject")}>
-                <X size={16} /> Reject
+                <X size={16} /> Từ chối{" "}
               </button>
             )}
             {can("employee.application.approve") && (
@@ -174,7 +176,7 @@ export function ApplicationDetail({ id }: { id: string }) {
                 className="ap-button primary"
                 onClick={() => setDialog("approve")}
               >
-                <Check size={16} /> Approve application
+                <Check size={16} /> Duyệt hồ sơ{" "}
               </button>
             )}
           </>
@@ -196,19 +198,19 @@ export function ApplicationDetail({ id }: { id: string }) {
             </div>
             <div className="ap-detail-facts ap-panel-padding">
               <div>
-                <span>Email address</span>
+                <span>Địa chỉ email</span>
                 <a href={`mailto:${a.email}`}>{a.email}</a>
               </div>
               <div>
-                <span>Phone</span>
+                <span>Số điện thoại</span>
                 {a.phone}
               </div>
               <div>
-                <span>Country</span>
-                {a.country === "VN" ? "Vietnam" : a.country}
+                <span>Quốc gia</span>
+                {a.country === "VN" ? "Việt Nam" : a.country}
               </div>
               <div>
-                <span>Timezone</span>
+                <span>Múi giờ</span>
                 {a.timezone}
               </div>
               <div>
@@ -216,16 +218,16 @@ export function ApplicationDetail({ id }: { id: string }) {
                 {a.riotId}
               </div>
               <div>
-                <span>Position applied</span>
-                {a.positionApplied}
+                <span>Vị trí ứng tuyển</span>
+                {adminText(a.positionApplied)}
               </div>
             </div>
           </section>
           <section className="ap-panel ap-prose">
-            <h2>Experience & background</h2>
-            <p>{a.experience}</p>
-            <h2>A note from {a.displayName}</h2>
-            <p>{a.note}</p>
+            <h2>Kinh nghiệm và thông tin ứng viên</h2>
+            <p>{adminText(a.experience)}</p>
+            <h2>Lời nhắn từ {a.displayName}</h2>
+            <p>{adminText(a.note)}</p>
           </section>
         </div>
         <aside>
@@ -233,48 +235,51 @@ export function ApplicationDetail({ id }: { id: string }) {
             <div className="ap-section-icon">
               <ClipboardCheck size={22} />
             </div>
-            <h2>Review status</h2>
+            <h2>Trạng thái xét duyệt</h2>
             <StatusBadge status={a.status} />
             <ol className="ap-review-timeline">
               <li>
-                <b>Application received</b>
+                <b>Đã nhận hồ sơ</b>
                 <small>{formatDate(a.submittedAt)}</small>
               </li>
               <li>
                 <b>
                   {a.status === "PENDING"
-                    ? "Awaiting your review"
-                    : `Application ${a.status.toLowerCase()}`}
+                    ? "Đang chờ xét duyệt"
+                    : `Hồ sơ: ${adminText(a.status)}`}
                 </b>
                 <small>
                   {a.reviewedBy
                     ? `${a.reviewedBy} · ${formatDate(a.reviewedAt!)}`
-                    : "Take a moment to review their experience."}
+                    : "Hãy xem xét kinh nghiệm của ứng viên."}
                 </small>
               </li>
             </ol>
             {a.rejectionReason && (
-              <div className="ap-error">{a.rejectionReason}</div>
+              <div className="ap-error">{adminText(a.rejectionReason)}</div>
             )}
             {a.status === "APPROVED" && (
               <>
                 <div className="ap-success">
                   <Mail size={18} />
                   <span>
-                    Employee credentials have been sent.
-                    <small>Simulated delivery in this demo.</small>
+                    Đã gửi thông tin đăng nhập cho nhân viên.{" "}
+                    <small>Việc gửi được mô phỏng trong bản dùng thử.</small>
                   </span>
                 </div>
-                <p>First sign-in requires a password change within 24 hours.</p>
                 <p>
-                  {a.department} · {a.maxActiveOrders} active orders
+                  Lần đăng nhập đầu tiên yêu cầu đổi mật khẩu trong vòng 24 giờ.
+                </p>
+                <p>
+                  {adminText(a.department ?? "")} · {a.maxActiveOrders} đơn đang
+                  thực hiện{" "}
                 </p>
                 {can("employee.application.approve") && (
                   <button
                     className="ap-button"
                     onClick={() => setDialog("resend")}
                   >
-                    <Send size={15} /> Resend credentials
+                    <Send size={15} /> Gửi lại thông tin đăng nhập{" "}
                   </button>
                 )}
               </>
@@ -283,8 +288,8 @@ export function ApplicationDetail({ id }: { id: string }) {
           <div className="ap-side-note">
             <Globe size={18} />
             <p>
-              Great service starts with great people. Review every application
-              thoughtfully.
+              Dịch vụ tốt bắt đầu từ nhân sự tốt. Hãy xem xét kỹ từng hồ
+              sơ.{" "}
             </p>
           </div>
         </aside>
@@ -293,24 +298,24 @@ export function ApplicationDetail({ id }: { id: string }) {
         <FormModal
           title={
             dialog === "approve"
-              ? "Welcome a new employee"
+              ? "Chào đón nhân viên mới"
               : dialog === "reject"
-                ? "Reject application"
-                : "Resend employee credentials"
+                ? "Từ chối hồ sơ"
+                : "Gửi lại thông tin đăng nhập cho nhân viên"
           }
           description={
             dialog === "approve"
-              ? `Set up ${a.displayName}’s employee account. Temporary credentials will be sent by email.`
+              ? `Thiết lập tài khoản cho ${a.displayName}. Thông tin đăng nhập tạm sẽ được gửi qua email.`
               : dialog === "reject"
-                ? "Add a clear reason for your decision. This review cannot be undone."
-                : "A new temporary password replaces the old one and revokes existing sessions."
+                ? "Nêu rõ lý do từ chối. Không thể hoàn tác quyết định này."
+                : "Mật khẩu tạm mới thay thế mật khẩu cũ và thu hồi các phiên hiện tại."
           }
           submit={
             dialog === "approve"
-              ? "Approve & send credentials"
+              ? "Duyệt và gửi thông tin đăng nhập"
               : dialog === "reject"
-                ? "Reject application"
-                : "Resend credentials"
+                ? "Từ chối hồ sơ"
+                : "Gửi lại thông tin đăng nhập"
           }
           danger={dialog === "reject"}
           onClose={() => setDialog(null)}
@@ -337,31 +342,31 @@ export function ApplicationDetail({ id }: { id: string }) {
               await employeeApplicationService.resendCredentials(a.id);
             notice(
               dialog === "reject"
-                ? "Application rejected. Review saved."
-                : "Employee credentials have been sent (demo).",
+                ? "Đã từ chối hồ sơ và lưu kết quả xét duyệt."
+                : "Đã gửi thông tin đăng nhập cho nhân viên (dùng thử).",
             );
           }}
         >
           {dialog === "approve" ? (
             <>
-              <Field label="Employee type">
+              <Field label="Loại nhân viên">
                 <select name="employee_type" defaultValue={a.positionApplied}>
-                  <option>BOOSTER</option>
-                  <option>COACH</option>
+                  <option value="BOOSTER">Nhân viên cày hạng</option>
+                  <option value="COACH">Huấn luyện viên</option>
                 </select>
               </Field>
-              <Field label="Department">
+              <Field label="Bộ phận">
                 <select
                   name="department"
                   defaultValue={
                     a.positionApplied === "COACH" ? "COACHING" : "BOOSTING"
                   }
                 >
-                  <option>BOOSTING</option>
-                  <option>COACHING</option>
+                  <option value="BOOSTING">Cày hạng</option>
+                  <option value="COACHING">Huấn luyện</option>
                 </select>
               </Field>
-              <Field label="Maximum active orders">
+              <Field label="Số đơn tối đa đang thực hiện">
                 <input
                   name="max_active_orders"
                   type="number"
@@ -373,20 +378,20 @@ export function ApplicationDetail({ id }: { id: string }) {
               </Field>
             </>
           ) : dialog === "reject" ? (
-            <Field label="Rejection reason">
+            <Field label="Lý do từ chối">
               <textarea
                 name="rejection_reason"
                 required
                 minLength={5}
                 maxLength={2000}
                 rows={4}
-                placeholder="Explain why this application is not a fit…"
+                placeholder="Nêu lý do hồ sơ chưa phù hợp…"
               />
             </Field>
           ) : (
             <p>
-              This demo records the resend in the audit timeline. No real email
-              is sent.
+              Bản dùng thử ghi nhận việc gửi lại vào nhật ký. Không gửi email
+              thật.{" "}
             </p>
           )}
         </FormModal>

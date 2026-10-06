@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText, adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useEffect, useState, useRef, useCallback } from "react";
 import {
@@ -67,7 +69,9 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
         .markAsRead(selected)
         .catch((e: unknown) =>
           setError(
-            e instanceof Error ? e.message : "Unable to update read status.",
+            e instanceof Error
+              ? e.message
+              : "Không thể cập nhật trạng thái đã đọc.",
           ),
         );
   }, [selected, allowed, conversationId]);
@@ -85,21 +89,21 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   return (
     <>
       <PageHeader
-        eyebrow="COMMUNICATION"
-        title="Chat center"
-        description="One place for every conversation. Keep everyone in the loop."
+        eyebrow="LIÊN LẠC"
+        title="Tin nhắn"
+        description="Tập trung mọi cuộc trò chuyện để đội ngũ luôn nắm thông tin."
       >
         <span className="ap-date">
           <MessageSquare size={16} />
           {conversations
             .filter((c) => !c.archived)
             .reduce((sum, c) => sum + c.unread, 0)}{" "}
-          unread messages
+          tin nhắn chưa đọc{" "}
         </span>
       </PageHeader>
       {error && (
         <p className="ap-error" role="alert">
-          {error}
+          {adminError(error)}
         </p>
       )}
       <div
@@ -119,7 +123,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
               <header className="op-chat-header">
                 <button
                   className="ap-icon-button op-inbox-back"
-                  aria-label="Back to conversations"
+                  aria-label="Quay lại danh sách trò chuyện"
                   onClick={() => setSelected("")}
                 >
                   <ArrowLeft size={18} />
@@ -128,7 +132,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                 <div>
                   <h2>{conversation.participant.name}</h2>
                   <small>
-                    {conversation.participant.role.toLowerCase()} · #
+                    {adminText(conversation.participant.role)} · #
                     {conversation.orderId}
                   </small>
                 </div>
@@ -139,7 +143,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                       className="ap-button"
                       href={`/admin/orders/${conversation.orderId}`}
                     >
-                      View order
+                      Xem đơn hàng{" "}
                     </Link>
                   )}
                   {orderView && order && (
@@ -147,7 +151,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                       className="ap-button"
                       onClick={() => setCustomerOpen(true)}
                     >
-                      View customer
+                      Xem khách hàng{" "}
                     </button>
                   )}
                   {send && (
@@ -155,8 +159,8 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                       className="ap-icon-button"
                       aria-label={
                         conversation.archived
-                          ? "Reopen conversation"
-                          : "Archive conversation"
+                          ? "Mở lại cuộc trò chuyện"
+                          : "Lưu trữ cuộc trò chuyện"
                       }
                       onClick={() => setArchive(true)}
                     >
@@ -165,7 +169,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                   )}
                   <button
                     className="ap-icon-button"
-                    aria-label="Toggle conversation context"
+                    aria-label="Mở hoặc đóng thông tin trò chuyện"
                     aria-expanded={context}
                     onClick={() => setContext(!context)}
                   >
@@ -176,7 +180,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
               <div
                 className="op-chat-tabs"
                 role="tablist"
-                aria-label="Conversation channel"
+                aria-label="Kênh trò chuyện"
               >
                 <button
                   role="tab"
@@ -186,7 +190,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                   onClick={() => setChannel("CUSTOMER")}
                 >
                   <MessageSquare size={14} />
-                  Customer chat
+                  Trao đổi với khách hàng{" "}
                 </button>
                 <button
                   role="tab"
@@ -196,13 +200,14 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                   onClick={() => setChannel("INTERNAL")}
                 >
                   <LockKeyhole size={14} />
-                  Internal notes
+                  Ghi chú nội bộ{" "}
                 </button>
               </div>
               {channel === "INTERNAL" && (
                 <div className="op-internal-banner">
                   <LockKeyhole size={13} />
-                  Only staff can see these notes. Never shared in customer chat.
+                  Chỉ nhân sự quản trị thấy ghi chú này. Không hiển thị cho
+                  khách hàng.{" "}
                 </div>
               )}
               <div
@@ -226,13 +231,13 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                   <EmptyState
                     title={
                       channel === "INTERNAL"
-                        ? "Keep your team in the loop"
-                        : "Start the conversation"
+                        ? "Cập nhật thông tin cho đội ngũ"
+                        : "Bắt đầu trò chuyện"
                     }
                     text={
                       channel === "INTERNAL"
-                        ? "Add the first private note for your team."
-                        : "Send a helpful first message below."
+                        ? "Thêm ghi chú nội bộ đầu tiên cho đội ngũ."
+                        : "Gửi tin nhắn đầu tiên bên dưới."
                     }
                   />
                 )}
@@ -244,12 +249,12 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                       <i />
                       <i />
                       <i />
-                      {conversation.participant.name} is typing…{" "}
-                      <small>demo</small>
+                      {conversation.participant.name} đang nhập…{" "}
+                      <small>dùng thử</small>
                     </span>
                   ) : (
                     <button onClick={() => setTyping(true)}>
-                      Preview typing indicator
+                      Xem thử trạng thái đang nhập{" "}
                     </button>
                   )}
                 </div>
@@ -262,8 +267,8 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
             </>
           ) : (
             <EmptyState
-              title="Select a conversation to start messaging."
-              text="Customer questions, employee updates, and your team’s private notes — all in one place."
+              title="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
+              text="Câu hỏi của khách hàng, cập nhật của nhân viên và ghi chú nội bộ ở cùng một nơi."
             />
           )}
         </section>
@@ -277,8 +282,8 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       {customerOpen && order && orderView && (
         <FormModal
           title={order.customer.name}
-          description="Customer profile · Demo data"
-          submit="Done"
+          description="Hồ sơ khách hàng · Dữ liệu dùng thử"
+          submit="Đóng"
           onClose={() => setCustomerOpen(false)}
           onSubmit={async () => {}}
         >
@@ -288,11 +293,11 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
               <dd>{order.customer.email}</dd>
             </div>
             <div>
-              <dt>Country</dt>
-              <dd>{order.customer.country}</dd>
+              <dt>Quốc gia</dt>
+              <dd>{adminText(order.customer.country)}</dd>
             </div>
             <div>
-              <dt>Timezone</dt>
+              <dt>Múi giờ</dt>
               <dd>{order.customer.timezone}</dd>
             </div>
           </dl>
@@ -302,18 +307,18 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
         <FormModal
           title={
             conversation.archived
-              ? "Reopen conversation?"
-              : "Archive conversation?"
+              ? "Mở lại cuộc trò chuyện?"
+              : "Lưu trữ cuộc trò chuyện?"
           }
           description={
             conversation.archived
-              ? "Move this conversation back to the active inbox."
-              : "This conversation will move to Archived. You can reopen it later."
+              ? "Đưa cuộc trò chuyện trở lại hộp thư đang hoạt động."
+              : "Cuộc trò chuyện sẽ được lưu trữ. Bạn có thể mở lại sau."
           }
           submit={
             conversation.archived
-              ? "Reopen conversation"
-              : "Archive conversation"
+              ? "Mở lại cuộc trò chuyện"
+              : "Lưu trữ cuộc trò chuyện"
           }
           onClose={() => setArchive(false)}
           onSubmit={async () => {

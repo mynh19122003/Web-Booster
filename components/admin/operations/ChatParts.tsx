@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText, adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState, useRef, type FormEvent } from "react";
 import {
@@ -44,18 +46,18 @@ export function ConversationList({
     <aside className="op-conversation-list">
       <header>
         <h2>
-          Inbox{" "}
+          Hộp thư{" "}
           <span className="ap-count">
             {conversations.filter((c) => !c.archived).length}
           </span>
         </h2>
-        <span className="op-muted">People, connected.</span>
+        <span className="op-muted">Kết nối mọi người.</span>
       </header>
       <label className="ap-search">
         <Search size={16} />
         <input
-          aria-label="Search conversations"
-          placeholder="Search conversations…"
+          aria-label="Tìm cuộc trò chuyện"
+          placeholder="Tìm cuộc trò chuyện…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -63,7 +65,7 @@ export function ConversationList({
       <div
         className="op-chat-filters"
         role="group"
-        aria-label="Conversation filters"
+        aria-label="Bộ lọc trò chuyện"
       >
         {["All", "Unread", "Customers", "Employees", "Orders", "Archived"].map(
           (f) => (
@@ -72,7 +74,7 @@ export function ConversationList({
               aria-pressed={filter === f}
               onClick={() => setFilter(f)}
             >
-              {f}
+              {adminText(f)}
             </button>
           ),
         )}
@@ -89,7 +91,7 @@ export function ConversationList({
               key={c.id}
               className={`op-conversation-row ${selected === c.id ? "active" : ""}`}
               onClick={() => onSelect(c.id)}
-              aria-label={`Open conversation with ${c.participant.name}`}
+              aria-label={`Mở cuộc trò chuyện với ${c.participant.name}`}
               aria-current={selected === c.id ? "true" : undefined}
             >
               <Avatar name={c.participant.name} />
@@ -97,23 +99,23 @@ export function ConversationList({
                 <strong>
                   {c.participant.name}
                   <small>
-                    {new Date(c.updatedAt).toLocaleTimeString("en-GB", {
+                    {new Date(c.updatedAt).toLocaleTimeString("vi-VN", {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                   </small>
                 </strong>
                 <span className="op-chat-meta">
-                  {c.participant.role.toLowerCase()} · #{c.orderId}
+                  {adminText(c.participant.role)} · #{c.orderId}
                 </span>
                 <span className="op-message-snippet">
-                  {last?.body || "No messages yet"}
+                  {adminText(last?.body ?? "") || "Chưa có tin nhắn"}
                 </span>
               </span>
               {c.unread > 0 && (
                 <b
                   className="op-unread"
-                  aria-label={`${c.unread} unread messages`}
+                  aria-label={`${c.unread} tin nhắn chưa đọc`}
                 >
                   {c.unread}
                 </b>
@@ -123,8 +125,8 @@ export function ConversationList({
         })}
         {!filtered.length && (
           <EmptyState
-            title="A quiet inbox"
-            text="No conversations match this filter."
+            title="Hộp thư chưa có dữ liệu"
+            text="Không có cuộc trò chuyện phù hợp bộ lọc."
           />
         )}
       </div>
@@ -139,16 +141,16 @@ export function ChatMessage({ message }: { message: Message }) {
       <div className="op-message-sender">
         <Avatar name={message.sender.name} />
         <strong>{message.sender.name}</strong>
-        <span>{message.sender.role.toLowerCase()}</span>
+        <span>{adminText(message.sender.role)}</span>
         {message.channel === "INTERNAL" && (
           <span>
             <LockKeyhole size={11} />
-            Internal only
+            Chỉ nội bộ{" "}
           </span>
         )}
       </div>
       <div className="op-message-bubble">
-        {message.body && <p>{message.body}</p>}
+        {message.body && <p>{adminText(message.body)}</p>}
         {message.attachment && (
           <div className="op-message-attachment">
             {message.attachment.kind === "image" ? (
@@ -158,7 +160,7 @@ export function ChatMessage({ message }: { message: Message }) {
             )}
             <span>
               {message.attachment.name}
-              <small>Demo attachment · No file uploaded</small>
+              <small>Tệp đính kèm dùng thử · Chưa tải tệp lên</small>
             </span>
           </div>
         )}
@@ -168,7 +170,7 @@ export function ChatMessage({ message }: { message: Message }) {
         {message.sender.role === "ADMIN" && (
           <span>
             <CheckCheck size={12} />
-            {message.read ? "Read (demo)" : "Sent locally"}
+            {message.read ? "Đã đọc (dùng thử)" : "Đã gửi cục bộ"}
           </span>
         )}
       </small>
@@ -199,9 +201,7 @@ export function ChatComposer({
       setBody("");
       setAttachment(undefined);
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Message could not be sent.",
-      );
+      setError(adminError(error));
     } finally {
       setPending(false);
     }
@@ -211,8 +211,8 @@ export function ChatComposer({
       <div className="op-composer-locked">
         <LockKeyhole size={16} />
         {conversation.archived
-          ? "This conversation is archived. Reopen it to reply."
-          : "You have read-only access to this conversation."}
+          ? "Cuộc trò chuyện đã được lưu trữ. Mở lại để trả lời."
+          : "Bạn chỉ có quyền xem cuộc trò chuyện này."}
       </div>
     );
   return (
@@ -224,7 +224,7 @@ export function ChatComposer({
       {channel === "INTERNAL" && (
         <small>
           <LockKeyhole size={12} />
-          Internal note — visible to staff only
+          Ghi chú nội bộ — chỉ nhân sự quản trị thấy{" "}
         </small>
       )}
       {attachment && (
@@ -232,7 +232,7 @@ export function ChatComposer({
           {attachment.name}
           <button
             type="button"
-            aria-label="Remove attachment"
+            aria-label="Xóa tệp đính kèm"
             onClick={() => setAttachment(undefined)}
           >
             <X size={14} />
@@ -241,12 +241,12 @@ export function ChatComposer({
       )}
       <textarea
         aria-label={
-          channel === "INTERNAL" ? "Write an internal note" : "Type a message"
+          channel === "INTERNAL" ? "Viết ghi chú nội bộ" : "Nhập tin nhắn"
         }
         placeholder={
           channel === "INTERNAL"
-            ? "Leave a note for your team…"
-            : "Type a message…"
+            ? "Để lại ghi chú cho đội ngũ…"
+            : "Nhập tin nhắn…"
         }
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -262,7 +262,7 @@ export function ChatComposer({
       />
       {error && (
         <p role="alert" className="ap-error">
-          {error}
+          {adminError(error)}
         </p>
       )}
       <footer>
@@ -270,7 +270,7 @@ export function ChatComposer({
           <button
             type="button"
             className="ap-icon-button"
-            aria-label="Add demo attachment"
+            aria-label="Thêm tệp đính kèm dùng thử"
             aria-expanded={attachMenu}
             onClick={() => setAttachMenu(!attachMenu)}
           >
@@ -278,7 +278,7 @@ export function ChatComposer({
           </button>
           {attachMenu && (
             <div>
-              <small>Placeholder only · No upload</small>
+              <small>Chỉ mô phỏng · Không tải tệp lên</small>
               <button
                 type="button"
                 onClick={() => {
@@ -290,7 +290,7 @@ export function ChatComposer({
                 }}
               >
                 <ImageIcon size={16} />
-                Image placeholder
+                Ảnh mô phỏng{" "}
               </button>
               <button
                 type="button"
@@ -300,17 +300,21 @@ export function ChatComposer({
                 }}
               >
                 <FileText size={16} />
-                File placeholder
+                Tệp mô phỏng{" "}
               </button>
             </div>
           )}
         </div>
-        <small>Enter to send · Shift+Enter for a new line</small>
+        <small>Enter để gửi · Shift+Enter để xuống dòng</small>
         <button
           className="ap-button primary"
           disabled={pending || (!body.trim() && !attachment)}
         >
-          {pending ? "Sending…" : channel === "INTERNAL" ? "Add note" : "Send"}
+          {pending
+            ? "Đang gửi…"
+            : channel === "INTERNAL"
+              ? "Thêm ghi chú"
+              : "Gửi"}
           <Send size={15} />
         </button>
       </footer>
@@ -334,24 +338,24 @@ export function ChatContextPanel({
       <aside className="op-chat-context">
         <button
           className="ap-icon-button"
-          aria-label="Close context"
+          aria-label="Đóng thông tin trò chuyện"
           onClick={onClose}
         >
           <X size={16} />
         </button>
         <EmptyState
-          title="Conversation context"
-          text="Order view permission is required for order details."
+          title="Thông tin trò chuyện"
+          text="Cần quyền xem đơn hàng để mở chi tiết."
         />
       </aside>
     );
   return (
     <aside className="op-chat-context">
       <header>
-        <span className="ap-eyebrow">ORDER CONTEXT</span>
+        <span className="ap-eyebrow">THÔNG TIN ĐƠN HÀNG</span>
         <button
           className="ap-icon-button"
-          aria-label="Close context"
+          aria-label="Đóng thông tin trò chuyện"
           onClick={onClose}
         >
           <X size={16} />
@@ -365,7 +369,7 @@ export function ChatContextPanel({
         <p>
           {order.game}
           <br />
-          {order.service}
+          {adminText(order.service)}
         </p>
         <StatusBadge status={order.status} />
       </div>
@@ -375,35 +379,34 @@ export function ChatContextPanel({
       <OrderProgressBar value={order.progress} />
       <dl className="op-facts">
         <div>
-          <dt>Assigned employee</dt>
-          <dd>{employee?.name ?? "Unassigned"}</dd>
+          <dt>Nhân viên phụ trách</dt>
+          <dd>{employee?.name ?? "Chưa phân công"}</dd>
         </div>
         <div>
-          <dt>Customer</dt>
+          <dt>Khách hàng</dt>
           <dd>{order.customer.name}</dd>
         </div>
         <div>
-          <dt>Order value</dt>
+          <dt>Giá trị đơn</dt>
           <dd>{money(order.amount)}</dd>
         </div>
         <div>
-          <dt>Expected completion</dt>
+          <dt>Dự kiến hoàn thành</dt>
           <dd>{dateTime(order.deadline)}</dd>
         </div>
       </dl>
       <Link href={`/admin/orders/${order.id}`} className="ap-button full">
-        View order
-        <ArrowUpRight size={15} />
+        Xem đơn hàng <ArrowUpRight size={15} />
       </Link>
       <button className="ap-button full" onClick={() => setPerson("customer")}>
-        View customer
+        Xem khách hàng{" "}
       </button>
       {employee && (
         <button
           className="ap-button full"
           onClick={() => setPerson("employee")}
         >
-          View employee
+          Xem nhân viên{" "}
         </button>
       )}
       {person && (
@@ -411,10 +414,10 @@ export function ChatContextPanel({
           title={person === "customer" ? order.customer.name : employee!.name}
           description={
             person === "customer"
-              ? "Customer profile · Demo data"
-              : "Employee profile · Demo data"
+              ? "Hồ sơ khách hàng · Dữ liệu dùng thử"
+              : "Hồ sơ nhân viên · Dữ liệu dùng thử"
           }
-          submit="Done"
+          submit="Đóng"
           onClose={() => setPerson(null)}
           onSubmit={async () => {}}
         >
@@ -425,30 +428,30 @@ export function ChatContextPanel({
                 <dd>{order.customer.email}</dd>
               </div>
               <div>
-                <dt>Country</dt>
-                <dd>{order.customer.country}</dd>
+                <dt>Quốc gia</dt>
+                <dd>{adminText(order.customer.country)}</dd>
               </div>
               <div>
-                <dt>Timezone</dt>
+                <dt>Múi giờ</dt>
                 <dd>{order.customer.timezone}</dd>
               </div>
             </dl>
           ) : (
             <dl className="op-facts">
               <div>
-                <dt>Employee ID</dt>
+                <dt>Mã nhân viên</dt>
                 <dd>{employee!.id}</dd>
               </div>
               <div>
-                <dt>Type</dt>
-                <dd>{employee!.type}</dd>
+                <dt>Loại</dt>
+                <dd>{adminText(employee!.type)}</dd>
               </div>
               <div>
-                <dt>Capability</dt>
+                <dt>Khả năng xử lý hạng</dt>
                 <dd>{employee!.rank}</dd>
               </div>
               <div>
-                <dt>Success rate</dt>
+                <dt>Tỷ lệ thành công</dt>
                 <dd>{employee!.successRate}%</dd>
               </div>
             </dl>

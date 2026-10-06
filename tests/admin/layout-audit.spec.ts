@@ -11,7 +11,7 @@ const sizes = [
 async function login(page: Page) {
   await page.goto("/admin/login");
   await page.locator('input[name="password"]').fill("DemoPass123!");
-  await page.getByRole("button", { name: "Sign in to workspace" }).click();
+  await page.getByRole("button", { name: "Đăng nhập" }).click();
   await expect(page).toHaveURL(/\/admin$/);
 }
 async function checkDialog(page: Page) {
@@ -43,16 +43,16 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
     await page.setViewportSize({ width, height });
     for (const route of [
       "",
-      "orders",
+      "đơn hàng",
       "incoming-orders",
       "assignments",
       "orders/ASC-1049",
       "chat",
-      "staff",
+      "Nhân sự quản trị",
       "staff/invitations",
       "employee-applications",
       "employee-applications/app-1048",
-      "security",
+      "BẢO MẬT",
       "profile",
     ]) {
       await page.goto("/admin/" + route);
@@ -66,7 +66,7 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
     }
     await page.goto("/admin/orders/ASC-1049");
     await page
-      .getByRole("button", { name: "Assign employee", exact: true })
+      .getByRole("button", { name: "Phân công nhân viên", exact: true })
       .click();
     const radio = page.locator(".op-candidate input").first();
     await expect(radio).toHaveCSS("width", "15px");
@@ -83,19 +83,19 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
     await checkDialog(page);
     await page.goto("/admin/incoming-orders");
     await page
-      .getByRole("button", { name: "Review order", exact: true })
+      .getByRole("button", { name: "Xác nhận đơn", exact: true })
       .first()
       .click();
     for (const field of [
-      "Customer",
-      "Game",
-      "Service",
-      "Current",
-      "Target",
-      "Region",
-      "Price",
-      "Options",
-      "Submitted",
+      "Khách hàng",
+      "Trò chơi",
+      "Dịch vụ",
+      "Hiện tại",
+      "Mục tiêu",
+      "Khu vực",
+      "Giá",
+      "Tùy chọn",
+      "Ngày gửi",
     ])
       await expect(
         page
@@ -108,11 +108,11 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
       el.scrollTop = el.scrollHeight;
     });
     await expect(
-      page.getByRole("dialog").getByText("Submitted", { exact: true }),
+      page.getByRole("dialog").getByText("Ngày gửi", { exact: true }),
     ).toBeInViewport();
     await checkDialog(page);
     await page.goto("/admin/employee-applications/app-1048");
-    for (const name of ["Approve application", "Reject"]) {
+    for (const name of ["Duyệt hồ sơ", "Từ chối"]) {
       await page.getByRole("button", { name, exact: true }).click();
       await checkDialog(page);
     }

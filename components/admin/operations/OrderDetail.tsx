@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import {
@@ -37,7 +39,7 @@ function Facts({ items }: { items: [string, string][] }) {
       {items.map(([label, value]) => (
         <div key={label}>
           <dt>{label}</dt>
-          <dd>{value}</dd>
+          <dd>{adminText(value)}</dd>
         </div>
       ))}
     </dl>
@@ -60,7 +62,7 @@ export function OrderDetail({ id }: { id: string }) {
   const order = orders.find((o) => o.id === id);
   if (!order)
     return (
-      <ErrorPanel error="This order could not be found." retry={load.retry} />
+      <ErrorPanel error="Không tìm thấy đơn hàng này." retry={load.retry} />
     );
   const employee = employees.find((e) => e.id === order.employeeId);
   const history = assignments.filter((a) => a.orderId === id).toReversed();
@@ -79,11 +81,11 @@ export function OrderDetail({ id }: { id: string }) {
     <>
       <Link className="op-back" href="/admin/orders">
         <ArrowLeft size={15} />
-        All orders
+        Tất cả đơn hàng{" "}
       </Link>
       <PageHeader
         eyebrow={`${order.game.toUpperCase()} · ${order.service.toUpperCase()}`}
-        title={`Order #${id}`}
+        title={`Đơn hàng #${id}`}
         description={`Created ${dateTime(order.createdAt)} · ${order.customer.name}`}
       >
         <StatusBadge status={order.status} />
@@ -95,15 +97,15 @@ export function OrderDetail({ id }: { id: string }) {
             <div className="ap-panel-heading">
               <h2>
                 <TrendingUp size={18} />
-                Live progress
+                Tiến độ hiện tại{" "}
               </h2>
-              <span className="op-demo-label">Local demo updates</span>
+              <span className="op-demo-label">Cập nhật dùng thử cục bộ</span>
               {edit && order.status === "IN_PROGRESS" && (
                 <button
                   className="ap-button"
                   onClick={() => setDialog("progress")}
                 >
-                  Update progress
+                  Cập nhật tiến độ{" "}
                 </button>
               )}
             </div>
@@ -121,90 +123,92 @@ export function OrderDetail({ id }: { id: string }) {
                         : String(i + 1).padStart(2, "0")}
                     </span>
                     <strong>{rank}</strong>
-                    {i === milestoneIndex && <small>Current checkpoint</small>}
+                    {i === milestoneIndex && (
+                      <small>Mốc tiến độ hiện tại</small>
+                    )}
                   </li>
                 ))}
               </ol>
               <p>
-                {order.currentLP} LP · Target: {order.targetRank} · Progress
-                updates appear across the workspace.
+                {order.currentLP} LP · Mục tiêu: {order.targetRank} · Tiến độ
+                được cập nhật trong toàn hệ thống.{" "}
               </p>
             </div>
           </section>
           <div className="op-two-columns">
             <section className="ap-panel ap-prose">
-              <h2>Customer information</h2>
+              <h2>Thông tin khách hàng</h2>
               <div className="ap-person op-spaced">
                 <Avatar name={order.customer.name} />
                 <div>
                   <strong>{order.customer.name}</strong>
-                  <small>Customer · {order.customer.id}</small>
+                  <small>Khách hàng · {order.customer.id}</small>
                 </div>
               </div>
               <Facts
                 items={[
                   ["Email", order.customer.email],
-                  ["Country", order.customer.country],
-                  ["Timezone", order.customer.timezone],
+                  ["Quốc gia", order.customer.country],
+                  ["Múi giờ", order.customer.timezone],
                 ]}
               />
             </section>
             <section className="ap-panel ap-prose">
               <h2>
                 <Gamepad2 size={18} />
-                Game account
+                Tài khoản trò chơi{" "}
               </h2>
               <Facts
                 items={[
-                  ["Game", order.game],
+                  ["Trò chơi", order.game],
                   ["Riot ID", order.riotId],
-                  ["Region", order.region],
-                  ["Starting rank", order.currentRank],
-                  ["Current LP", String(order.currentLP)],
-                  ["Target", order.targetRank],
+                  ["Khu vực", order.region],
+                  ["Hạng bắt đầu", order.currentRank],
+                  ["LP hiện tại", String(order.currentLP)],
+                  ["Mục tiêu", order.targetRank],
                 ]}
               />
               <small className="op-safe">
                 <LockKeyhole size={12} />
-                Game credentials are never displayed.
+                Không hiển thị thông tin đăng nhập trò chơi.{" "}
               </small>
             </section>
           </div>
           <section className="ap-panel ap-prose">
-            <h2>Service details</h2>
+            <h2>Chi tiết dịch vụ</h2>
             <Facts
               items={[
-                ["Service type", order.service],
-                ["Queue", order.queue],
-                ["Desired rank", order.targetRank],
-                ["Priority", order.priority],
-                ["Expected completion", dateTime(order.deadline)],
-                ["Price", money(order.amount)],
+                ["Loại dịch vụ", order.service],
+                ["Chế độ chơi", order.queue],
+                ["Hạng mục tiêu", order.targetRank],
+                ["Mức ưu tiên", order.priority],
+                ["Dự kiến hoàn thành", dateTime(order.deadline)],
+                ["Giá", money(order.amount)],
               ]}
             />
             <div className="op-option-tags">
               {order.options.map((option) => (
-                <span key={option}>{option}</span>
+                <span key={option}>{adminText(option)}</span>
               ))}
             </div>
-            <p className="op-instructions">{order.instructions}</p>
+            <p className="op-instructions">{adminText(order.instructions)}</p>
           </section>
           <section className="ap-panel">
             <div className="ap-panel-heading">
-              <h2>Order timeline</h2>
-              <span className="ap-count">Activity log</span>
+              <h2>Lịch sử đơn hàng</h2>
+              <span className="ap-count">Nhật ký hoạt động</span>
             </div>
             <OrderTimeline orderId={id} />
           </section>
           <section className="ap-panel">
             <div className="ap-panel-heading">
-              <h2>Notes</h2>
+              <h2>Ghi chú</h2>
               {edit && (
                 <button
                   className="ap-button"
                   onClick={() => setDialog("notes")}
                 >
-                  Edit admin notes
+                  Sửa ghi chú quản trị{" "}
                 </button>
               )}
             </div>
@@ -212,20 +216,25 @@ export function OrderDetail({ id }: { id: string }) {
               <div className="op-note">
                 <span>
                   <LockKeyhole size={13} />
-                  Admin · Internal
+                  Quản trị · Nội bộ{" "}
                 </span>
-                <p>{order.adminNotes || "No admin notes yet."}</p>
+                <p>
+                  {adminText(order.adminNotes) || "Chưa có ghi chú quản trị."}
+                </p>
               </div>
               <div className="op-note employee">
-                <span>Employee notes</span>
-                <p>{order.employeeNotes || "No employee notes yet."}</p>
+                <span>Ghi chú nhân viên</span>
+                <p>
+                  {adminText(order.employeeNotes) ||
+                    "Chưa có ghi chú nhân viên."}
+                </p>
               </div>
             </div>
           </section>
         </div>
         <aside className="op-detail-aside">
           <section className="ap-panel ap-prose">
-            <h2>Assigned employee</h2>
+            <h2>Nhân viên phụ trách</h2>
             {employee ? (
               <>
                 <div className="ap-person op-spaced">
@@ -233,7 +242,7 @@ export function OrderDetail({ id }: { id: string }) {
                   <div>
                     <strong>{employee.name}</strong>
                     <small>
-                      {employee.id} · {employee.type}
+                      {employee.id} · {adminText(employee.type)}
                     </small>
                   </div>
                   <span
@@ -243,35 +252,38 @@ export function OrderDetail({ id }: { id: string }) {
                 <Facts
                   items={[
                     [
-                      "Workload",
-                      `${workload(employee.id)} / ${employee.maxActiveOrders} active orders`,
+                      "Khối lượng công việc",
+                      `${workload(employee.id)} / ${employee.maxActiveOrders} đơn đang thực hiện`,
                     ],
-                    ["Success rate", `${employee.successRate}%`],
-                    ["Status", employee.online ? "Online" : "Offline"],
-                    ["Last activity", dateTime(employee.lastActivity)],
+                    ["Tỷ lệ thành công", `${employee.successRate}%`],
+                    [
+                      "Trạng thái",
+                      employee.online ? "Trực tuyến" : "Ngoại tuyến",
+                    ],
+                    ["Hoạt động gần nhất", dateTime(employee.lastActivity)],
                   ]}
                 />
                 {offer && (
                   <div className="op-offer-state">
-                    <strong>Offer sent · Waiting for response</strong>
+                    <strong>Đã gửi đề nghị · Đang chờ phản hồi</strong>
                     <OfferCountdown expiresAt={offer.expiresAt} />
                     <Link
                       href={`/employee/orders/${id}?employee=${employee.id}`}
                     >
-                      Open employee preview →
+                      Mở bản xem thử nhân viên →{" "}
                     </Link>
                   </div>
                 )}
               </>
             ) : (
               <p>
-                This order is waiting for a specialist. Use Assign employee to
-                send an offer.
+                Đơn đang chờ nhân viên phù hợp. Chọn Phân công nhân viên để gửi
+                đề nghị.{" "}
               </p>
             )}
           </section>
           <section className="ap-panel ap-prose">
-            <h2>Assignment history</h2>
+            <h2>Lịch sử phân công</h2>
             <div className="op-assignment-history">
               {history.length ? (
                 history.map((a) => (
@@ -289,11 +301,11 @@ export function OrderDetail({ id }: { id: string }) {
                         <small>{dateTime(a.respondedAt ?? a.offeredAt)}</small>
                       </div>
                     )}
-                    {a.reason && <p>Reason: {a.reason}</p>}
+                    {a.reason && <p>Lý do: {a.reason}</p>}
                   </article>
                 ))
               ) : (
-                <p>No offers have been sent yet.</p>
+                <p>Chưa gửi đề nghị nào.</p>
               )}
             </div>
           </section>
@@ -302,7 +314,7 @@ export function OrderDetail({ id }: { id: string }) {
               <div className="ap-panel-heading">
                 <h2>
                   <MessageSquare size={17} />
-                  Chat preview
+                  Xem trước trò chuyện{" "}
                 </h2>
               </div>
               <div className="ap-panel-padding op-chat-preview">
@@ -311,19 +323,19 @@ export function OrderDetail({ id }: { id: string }) {
                     <div key={m.id}>
                       <strong>
                         {m.sender.name}{" "}
-                        <small>{m.sender.role.toLowerCase()}</small>
+                        <small>{adminText(m.sender.role)}</small>
                       </strong>
-                      <p>{m.body}</p>
+                      <p>{adminText(m.body)}</p>
                     </div>
                   ))
                 ) : (
-                  <p>No messages yet. Start the conversation.</p>
+                  <p>Chưa có tin nhắn. Hãy bắt đầu trò chuyện.</p>
                 )}
                 <Link
                   className="ap-button full"
                   href={`/admin/chat?order=${id}`}
                 >
-                  Open full chat <MessageSquare size={15} />
+                  Mở trò chuyện đầy đủ <MessageSquare size={15} />
                 </Link>
               </div>
             </section>
@@ -334,15 +346,15 @@ export function OrderDetail({ id }: { id: string }) {
         <FormModal
           title={
             dialog === "progress"
-              ? "Update live progress"
-              : "Edit internal notes"
+              ? "Cập nhật tiến độ hiện tại"
+              : "Sửa ghi chú nội bộ"
           }
           description={
             dialog === "progress"
-              ? "Simulate a progress update. Use Complete order when the target is reached."
-              : "Admin notes stay inside the operations workspace."
+              ? "Mô phỏng cập nhật tiến độ. Chọn Hoàn thành đơn khi đạt mục tiêu."
+              : "Ghi chú quản trị chỉ hiển thị trong không gian vận hành."
           }
-          submit="Save update"
+          submit="Lưu cập nhật"
           onClose={() => setDialog(null)}
           onSubmit={async (data) => {
             if (dialog === "notes")
@@ -354,11 +366,11 @@ export function OrderDetail({ id }: { id: string }) {
                 Number(data.get("lp")),
                 String(data.get("note")),
               );
-            notice("Order update saved (demo).");
+            notice("Đã lưu cập nhật đơn hàng (dùng thử).");
           }}
         >
           {dialog === "notes" ? (
-            <Field label="Admin notes">
+            <Field label="Ghi chú quản trị">
               <textarea
                 name="notes"
                 rows={5}
@@ -368,7 +380,7 @@ export function OrderDetail({ id }: { id: string }) {
             </Field>
           ) : (
             <>
-              <Field label="Progress percent">
+              <Field label="Phần trăm tiến độ">
                 <input
                   name="progress"
                   type="number"
@@ -378,7 +390,7 @@ export function OrderDetail({ id }: { id: string }) {
                   required
                 />
               </Field>
-              <Field label="Current LP">
+              <Field label="LP hiện tại">
                 <input
                   name="lp"
                   type="number"
@@ -388,12 +400,12 @@ export function OrderDetail({ id }: { id: string }) {
                   required
                 />
               </Field>
-              <Field label="Update note">
+              <Field label="Ghi chú cập nhật">
                 <textarea
                   name="note"
                   rows={3}
                   maxLength={1000}
-                  placeholder="What changed in this session?"
+                  placeholder="Phiên làm việc này có thay đổi gì?"
                 />
               </Field>
             </>

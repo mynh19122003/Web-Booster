@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -88,15 +90,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
     );
   if (!ready || !operationsReady)
     return (
-      <div className="ap-loading" aria-label="Loading admin workspace">
+      <div className="ap-loading" aria-label="Đang tải trang quản trị">
         <div className="ap-skeleton" />
         <div className="ap-skeleton" />
-        <p>Preparing your workspace…</p>
+        <p>Đang chuẩn bị không gian làm việc…</p>
       </div>
     );
   if (publicPage)
     return <Notice.Provider value={setNotice}>{children}</Notice.Provider>;
-  if (!user) return <div className="ap-loading">Opening sign in…</div>;
+  if (!user) return <div className="ap-loading">Đang mở trang đăng nhập…</div>;
   const nav = adminNav.filter(
     (n) =>
       (!n.owner || user.role === "SUPER_ADMIN") &&
@@ -112,7 +114,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         {mobile && (
           <button
             className="ap-sidebar-backdrop"
-            aria-label="Close navigation"
+            aria-label="Đóng điều hướng"
             onClick={() => setMobile(false)}
           />
         )}
@@ -120,17 +122,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Link href="/admin" className="ap-brand">
             <span className="ap-mark">A</span>
             <span>
-              ASCEND<small>ADMIN PORTAL</small>
+              ASCEND<small>TRANG QUẢN TRỊ</small>
             </span>
           </Link>
           <div className="ap-workspace-label">
             <span className="ap-workspace-square">A</span>
             <div>
-              Ascend workspace<small>Operations & people</small>
+              Không gian ASCEND<small>Vận hành và nhân sự</small>
             </div>
             <ChevronRight size={14} />
           </div>
-          <nav aria-label="Admin navigation">
+          <nav aria-label="Điều hướng quản trị">
             {nav.map((n, index) => {
               const Icon = icons[n.icon as keyof typeof icons];
               const count =
@@ -168,26 +170,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="ap-sidebar-bottom">
             <div className="ap-demo-card">
               <Zap size={18} />
-              <strong>Your operations, elevated.</strong>
-              <p>A focused workspace for the people behind every great game.</p>
+              <strong>Nâng tầm vận hành.</strong>
+              <p>
+                Không gian làm việc dành cho đội ngũ tạo nên trải nghiệm chơi
+                game tuyệt vời.
+              </p>
               <span>
-                <i /> Demo workspace
+                <i /> Không gian dùng thử{" "}
               </span>
             </div>
             <Link href="/" className="ap-public-link">
-              View public website <ArrowUpRight size={15} />
+              Xem trang web <ArrowUpRight size={15} />
             </Link>
             <button
               className="ap-collapse"
               onClick={() => setCollapsed(!collapsed)}
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label={collapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
             >
               {collapsed ? (
                 <ChevronRight size={17} />
               ) : (
                 <>
                   <ChevronLeft size={17} />
-                  <span>Collapse sidebar</span>
+                  <span>Thu gọn thanh bên</span>
                 </>
               )}
             </button>
@@ -197,14 +202,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <header className="ap-topbar">
             <button
               className="ap-mobile-toggle"
-              aria-label="Open navigation"
+              aria-label="Mở điều hướng"
               onClick={() => setMobile(!mobile)}
             >
               <Menu size={22} />
             </button>
             <div className="ap-breadcrumb">
-              Workspace <ChevronRight size={13} />
-              <strong>{active?.label ?? "Application detail"}</strong>
+              Không gian làm việc <ChevronRight size={13} />
+              <strong>{active?.label ?? "Chi tiết hồ sơ"}</strong>
             </div>
             <div className="ap-topbar-right">
               <Link
@@ -216,15 +221,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 className="ap-top-search"
               >
                 <Search size={16} />
-                <span>
-                  {can("order.view") ? "Find an order" : "Find an application"}
-                </span>
+                <span>{can("order.view") ? "Tìm đơn hàng" : "Tìm hồ sơ"}</span>
                 <kbd>↗</kbd>
               </Link>
-              <span className="ap-demo-tag">DEMO</span>
+              <span className="ap-demo-tag">DÙNG THỬ</span>
               <div className="ap-notifications">
                 <button
-                  aria-label="Notifications"
+                  aria-label="Thông báo"
                   onClick={() => setNotifications(!notifications)}
                 >
                   <Bell size={19} />
@@ -232,7 +235,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 </button>
                 {notifications && (
                   <div className="ap-notification-popover">
-                    <strong>Workspace notifications</strong>
+                    <strong>Thông báo quản trị</strong>
                     {operationNotifications
                       .filter((n) => can(n.scope))
                       .slice(0, 5)
@@ -243,14 +246,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           key={n.id}
                           onClick={() => setNotifications(false)}
                         >
-                          <strong>{n.title}</strong>
-                          <span>{n.detail}</span>
+                          <strong>{adminText(n.title)}</strong>
+                          <span>{adminText(n.detail)}</span>
                           <small>
-                            {new Date(n.at).toLocaleTimeString("en-GB", {
+                            {new Date(n.at).toLocaleTimeString("vi-VN", {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}{" "}
-                            · demo
+                            · dùng thử{" "}
                           </small>
                         </Link>
                       ))}
@@ -259,13 +262,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         applications.filter((a) => a.status === "PENDING")
                           .length
                       }{" "}
-                      applications are waiting for review.
+                      hồ sơ đang chờ duyệt.{" "}
                     </p>
                     <Link
                       href="/admin/employee-applications"
                       onClick={() => setNotifications(false)}
                     >
-                      Open applications →
+                      Mở hồ sơ ứng tuyển →{" "}
                     </Link>
                   </div>
                 )}
@@ -277,20 +280,20 @@ export function AdminShell({ children }: { children: ReactNode }) {
                     {user.displayName}
                     <small>
                       {user.role === "SUPER_ADMIN"
-                        ? "Super admin"
-                        : "Staff member"}
+                        ? "Quản trị viên cấp cao"
+                        : "Nhân sự quản trị"}
                     </small>
                   </span>
                 </summary>
                 <div>
-                  <Link href="/admin/profile">My profile</Link>
+                  <Link href="/admin/profile">Hồ sơ cá nhân</Link>
                   <button
                     onClick={() => {
                       void adminAuthService.logout();
                       router.push("/admin/login");
                     }}
                   >
-                    <LogOut size={15} /> Sign out
+                    <LogOut size={15} /> Đăng xuất{" "}
                   </button>
                 </div>
               </details>
@@ -301,11 +304,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
           <footer className="ap-workspace-footer">
             <span>
-              ASCEND <i>/</i> Team operations
+              ASCEND <i>/</i> Vận hành đội ngũ{" "}
             </span>
             <span>
-              <i className="ap-online" /> Local demo · No live emails or account
-              changes
+              <i className="ap-online" /> Dùng thử cục bộ · Không gửi email hay
+              thay đổi tài khoản thật{" "}
             </span>
           </footer>
         </div>
@@ -313,10 +316,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="ap-toast" role="status">
             <ShieldCheck size={19} />
             <span>{notice}</span>
-            <button
-              aria-label="Dismiss notification"
-              onClick={() => setNotice("")}
-            >
+            <button aria-label="Đóng thông báo" onClick={() => setNotice("")}>
               <X size={17} />
             </button>
           </div>

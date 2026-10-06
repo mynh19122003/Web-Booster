@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -30,49 +32,55 @@ export function Dashboard() {
   return (
     <>
       <PageHeader
-        eyebrow="YOUR WORKSPACE, AT A GLANCE"
-        title={`Good morning, ${user?.displayName}.`}
-        description="Here’s what’s happening with your team today."
+        eyebrow="TỔNG QUAN KHÔNG GIAN LÀM VIỆC"
+        title={`Xin chào, ${user?.displayName}.`}
+        description="Theo dõi hoạt động của đội ngũ hôm nay."
       >
         <span className="ap-date">
-          <CalendarDays size={16} /> 05 October 2026
+          <CalendarDays size={16} /> 05 tháng 10 năm 2026{" "}
         </span>
         {owner && (
           <Link
             href="/admin/staff/invitations?invite=1"
             className="ap-button primary"
           >
-            <Plus size={16} /> Invite staff
+            <Plus size={16} /> Mời nhân sự{" "}
           </Link>
         )}
       </PageHeader>
       <OperationsOverview />
       <div className="ap-stats">
         <AdminStatCard
-          label="Pending applications"
+          label="Hồ sơ chờ duyệt"
           value={view ? stats.pendingApplications : 0}
-          note={view ? "Ready for your review" : "View permission required"}
+          note={view ? "Sẵn sàng xét duyệt" : "Cần quyền xem"}
           icon={<ClipboardList size={19} />}
           index="01"
         />
         <AdminStatCard
-          label="Active staff"
+          label="Nhân sự đang hoạt động"
           value={owner ? stats.activeStaff : 1}
-          note={owner ? "Keeping things moving" : "Your staff account"}
+          note={
+            owner ? "Duy trì hoạt động liên tục" : "Tài khoản nhân sự của bạn"
+          }
           icon={<Users size={19} />}
           index="02"
         />
         <AdminStatCard
-          label="Pending invitations"
+          label="Lời mời đang chờ"
           value={owner ? stats.pendingInvitations : 0}
-          note={owner ? "Waiting to join your team" : "Managed by super admin"}
+          note={
+            owner
+              ? "Đang chờ gia nhập đội ngũ"
+              : "Do quản trị viên cấp cao quản lý"
+          }
           icon={<Mail size={19} />}
           index="03"
         />
         <AdminStatCard
-          label="Active employees"
+          label="Nhân viên đang hoạt động"
           value={view ? stats.activeEmployees : 0}
-          note="Approved in this workspace"
+          note="Đã được duyệt trong hệ thống"
           icon={<CheckCircle2 size={19} />}
           index="04"
         />
@@ -82,27 +90,27 @@ export function Dashboard() {
           <div className="ap-panel-heading">
             <div>
               <h2>
-                Recent applications{" "}
+                Hồ sơ gần đây{" "}
                 <span className="ap-count">
                   {view ? applications.length : "—"}
                 </span>
               </h2>
-              <p>Your next great team member could be here.</p>
+              <p>Thành viên tiếp theo của đội ngũ có thể ở đây.</p>
             </div>
             {view && (
               <Link href="/admin/employee-applications">
-                View all <ArrowUpRight size={15} />
+                Xem tất cả <ArrowUpRight size={15} />
               </Link>
             )}
           </div>
           {view ? (
             <div className="ap-table-wrap">
-              <table aria-label="Recent applications">
+              <table aria-label="Hồ sơ gần đây">
                 <thead>
                   <tr>
-                    <th>Applicant</th>
-                    <th>Position</th>
-                    <th>Status</th>
+                    <th>Ứng viên</th>
+                    <th>Vị trí ứng tuyển</th>
+                    <th>Trạng thái</th>
                     <th />
                   </tr>
                 </thead>
@@ -120,7 +128,7 @@ export function Dashboard() {
                       </td>
                       <td>
                         <span className="ap-position">
-                          {a.positionApplied.toLowerCase()}
+                          {adminText(a.positionApplied)}
                         </span>
                       </td>
                       <td>
@@ -130,7 +138,7 @@ export function Dashboard() {
                         <Link
                           href={`/admin/employee-applications/${a.id}`}
                           className="ap-icon-button"
-                          aria-label={`Review ${a.fullName}`}
+                          aria-label={`Xem hồ sơ ${a.fullName}`}
                         >
                           <ArrowUpRight size={18} />
                         </Link>
@@ -142,7 +150,7 @@ export function Dashboard() {
             </div>
           ) : (
             <p className="ap-panel-padding">
-              Application access is managed by your super admin.
+              Quyền truy cập hồ sơ do quản trị viên cấp cao quản lý.{" "}
             </p>
           )}
         </section>
@@ -150,21 +158,20 @@ export function Dashboard() {
           <div className="ap-spotlight-icon">
             <ShieldCheck size={29} />
           </div>
-          <div className="ap-eyebrow">BUILT ON TRUST</div>
+          <div className="ap-eyebrow">XÂY DỰNG TRÊN NIỀM TIN</div>
           <h2>
-            A great team starts
-            <br />
-            with the right people.
+            Đội ngũ vững mạnh bắt đầu <br />
+            từ những người phù hợp.{" "}
           </h2>
           <p>
-            Review talent, give your staff the right access, and keep your
-            workspace secure.
+            Xét duyệt ứng viên, cấp quyền phù hợp và bảo vệ không gian làm
+            việc.{" "}
           </p>
           <Link
             href={view ? "/admin/employee-applications" : "/admin/profile"}
             className="ap-button primary"
           >
-            {view ? "Review applications" : "View your profile"}
+            {view ? "Xét duyệt hồ sơ" : "Xem hồ sơ cá nhân"}
             <ArrowRight size={16} />
           </Link>
           <div className="ap-spotlight-bottom">
@@ -173,22 +180,22 @@ export function Dashboard() {
               <Avatar name="Marcus Reed" />
               <Avatar name="Sofia Laurent" />
             </span>
-            <small>One team. A higher standard.</small>
+            <small>Một đội ngũ. Một tiêu chuẩn cao hơn.</small>
           </div>
         </section>
         <section className="ap-panel">
           <div className="ap-panel-heading">
             <div>
-              <h2>{owner ? "Staff invitations" : "Your workspace"}</h2>
+              <h2>{owner ? "Lời mời nhân sự" : "Không gian làm việc"}</h2>
               <p>
                 {owner
-                  ? "A warm welcome is on its way."
-                  : "Everything you need, one click away."}
+                  ? "Lời chào đón đang được gửi đi."
+                  : "Mọi thứ bạn cần chỉ cách một thao tác."}
               </p>
             </div>
             {owner && (
               <Link href="/admin/staff/invitations">
-                Manage <ArrowUpRight size={15} />
+                Quản lý <ArrowUpRight size={15} />
               </Link>
             )}
           </div>
@@ -210,26 +217,26 @@ export function Dashboard() {
           ) : (
             <div className="ap-panel-padding">
               <p>
-                Your account has {user?.permissions.length} assigned
-                permissions.
+                Tài khoản của bạn có {user?.permissions.length} quyền được
+                cấp.{" "}
               </p>
               <Link className="ap-text-link" href="/admin/profile">
-                Review your access →
+                Xem quyền truy cập →{" "}
               </Link>
             </div>
           )}
           <div className="ap-panel-footnote">
-            <span className="ap-online" /> Invitations expire after 24 hours
+            <span className="ap-online" /> Lời mời hết hạn sau 24 giờ{" "}
           </div>
         </section>
         <section className="ap-panel">
           <div className="ap-panel-heading">
             <div>
-              <h2>Recent activity</h2>
-              <p>A little visibility. A lot of peace of mind.</p>
+              <h2>Hoạt động gần đây</h2>
+              <p>Theo dõi rõ ràng. Quản lý an tâm.</p>
             </div>
             <Link href="/admin/security">
-              Security <ArrowUpRight size={15} />
+              Bảo mật <ArrowUpRight size={15} />
             </Link>
           </div>
           <ActivityTimeline
@@ -244,7 +251,7 @@ export function Dashboard() {
           <Link href="/admin/staff">
             <Users size={18} />
             <span>
-              Manage your team<small>People, permissions and access</small>
+              Quản lý đội ngũ<small>Nhân sự, quyền hạn và truy cập</small>
             </span>
             <ArrowUpRight size={17} />
           </Link>
@@ -252,13 +259,13 @@ export function Dashboard() {
         <Link href="/admin/security">
           <ShieldCheck size={18} />
           <span>
-            Keep your workspace safe
-            <small>Sessions and security activity</small>
+            Bảo vệ không gian làm việc{" "}
+            <small>Phiên đăng nhập và hoạt động bảo mật</small>
           </span>
           <ArrowUpRight size={17} />
         </Link>
         <span className="ap-updated">
-          Demo snapshot · {formatDate("2026-10-05")}
+          Dữ liệu dùng thử · {formatDate("2026-10-05")}
         </span>
       </div>
     </>

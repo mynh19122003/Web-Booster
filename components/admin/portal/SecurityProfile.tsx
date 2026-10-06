@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText, adminError } from "@/lib/admin/vi";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Monitor, LockKeyhole, LogOut } from "lucide-react";
@@ -26,41 +28,41 @@ export function SecurityPage() {
   return (
     <>
       <PageHeader
-        eyebrow="PROTECT YOUR WORKSPACE"
-        title="Security & activity"
-        description="Know who’s signed in. Stay in control of your team’s access."
+        eyebrow="BẢO VỆ KHÔNG GIAN LÀM VIỆC"
+        title="Bảo mật và hoạt động"
+        description="Theo dõi người đang đăng nhập và quản lý quyền truy cập của đội ngũ."
       >
         <span className="ap-date">
-          <ShieldCheck size={16} /> Session monitoring
+          <ShieldCheck size={16} /> Theo dõi phiên đăng nhập{" "}
         </span>
       </PageHeader>
       <div className="ap-info-strip">
         <ShieldCheck size={20} />
         <p>
-          Revoking a session signs that device out. IP addresses are recorded
-          for audit, never used as the only authentication factor.
+          Thu hồi phiên sẽ đăng xuất thiết bị đó. IP được ghi vào nhật ký, không
+          dùng làm yếu tố xác thực duy nhất.{" "}
         </p>
       </div>
       <section className="ap-panel">
         <div className="ap-panel-heading">
           <div>
-            <h2>Login sessions</h2>
+            <h2>Phiên đăng nhập</h2>
             <p>
               {owner
-                ? "Active and recently revoked sessions across your team."
-                : "Your account’s recent sessions."}
+                ? "Các phiên đang hoạt động và vừa bị thu hồi của đội ngũ."
+                : "Các phiên đăng nhập gần đây của bạn."}
             </p>
           </div>
           <span className="ap-count">
-            {visible.filter((s) => s.status === "ACTIVE").length} active
+            {visible.filter((s) => s.status === "ACTIVE").length} đang hoạt động
           </span>
         </div>
         <DataTable
           rows={visible}
-          label="Sessions"
+          label="Phiên đăng nhập"
           columns={[
             {
-              label: "User",
+              label: "Người dùng",
               render: (s) => (
                 <div className="ap-person">
                   <Avatar name={s.user} />
@@ -72,37 +74,40 @@ export function SecurityPage() {
               ),
             },
             {
-              label: "Device / IP",
+              label: "Thiết bị / IP",
               render: (s) => (
                 <div className="ap-cell-stack">
                   <span>
-                    <Monitor size={14} /> {s.device}
+                    <Monitor size={14} /> {adminText(s.device)}
                   </span>
                   <small>{s.ip}</small>
                 </div>
               ),
             },
-            { label: "Login time", render: (s) => formatDate(s.loginAt) },
             {
-              label: "Last activity",
+              label: "Thời gian đăng nhập",
+              render: (s) => formatDate(s.loginAt),
+            },
+            {
+              label: "Hoạt động gần nhất",
               render: (s) => formatDate(s.lastActivityAt),
             },
             {
-              label: "Status",
+              label: "Trạng thái",
               render: (s) => <StatusBadge status={s.status} />,
             },
             {
-              label: "Actions",
+              label: "Thao tác",
               render: (s) =>
                 s.status === "ACTIVE" ? (
                   <button
                     className="ap-button small"
                     onClick={() => setTarget(s)}
                   >
-                    Revoke{s.current ? " (current)" : ""}
+                    Thu hồi{s.current ? " (hiện tại)" : ""}
                   </button>
                 ) : (
-                  <span className="ap-muted">Signed out</span>
+                  <span className="ap-muted">Đã đăng xuất</span>
                 ),
             },
           ]}
@@ -111,10 +116,10 @@ export function SecurityPage() {
       <section className="ap-panel ap-spaced">
         <div className="ap-panel-heading">
           <div>
-            <h2>Audit activity</h2>
-            <p>A clear record of important workspace changes.</p>
+            <h2>Nhật ký hoạt động</h2>
+            <p>Ghi nhận các thay đổi quan trọng trong hệ thống.</p>
           </div>
-          <span className="ap-demo-tag">DEMO EVENTS</span>
+          <span className="ap-demo-tag">HOẠT ĐỘNG DÙNG THỬ</span>
         </div>
         <ActivityTimeline
           activities={activities.filter(
@@ -124,20 +129,20 @@ export function SecurityPage() {
       </section>
       {target && (
         <FormModal
-          title="Revoke this session?"
-          description={`${target.user} · ${target.device}`}
-          submit="Revoke session"
+          title="Thu hồi phiên đăng nhập này?"
+          description={`${target.user} · ${adminText(target.device)}`}
+          submit="Thu hồi phiên đăng nhập"
           danger
           onClose={() => setTarget(null)}
           onSubmit={async () => {
             await securityService.revokeSession(target.id);
-            notice("Session revoked successfully.");
+            notice("Đã thu hồi phiên đăng nhập thành công.");
           }}
         >
           <p>
             {target.current && target.userId === user?.id
-              ? "This is your current demo session. You will be signed out."
-              : "This device will lose access immediately. The user must sign in again to continue."}
+              ? "Đây là phiên dùng thử hiện tại. Bạn sẽ bị đăng xuất."
+              : "Thiết bị này sẽ mất quyền truy cập ngay. Người dùng cần đăng nhập lại để tiếp tục."}
           </p>
         </FormModal>
       )}
@@ -163,7 +168,7 @@ export function ProfilePage() {
       );
       router.push("/admin/login?changed=1");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to change password.");
+      setError(adminError(e));
     } finally {
       setPending(false);
     }
@@ -172,9 +177,9 @@ export function ProfilePage() {
   return (
     <>
       <PageHeader
-        eyebrow="YOUR ACCOUNT"
-        title="My profile"
-        description="Your identity, access and security preferences."
+        eyebrow="TÀI KHOẢN CỦA BẠN"
+        title="Hồ sơ cá nhân"
+        description="Thông tin cá nhân, quyền truy cập và thiết lập bảo mật."
       />
       <div className="ap-detail-grid">
         <div>
@@ -185,24 +190,24 @@ export function ProfilePage() {
                 <h2>{user.fullName}</h2>
                 <p>{user.email}</p>
               </div>
-              <span className="ap-role">{user.role.replaceAll("_", " ")}</span>
+              <span className="ap-role">{adminText(user.role)}</span>
             </div>
             <div className="ap-detail-facts ap-panel-padding">
               <div>
-                <span>Display name</span>
+                <span>Tên hiển thị</span>
                 {user.displayName}
               </div>
               <div>
-                <span>Account status</span>
+                <span>Trạng thái tài khoản</span>
                 <StatusBadge status="ACTIVE" />
               </div>
               <div>
-                <span>Workspace</span>ASCEND Operations
+                <span>Không gian làm việc</span>Vận hành ASCEND{" "}
               </div>
               <div>
-                <span>Access</span>
+                <span>Quyền truy cập</span>
                 {user.role === "SUPER_ADMIN" ? (
-                  "Full workspace access"
+                  "Toàn quyền quản trị"
                 ) : (
                   <PermissionBadgeGroup permissions={user.permissions} />
                 )}
@@ -211,14 +216,14 @@ export function ProfilePage() {
           </section>
           <section className="ap-panel ap-prose">
             <h2>
-              <LockKeyhole size={20} /> Change password
+              <LockKeyhole size={20} /> Đổi mật khẩu{" "}
             </h2>
             <p>
-              Changing your password signs you out of all sessions. You’ll need
-              to log in again.
+              Đổi mật khẩu sẽ đăng xuất tất cả phiên. Bạn cần đăng nhập
+              lại.{" "}
             </p>
             <form onSubmit={change}>
-              <Field label="Current password">
+              <Field label="Mật khẩu hiện tại">
                 <input
                   name="current"
                   type="password"
@@ -227,7 +232,7 @@ export function ProfilePage() {
                 />
               </Field>
               <div className="ap-form-grid">
-                <Field label="New password">
+                <Field label="Mật khẩu mới">
                   <input
                     name="password"
                     type="password"
@@ -237,7 +242,7 @@ export function ProfilePage() {
                     autoComplete="new-password"
                   />
                 </Field>
-                <Field label="Confirm new password">
+                <Field label="Xác nhận mật khẩu mới">
                   <input
                     name="confirmation"
                     type="password"
@@ -247,19 +252,19 @@ export function ProfilePage() {
                 </Field>
               </div>
               <p className="ap-form-hint">
-                12+ characters, uppercase, lowercase, number and symbol. Demo
-                only: don’t enter a real password.
+                Ít nhất 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
+                Không nhập mật khẩu thật vào bản dùng thử.{" "}
               </p>
               {error && (
                 <p role="alert" className="ap-error">
-                  {error}
+                  {adminError(error)}
                 </p>
               )}
               <button
                 className="ap-button primary ap-spaced"
                 disabled={pending}
               >
-                {pending ? "Updating…" : "Update password & sign out"}
+                {pending ? "Đang cập nhật…" : "Cập nhật mật khẩu và đăng xuất"}
                 <LogOut size={16} />
               </button>
             </form>
@@ -270,28 +275,30 @@ export function ProfilePage() {
             <div className="ap-section-icon">
               <ShieldCheck size={25} />
             </div>
-            <h2>Security at a glance</h2>
-            <p>Your permissions are managed by the workspace owner.</p>
+            <h2>Thông tin bảo mật</h2>
+            <p>Quyền hạn của bạn do quản trị viên quản lý.</p>
             <div className="ap-detail-facts">
               <div>
-                <span>Last sign-in</span>
-                {recent ? formatDate(recent.loginAt) : "This demo session"}
+                <span>Đăng nhập gần nhất</span>
+                {recent
+                  ? formatDate(recent.loginAt)
+                  : "Phiên dùng thử hiện tại"}
               </div>
               <div>
-                <span>Device</span>
-                {recent?.device ?? "Local browser"}
+                <span>Thiết bị</span>
+                {recent?.device ?? "Trình duyệt hiện tại"}
               </div>
               <div>
-                <span>IP address</span>
-                {recent?.ip ?? "Not recorded in demo"}
+                <span>Địa chỉ IP</span>
+                {recent?.ip ?? "Không ghi nhận trong bản dùng thử"}
               </div>
             </div>
           </section>
           <div className="ap-side-note">
             <LockKeyhole size={18} />
             <p>
-              Demo passwords are never saved. Real password checks and session
-              revocation will be handled by the API adapter.
+              Không lưu mật khẩu dùng thử. Việc kiểm tra mật khẩu thật và thu
+              hồi phiên sẽ được thực hiện khi kết nối API.{" "}
             </p>
           </div>
         </aside>

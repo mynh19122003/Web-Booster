@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState } from "react";
 import { Plus, Users, ShieldCheck, Mail, ArrowUpRight } from "lucide-react";
@@ -38,28 +40,29 @@ export function StaffPage() {
   return (
     <>
       <PageHeader
-        eyebrow="PEOPLE & ACCESS"
-        title="Your team, in sync."
-        description="Manage the people who keep ASCEND running at its best."
+        eyebrow="NHÂN SỰ VÀ QUYỀN TRUY CẬP"
+        title="Đội ngũ cùng nhịp."
+        description="Quản lý đội ngũ giúp ASCEND vận hành hiệu quả."
       >
         <Link
           href="/admin/staff/invitations?invite=1"
           className="ap-button primary"
         >
-          <Plus size={16} /> Invite staff
+          <Plus size={16} /> Mời nhân sự{" "}
         </Link>
       </PageHeader>
       <div className="ap-inline-summary">
         <span>
           <Users size={17} />
-          <b>{staff.length}</b> Team members
+          <b>{staff.length}</b> Thành viên đội ngũ{" "}
         </span>
         <span>
           <i className="ap-online" />
-          <b>{staff.filter((s) => s.status === "ACTIVE").length}</b> Active
+          <b>{staff.filter((s) => s.status === "ACTIVE").length}</b> Đang hoạt
+          động{" "}
         </span>
         <span>
-          <ShieldCheck size={17} /> Permission-based access
+          <ShieldCheck size={17} /> Truy cập theo quyền hạn{" "}
         </span>
       </div>
       <section className="ap-panel">
@@ -71,11 +74,11 @@ export function StaffPage() {
           statuses={["ACTIVE", "SUSPENDED"]}
         />
         <DataTable
-          label="Staff members"
+          label="Nhân sự quản trị"
           rows={rows}
           columns={[
             {
-              label: "Team member",
+              label: "Thành viên",
               render: (s) => (
                 <div className="ap-person">
                   <Avatar name={s.fullName} />
@@ -87,21 +90,23 @@ export function StaffPage() {
               ),
             },
             {
-              label: "Role",
-              render: (s) => <span className="ap-role">{s.role}</span>,
+              label: "Vai trò",
+              render: (s) => (
+                <span className="ap-role">{adminText(s.role)}</span>
+              ),
             },
             {
-              label: "Status",
+              label: "Trạng thái",
               render: (s) => <StatusBadge status={s.status} />,
             },
             {
-              label: "Permissions",
+              label: "Quyền hạn",
               render: (s) => (
                 <PermissionBadgeGroup permissions={s.permissions} />
               ),
             },
             {
-              label: "Last login / IP",
+              label: "Đăng nhập gần nhất / IP",
               render: (s) => (
                 <div className="ap-cell-stack">
                   {formatDate(s.lastLogin)}
@@ -110,7 +115,7 @@ export function StaffPage() {
               ),
             },
             {
-              label: "Actions",
+              label: "Thao tác",
               render: (s) => (
                 <ActionMenu>
                   {[
@@ -123,7 +128,7 @@ export function StaffPage() {
                       key={action}
                       onClick={() => setDialog({ member: s, action })}
                     >
-                      {action}
+                      {adminText(action)}
                     </button>
                   ))}
                 </ActionMenu>
@@ -134,9 +139,11 @@ export function StaffPage() {
       </section>
       {dialog && (
         <FormModal
-          title={dialog.action}
+          title={adminText(dialog.action)}
           description={`${dialog.member.fullName} · ${dialog.member.email}`}
-          submit={dialog.action === "View detail" ? "Done" : dialog.action}
+          submit={
+            dialog.action === "View detail" ? "Đóng" : adminText(dialog.action)
+          }
           danger={["Suspend", "Revoke sessions"].includes(dialog.action)}
           onClose={() => setDialog(null)}
           onSubmit={async (data) => {
@@ -153,7 +160,9 @@ export function StaffPage() {
             if (action === "Revoke sessions")
               await staffService.revokeStaffSessions(member.id);
             if (action !== "View detail")
-              notice(`${action} completed for ${member.displayName}.`);
+              notice(
+                `${adminText(action)} thành công cho ${member.displayName}.`,
+              );
           }}
         >
           {dialog.action === "Edit permissions" ? (
@@ -161,29 +170,29 @@ export function StaffPage() {
           ) : dialog.action === "View detail" ? (
             <div className="ap-detail-facts">
               <div>
-                <span>Account status</span>
+                <span>Trạng thái tài khoản</span>
                 <StatusBadge status={dialog.member.status} />
               </div>
               <div>
-                <span>Last login</span>
+                <span>Đăng nhập gần nhất</span>
                 {formatDate(dialog.member.lastLogin)}
               </div>
               <div>
-                <span>Last IP</span>
+                <span>IP gần nhất</span>
                 {dialog.member.ip}
               </div>
               <div>
-                <span>Permissions</span>
+                <span>Quyền hạn</span>
                 <PermissionBadgeGroup permissions={dialog.member.permissions} />
               </div>
             </div>
           ) : (
             <p>
               {dialog.action === "Suspend"
-                ? "This member will lose workspace access and all active sessions will be revoked. You can reactivate them later."
+                ? "Thành viên này sẽ mất quyền truy cập và tất cả phiên đăng nhập sẽ bị thu hồi. Bạn có thể kích hoạt lại sau."
                 : dialog.action === "Activate"
-                  ? "Restore this staff member’s access. They will need to sign in again."
-                  : "All active sessions for this member will be signed out. They can sign in again with their password."}
+                  ? "Khôi phục quyền truy cập cho nhân sự này. Họ cần đăng nhập lại."
+                  : "Tất cả phiên của thành viên này sẽ bị đăng xuất. Họ có thể đăng nhập lại bằng mật khẩu."}
             </p>
           )}
         </FormModal>
@@ -214,21 +223,21 @@ export function InvitationsPage({
   return (
     <>
       <PageHeader
-        eyebrow="GROW YOUR TEAM"
-        title="Great people. One invitation away."
-        description="Invite trusted people into your workspace, with just the right access."
+        eyebrow="PHÁT TRIỂN ĐỘI NGŨ"
+        title="Nhân sự phù hợp bắt đầu từ một lời mời."
+        description="Mời người bạn tin tưởng vào hệ thống với quyền truy cập phù hợp."
       >
         <button className="ap-button primary" onClick={() => setInvite(true)}>
-          <Plus size={16} /> Invite staff
+          <Plus size={16} /> Mời nhân sự{" "}
         </button>
       </PageHeader>
       <div className="ap-info-strip">
         <Mail size={18} />
         <p>
-          Staff choose their own password. Each invitation is single-use and
-          expires after 24 hours.
+          Nhân sự tự đặt mật khẩu. Mỗi lời mời dùng một lần và hết hạn sau 24
+          giờ.{" "}
         </p>
-        <span>Secure by default</span>
+        <span>Bảo mật ngay từ đầu</span>
       </div>
       <section className="ap-panel">
         <SearchFilterBar
@@ -239,11 +248,11 @@ export function InvitationsPage({
           statuses={["PENDING", "ACCEPTED", "EXPIRED", "REVOKED"]}
         />
         <DataTable
-          label="Invitations"
+          label="Lời mời"
           rows={rows}
           columns={[
             {
-              label: "Invited member",
+              label: "Người được mời",
               render: (i) => (
                 <div className="ap-person">
                   <Avatar name={i.fullName} />
@@ -255,17 +264,17 @@ export function InvitationsPage({
               ),
             },
             {
-              label: "Permissions",
+              label: "Quyền hạn",
               render: (i) => (
                 <PermissionBadgeGroup permissions={i.permissions} />
               ),
             },
             {
-              label: "Status",
+              label: "Trạng thái",
               render: (i) => <StatusBadge status={i.status} />,
             },
             {
-              label: "Invited / Expires",
+              label: "Ngày mời / Hết hạn",
               render: (i) => (
                 <div className="ap-cell-stack">
                   {formatDate(i.createdAt)}
@@ -274,7 +283,7 @@ export function InvitationsPage({
               ),
             },
             {
-              label: "Actions",
+              label: "Thao tác",
               render: (i) => (
                 <ActionMenu>
                   <button
@@ -282,7 +291,7 @@ export function InvitationsPage({
                       setDialog({ invitation: i, action: "Invitation detail" })
                     }
                   >
-                    View detail
+                    Xem chi tiết{" "}
                   </button>
                   {["PENDING", "EXPIRED"].includes(i.status) && (
                     <>
@@ -294,7 +303,7 @@ export function InvitationsPage({
                           })
                         }
                       >
-                        Resend invitation
+                        Gửi lại lời mời{" "}
                       </button>
                       <button
                         onClick={() =>
@@ -304,7 +313,7 @@ export function InvitationsPage({
                           })
                         }
                       >
-                        Revoke invitation
+                        Thu hồi lời mời{" "}
                       </button>
                     </>
                   )}
@@ -316,9 +325,9 @@ export function InvitationsPage({
       </section>
       {invite && (
         <FormModal
-          title="Invite someone great"
-          description="A new teammate. A higher standard. Choose their access below."
-          submit="Send invitation"
+          title="Mời nhân sự mới"
+          description="Thêm thành viên, nâng tiêu chuẩn. Chọn quyền truy cập bên dưới."
+          submit="Gửi lời mời"
           onClose={() => setInvite(false)}
           onSubmit={async (data) => {
             await staffService.createStaffInvitation({
@@ -327,28 +336,28 @@ export function InvitationsPage({
               displayName: String(data.get("display_name")),
               permissions: data.getAll("permissions") as Permission[],
             });
-            notice("Staff invitation sent (demo). No live email was sent.");
+            notice("Đã gửi lời mời nhân sự (dùng thử). Không gửi email thật.");
           }}
         >
           <div className="ap-form-grid">
-            <Field label="Full name">
+            <Field label="Họ và tên">
               <input
                 name="full_name"
                 required
                 maxLength={160}
-                placeholder="e.g. Taylor Chen"
+                placeholder="Ví dụ: Nguyễn Minh Anh"
               />
             </Field>
-            <Field label="Display name">
+            <Field label="Tên hiển thị">
               <input
                 name="display_name"
                 required
                 maxLength={80}
-                placeholder="e.g. Taylor"
+                placeholder="Ví dụ: Minh Anh"
               />
             </Field>
           </div>
-          <Field label="Email address">
+          <Field label="Địa chỉ email">
             <input
               name="email"
               type="email"
@@ -361,10 +370,10 @@ export function InvitationsPage({
       )}
       {dialog && (
         <FormModal
-          title={dialog.action}
+          title={adminText(dialog.action)}
           description={dialog.invitation.email}
           submit={
-            dialog.action === "Invitation detail" ? "Done" : dialog.action
+            dialog.action === "Invitation detail" ? "Đóng" : dialog.action
           }
           danger={dialog.action === "Revoke invitation"}
           onClose={() => setDialog(null)}
@@ -374,16 +383,16 @@ export function InvitationsPage({
             if (dialog.action === "Revoke invitation")
               await staffService.revokeStaffInvitation(dialog.invitation.id);
             if (dialog.action !== "Invitation detail")
-              notice(`${dialog.action} completed (demo).`);
+              notice(`${adminText(dialog.action)} thành công (dùng thử).`);
           }}
         >
           <StatusBadge status={dialog.invitation.status} />
           <p className="ap-spaced">
             {dialog.action === "Revoke invitation"
-              ? "This link will stop working immediately. The invited person will no longer be able to join with it."
+              ? "Liên kết này sẽ hết hiệu lực ngay. Người được mời không thể sử dụng để gia nhập."
               : dialog.action === "Resend invitation"
-                ? "A new invitation will replace the previous link and restart the 24-hour expiry."
-                : `Invited ${formatDate(dialog.invitation.createdAt)}. Expires ${formatDate(dialog.invitation.expiresAt)}.`}
+                ? "Lời mời mới sẽ thay thế liên kết cũ và có hiệu lực trong 24 giờ."
+                : `Ngày mời ${formatDate(dialog.invitation.createdAt)}. Hết hạn ${formatDate(dialog.invitation.expiresAt)}.`}
           </p>
           <PermissionBadgeGroup permissions={dialog.invitation.permissions} />
           {dialog.action === "Invitation detail" &&
@@ -393,7 +402,7 @@ export function InvitationsPage({
                 className="ap-button ap-spaced"
                 href={`/admin/accept-invitation?token=${dialog.invitation.token}`}
               >
-                Preview demo invitation <ArrowUpRight size={15} />
+                Xem trước lời mời dùng thử <ArrowUpRight size={15} />
               </Link>
             )}
         </FormModal>

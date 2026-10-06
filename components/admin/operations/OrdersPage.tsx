@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -50,21 +52,21 @@ export function OrderTable({ orders }: { orders: Order[] }) {
   const employees = useOperations((s) => s.employees);
   return (
     <div className="ap-table-wrap op-order-table">
-      <table aria-label="Orders">
+      <table aria-label="Đơn hàng">
         <thead>
           <tr>
             {[
-              "Order ID",
-              "Customer",
-              "Game / Service",
-              "Current rank",
-              "Target rank",
-              "Employee",
-              "Status",
-              "Progress",
-              "Amount",
-              "Created",
-              "Actions",
+              "Mã đơn",
+              "Khách hàng",
+              "Trò chơi / Dịch vụ",
+              "Hạng hiện tại",
+              "Hạng mục tiêu",
+              "Nhân viên",
+              "Trạng thái",
+              "Tiến độ",
+              "Giá trị đơn",
+              "Ngày tạo",
+              "Thao tác",
             ].map((h) => (
               <th key={h}>{h}</th>
             ))}
@@ -96,7 +98,7 @@ export function OrderTable({ orders }: { orders: Order[] }) {
                 </td>
                 <td>
                   {o.game}
-                  <small className="op-block">{o.service}</small>
+                  <small className="op-block">{adminText(o.service)}</small>
                 </td>
                 <td>{o.currentRank}</td>
                 <td>{o.targetRank}</td>
@@ -107,7 +109,7 @@ export function OrderTable({ orders }: { orders: Order[] }) {
                       <span>{employee.name}</span>
                     </div>
                   ) : (
-                    <span className="op-muted">Unassigned</span>
+                    <span className="op-muted">Chưa phân công</span>
                   )}
                 </td>
                 <td>
@@ -177,24 +179,24 @@ export function OrdersPage() {
   const currentPage = Math.min(page, totalPages);
   const visible = filtered.slice((currentPage - 1) * 6, currentPage * 6);
   const stats = [
-    { label: "Total orders", value: orders.length, icon: Package },
+    { label: "Tổng đơn hàng", value: orders.length, icon: Package },
     {
-      label: "Pending",
+      label: "Chờ xử lý",
       value: orders.filter((o) => o.status === "PENDING").length,
       icon: Clock3,
     },
     {
-      label: "In progress",
+      label: "Đang thực hiện",
       value: orders.filter((o) => o.status === "IN_PROGRESS").length,
       icon: Activity,
     },
     {
-      label: "Completed",
+      label: "Hoàn thành",
       value: orders.filter((o) => o.status === "COMPLETED").length,
       icon: CheckCircle2,
     },
     {
-      label: "Disputed",
+      label: "Tranh chấp",
       value: orders.filter((o) => o.status === "DISPUTED").length,
       icon: ShieldAlert,
     },
@@ -205,12 +207,12 @@ export function OrdersPage() {
   return (
     <>
       <PageHeader
-        eyebrow="ORDER OPERATIONS"
-        title="Orders"
-        description="Manage and monitor all customer orders."
+        eyebrow="VẬN HÀNH ĐƠN HÀNG"
+        title="Đơn hàng"
+        description="Quản lý và theo dõi tất cả đơn hàng của khách."
       >
         <Link className="ap-button primary" href="/admin/incoming-orders">
-          Open order inbox <ArrowRight size={16} />
+          Mở hộp thư đơn hàng <ArrowRight size={16} />
         </Link>
       </PageHeader>
       <div className="ap-stats op-stats-five">
@@ -220,7 +222,7 @@ export function OrdersPage() {
             label={s.label}
             value={s.value}
             icon={<s.icon size={18} />}
-            note="Across this workspace"
+            note="Trong hệ thống"
             index={`0${i + 1}`}
           />
         ))}
@@ -230,55 +232,59 @@ export function OrdersPage() {
           <label className="ap-search">
             <Search size={17} />
             <input
-              aria-label="Search orders"
-              placeholder="Order ID, customer, Riot ID or employee…"
+              aria-label="Tìm đơn hàng"
+              placeholder="Mã đơn, khách hàng, Riot ID hoặc nhân viên…"
               value={filters.query}
               onChange={(e) => filter("query", e.target.value)}
             />
           </label>
           <div className="op-filter-grid">
-            <Field label="Status">
+            <Field label="Trạng thái">
               <select
                 value={filters.status}
                 onChange={(e) => filter("status", e.target.value)}
               >
-                <option value="ALL">All statuses</option>
+                <option value="ALL">Tất cả trạng thái</option>
                 {orderStatuses.map((s) => (
                   <option key={s} value={s}>
-                    {s.replaceAll("_", " ")}
+                    {adminText(s)}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Game">
+            <Field label="Trò chơi">
               <select
                 value={filters.game}
                 onChange={(e) => filter("game", e.target.value)}
               >
-                <option value="ALL">All games</option>
+                <option value="ALL">Tất cả trò chơi</option>
                 {[...new Set(orders.map((o) => o.game))].map((s) => (
-                  <option key={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {adminText(s)}
+                  </option>
                 ))}
               </select>
             </Field>
-            <Field label="Service">
+            <Field label="Dịch vụ">
               <select
                 value={filters.service}
                 onChange={(e) => filter("service", e.target.value)}
               >
-                <option value="ALL">All services</option>
+                <option value="ALL">Tất cả dịch vụ</option>
                 {[...new Set(orders.map((o) => o.service))].map((s) => (
-                  <option key={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {adminText(s)}
+                  </option>
                 ))}
               </select>
             </Field>
-            <Field label="Employee">
+            <Field label="Nhân viên">
               <select
                 value={filters.employee}
                 onChange={(e) => filter("employee", e.target.value)}
               >
-                <option value="ALL">All employees</option>
-                <option value="NONE">Unassigned</option>
+                <option value="ALL">Tất cả nhân viên</option>
+                <option value="NONE">Chưa phân công</option>
                 {employees.map((e) => (
                   <option value={e.id} key={e.id}>
                     {e.name}
@@ -286,7 +292,7 @@ export function OrdersPage() {
                 ))}
               </select>
             </Field>
-            <Field label="From date">
+            <Field label="Từ ngày">
               <input
                 type="date"
                 value={filters.from}
@@ -294,7 +300,7 @@ export function OrdersPage() {
                 onChange={(e) => filter("from", e.target.value)}
               />
             </Field>
-            <Field label="To date">
+            <Field label="Đến ngày">
               <input
                 type="date"
                 min={filters.from || undefined}
@@ -302,15 +308,15 @@ export function OrdersPage() {
                 onChange={(e) => filter("to", e.target.value)}
               />
             </Field>
-            <Field label="Sort orders">
+            <Field label="Sắp xếp đơn hàng">
               <select
                 value={filters.sort}
                 onChange={(e) => filter("sort", e.target.value)}
               >
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-                <option value="highest">Highest value</option>
-                <option value="lowest">Lowest value</option>
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="highest">Giá trị cao nhất</option>
+                <option value="lowest">Giá trị thấp nhất</option>
               </select>
             </Field>
           </div>
@@ -326,7 +332,7 @@ export function OrdersPage() {
                     )
                   }
                 >
-                  {k}: {v.replaceAll("_", " ")}
+                  {adminText(k)}: {adminText(v)}
                   <X size={12} />
                 </button>
               ))}
@@ -336,7 +342,7 @@ export function OrdersPage() {
                   setPage(1);
                 }}
               >
-                Clear filters
+                Xóa bộ lọc{" "}
               </button>
             </div>
           )}
@@ -345,29 +351,29 @@ export function OrdersPage() {
           <OrderTable orders={visible} />
         ) : (
           <EmptyState
-            title="No orders yet"
-            text="No orders match these filters. Try a different search."
+            title="Chưa có đơn hàng"
+            text="Không có đơn phù hợp bộ lọc. Hãy thử tìm kiếm khác."
           />
         )}
         <div className="ap-table-footer">
           <span>
             {filtered.length ? (currentPage - 1) * 6 + 1 : 0}–
-            {Math.min(currentPage * 6, filtered.length)} of {filtered.length}{" "}
-            orders
+            {Math.min(currentPage * 6, filtered.length)} trên {filtered.length}{" "}
+            đơn hàng{" "}
           </span>
           <div className="op-pagination">
             <button
-              aria-label="Previous page"
+              aria-label="Trang trước"
               disabled={currentPage === 1}
               onClick={() => setPage(currentPage - 1)}
             >
               <ArrowLeft size={16} />
             </button>
             <span>
-              Page {currentPage} of {totalPages}
+              Trang {currentPage} trên {totalPages}
             </span>
             <button
-              aria-label="Next page"
+              aria-label="Trang sau"
               disabled={currentPage === totalPages}
               onClick={() => setPage(currentPage + 1)}
             >

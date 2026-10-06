@@ -3,10 +3,10 @@ async function login(page: Page, viewer = false) {
   await page.goto("/admin/login");
   if (viewer)
     await page
-      .getByRole("button", { name: "View-only staff", exact: true })
+      .getByRole("button", { name: "Nhân sự chỉ xem", exact: true })
       .click();
   await page.locator('input[name="password"]').fill("DemoPass123!");
-  await page.getByRole("button", { name: "Sign in to workspace" }).click();
+  await page.getByRole("button", { name: "Đăng nhập" }).click();
   await expect(page).toHaveURL(/\/admin$/);
 }
 test("operations pages render, filter and paginate without backend calls", async ({
@@ -22,28 +22,26 @@ test("operations pages render, filter and paginate without backend calls", async
   await page.setViewportSize({ width: 1600, height: 1050 });
   await page.goto("/admin/orders");
   await expect(
-    page.getByRole("table", { name: "Orders", exact: true }),
+    page.getByRole("table", { name: "Đơn hàng", exact: true }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/orders-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Next page", exact: true }).click();
-  await expect(page.getByText("Page 2 of 3", { exact: true })).toBeVisible();
-  await page.getByRole("textbox", { name: "Search orders" }).fill("Mynh");
+  await page.getByRole("button", { name: "Trang sau", exact: true }).click();
+  await expect(page.getByText("Trang 2 trên 3", { exact: true })).toBeVisible();
+  await page.getByRole("textbox", { name: "Tìm đơn hàng" }).fill("Mynh");
   await expect(
     page.getByRole("link", { name: "#ASC-1042", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("table").locator("tbody tr")).toHaveCount(1);
   await page
-    .getByRole("textbox", { name: "Search orders" })
+    .getByRole("textbox", { name: "Tìm đơn hàng" })
     .fill("does-not-exist");
   await expect(
-    page.getByRole("heading", { name: "No orders yet" }),
+    page.getByRole("heading", { name: "Chưa có đơn hàng" }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Clear filters", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Xóa bộ lọc", exact: true }).click();
   await expect(page.getByRole("table").locator("tbody tr")).toHaveCount(6);
   for (const route of [
     "incoming-orders",
@@ -56,7 +54,7 @@ test("operations pages render, filter and paginate without backend calls", async
   }
   await page.goto("/admin/orders/ASC-1042");
   await expect(
-    page.getByRole("heading", { name: "Live progress" }),
+    page.getByRole("heading", { name: "Tiến độ hiện tại" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/order-detail.png",
@@ -71,14 +69,14 @@ test("assignment offer, employee decline, reassignment and accept share state", 
   await login(page);
   await page.goto("/admin/orders/ASC-1049");
   await page
-    .getByRole("button", { name: "Assign employee", exact: true })
+    .getByRole("button", { name: "Phân công nhân viên", exact: true })
     .click();
   await page.locator('input[name="employee_id"][value="emp-nova"]').check();
-  await page.getByRole("button", { name: "Send offer", exact: true }).click();
+  await page.getByRole("button", { name: "Gửi đề nghị", exact: true }).click();
   await expect(
-    page.getByText("Offer sent · Waiting for response", { exact: true }),
+    page.getByText("Đã gửi đề nghị · Đang chờ phản hồi", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Open employee preview" }).click();
+  await page.getByRole("link", { name: "Mở bản xem thử nhân viên" }).click();
   await expect(
     page.getByRole("combobox", { name: "Preview employee" }),
   ).toHaveValue("emp-nova");
@@ -94,14 +92,14 @@ test("assignment offer, employee decline, reassignment and accept share state", 
   ).toBeVisible();
   await page.goto("/admin/orders/ASC-1049");
   await expect(
-    page.getByText("Reason: Currently unavailable for the requested time."),
+    page.getByText("Lý do: Currently unavailable for the requested time."),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Assign employee", exact: true })
+    .getByRole("button", { name: "Phân công nhân viên", exact: true })
     .click();
   await page.locator('input[name="employee_id"][value="emp-zen"]').check();
-  await page.getByRole("button", { name: "Send offer", exact: true }).click();
-  await page.getByRole("link", { name: "Open employee preview" }).click();
+  await page.getByRole("button", { name: "Gửi đề nghị", exact: true }).click();
+  await page.getByRole("link", { name: "Mở bản xem thử nhân viên" }).click();
   await page.getByRole("button", { name: "Accept order", exact: true }).click();
   await page
     .getByRole("dialog")
@@ -120,10 +118,10 @@ test("assignment offer, employee decline, reassignment and accept share state", 
   );
   await page.goto("/admin/orders/ASC-1049");
   await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "in progress",
+    "Đang thực hiện",
   );
   await expect(
-    page.getByText("Employee accepted order", { exact: true }),
+    page.getByText("Nhân viên đã nhận đơn", { exact: true }),
   ).toBeVisible();
 });
 test("progress, pause and cancellation require deliberate confirmation", async ({
@@ -132,51 +130,49 @@ test("progress, pause and cancellation require deliberate confirmation", async (
   await login(page);
   await page.goto("/admin/orders/ASC-1042");
   await page
-    .getByRole("button", { name: "Update progress", exact: true })
+    .getByRole("button", { name: "Cập nhật tiến độ", exact: true })
     .click();
-  await page.getByLabel("Progress percent").fill("78");
-  await page.getByRole("button", { name: "Save update", exact: true }).click();
+  await page.getByLabel("Phần trăm tiến độ").fill("78");
+  await page.getByRole("button", { name: "Lưu cập nhật", exact: true }).click();
   await expect(page.getByRole("progressbar")).toHaveAttribute(
     "aria-valuenow",
     "78",
   );
-  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await page.getByRole("button", { name: "Tạm dừng", exact: true }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Cancel", exact: true })
+    .getByRole("button", { name: "Hủy", exact: true })
     .click();
   await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "in progress",
+    "Đang thực hiện",
   );
-  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await page.getByRole("button", { name: "Tạm dừng", exact: true }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Pause order", exact: true })
+    .getByRole("button", { name: "Tạm dừng đơn", exact: true })
     .click();
-  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText("paused");
-  await page.getByRole("button", { name: "Cancel order", exact: true }).click();
+  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
+    "Tạm dừng",
+  );
+  await page.getByRole("button", { name: "Hủy đơn", exact: true }).click();
   await page
-    .getByLabel("Cancellation reason")
+    .getByLabel("Lý do hủy đơn")
     .fill("Customer requested cancellation in the demo.");
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Cancel order", exact: true })
+    .getByRole("button", { name: "Hủy đơn", exact: true })
     .click();
-  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "cancelled",
-  );
+  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText("Đã hủy");
   await page.reload();
-  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "cancelled",
-  );
+  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText("Đã hủy");
 });
 test("order action dropdown never navigates its row", async ({ page }) => {
   await login(page);
   await page.goto("/admin/orders");
   const row = page.getByRole("row").filter({ hasText: "ASC-1049" });
-  await row.getByLabel("Open actions").click();
+  await row.getByLabel("Mở thao tác").click();
   await row
-    .getByRole("button", { name: "Assign employee", exact: true })
+    .getByRole("button", { name: "Phân công nhân viên", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page).toHaveURL(/\/admin\/orders$/);
@@ -189,15 +185,15 @@ test("chat separates internal notes, supports send and archive", async ({
   await page.goto("/admin/chat?order=ASC-1042");
   await page
     .locator(".op-chat-header")
-    .getByRole("button", { name: "View customer", exact: true })
+    .getByRole("button", { name: "Xem khách hàng", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toContainText("mynh.dat@example.com");
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Done", exact: true })
+    .getByRole("button", { name: "Đóng", exact: true })
     .click();
   const composer = page.getByRole("textbox", {
-    name: "Type a message",
+    name: "Nhập tin nhắn",
     exact: true,
   });
   await composer.fill("Thanks for checking in.");
@@ -212,15 +208,15 @@ test("chat separates internal notes, supports send and archive", async ({
       .locator(".op-message-bubble")
       .filter({ hasText: "We are on schedule." }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "Internal notes" }).click();
+  await page.getByRole("tab", { name: "Ghi chú nội bộ" }).click();
   await page
-    .getByRole("textbox", { name: "Write an internal note" })
+    .getByRole("textbox", { name: "Viết ghi chú nội bộ" })
     .fill("Private escalation note for staff only.");
-  await page.getByRole("button", { name: "Add note", exact: true }).click();
+  await page.getByRole("button", { name: "Thêm ghi chú", exact: true }).click();
   await expect(
     page.getByText("Private escalation note for staff only.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "Customer chat" }).click();
+  await page.getByRole("tab", { name: "Trao đổi với khách hàng" }).click();
   await expect(
     page.getByText("Private escalation note for staff only.", { exact: true }),
   ).toHaveCount(0);
@@ -229,21 +225,21 @@ test("chat separates internal notes, supports send and archive", async ({
     fullPage: true,
   });
   await page
-    .getByRole("button", { name: "Archive conversation", exact: true })
+    .getByRole("button", { name: "Lưu trữ cuộc trò chuyện", exact: true })
     .click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Archive conversation", exact: true })
+    .getByRole("button", { name: "Lưu trữ cuộc trò chuyện", exact: true })
     .click();
   await expect(
-    page.getByText("This conversation is archived. Reopen it to reply."),
+    page.getByText("Cuộc trò chuyện đã được lưu trữ. Mở lại để trả lời."),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Reopen conversation", exact: true })
+    .getByRole("button", { name: "Mở lại cuộc trò chuyện", exact: true })
     .click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Reopen conversation", exact: true })
+    .getByRole("button", { name: "Mở lại cuộc trò chuyện", exact: true })
     .click();
   await expect(composer).toBeVisible();
 });
@@ -253,24 +249,24 @@ test("read-only permissions hide order mutations and composer", async ({
   await login(page, true);
   await page.goto("/admin/orders/ASC-1042");
   await expect(
-    page.getByRole("heading", { name: "Live progress" }),
+    page.getByRole("heading", { name: "Tiến độ hiện tại" }),
   ).toBeVisible();
   for (const name of [
-    "Reassign",
-    "Pause",
-    "Cancel order",
-    "Complete",
-    "Update progress",
+    "Phân công lại",
+    "Tạm dừng",
+    "Hủy đơn",
+    "Hoàn thành",
+    "Cập nhật tiến độ",
   ])
     await expect(page.getByRole("button", { name, exact: true })).toHaveCount(
       0,
     );
   await page.goto("/admin/chat?order=ASC-1042");
   await expect(
-    page.getByText("You have read-only access to this conversation."),
+    page.getByText("Bạn chỉ có quyền xem cuộc trò chuyện này."),
   ).toBeVisible();
   await expect(
-    page.getByRole("textbox", { name: "Type a message" }),
+    page.getByRole("textbox", { name: "Nhập tin nhắn" }),
   ).toHaveCount(0);
 });
 test("mobile inbox drills into chat and back without horizontal overflow", async ({
@@ -280,18 +276,20 @@ test("mobile inbox drills into chat and back without horizontal overflow", async
   await login(page);
   await page.goto("/admin/chat");
   await page
-    .getByRole("button", { name: "Open conversation with Mynh Dat" })
+    .getByRole("button", { name: "Mở cuộc trò chuyện với Mynh Dat" })
     .click();
   await expect(
-    page.getByRole("textbox", { name: "Type a message" }),
+    page.getByRole("textbox", { name: "Nhập tin nhắn" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/chat-mobile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Back to conversations" }).click();
+  await page
+    .getByRole("button", { name: "Quay lại danh sách trò chuyện" })
+    .click();
   await expect(
-    page.getByRole("button", { name: "Open conversation with Mynh Dat" }),
+    page.getByRole("button", { name: "Mở cuộc trò chuyện với Mynh Dat" }),
   ).toBeVisible();
   for (const route of [
     "/admin/orders",

@@ -1,4 +1,6 @@
 "use client";
+
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { ArrowUpRight, Package, MessageSquare } from "lucide-react";
 import { useOperations } from "@/lib/admin/operations-store";
@@ -23,16 +25,16 @@ export function OperationsOverview() {
           <div className="op-section-title">
             <h2>
               <Package size={18} />
-              Order operations
+              Vận hành đơn hàng{" "}
             </h2>
             <Link href="/admin/orders">
-              View all orders <ArrowUpRight size={15} />
+              Xem tất cả đơn hàng <ArrowUpRight size={15} />
             </Link>
           </div>
           <div className="ap-stats">
             {[
               {
-                label: "Revenue today",
+                label: "Doanh thu hôm nay",
                 value: money(
                   todaysOrders
                     .filter(
@@ -43,24 +45,24 @@ export function OperationsOverview() {
                     )
                     .reduce((sum, o) => sum + o.amount, 0),
                 ),
-                note: "Confirmed order value · demo",
+                note: "Giá trị đơn đã xác nhận · dùng thử",
               },
               {
-                label: "Orders today",
+                label: "Đơn hàng hôm nay",
                 value: todaysOrders.length,
-                note: "New customer journeys",
+                note: "Hành trình khách hàng mới",
               },
               {
-                label: "Active orders",
+                label: "Đơn đang thực hiện",
                 value: orders.filter((o) => activeStatuses.includes(o.status))
                   .length,
-                note: "Across the delivery pipeline",
+                note: "Trong quy trình xử lý",
               },
               {
-                label: "Unassigned orders",
+                label: "Đơn chưa phân công",
                 value: orders.filter((o) => incomingStatuses.includes(o.status))
                   .length,
-                note: "Ready for review or assignment",
+                note: "Sẵn sàng duyệt hoặc phân công",
               },
             ].map((stat) => (
               <article className="ap-stat" key={stat.label}>
@@ -73,9 +75,9 @@ export function OperationsOverview() {
           <div className="op-overview-grid">
             <section className="ap-panel">
               <div className="ap-panel-heading">
-                <h2>Recent orders</h2>
+                <h2>Đơn hàng gần đây</h2>
                 <Link href="/admin/orders">
-                  View all <ArrowUpRight size={14} />
+                  Xem tất cả <ArrowUpRight size={14} />
                 </Link>
               </div>
               <div className="op-recent-orders">
@@ -89,7 +91,7 @@ export function OperationsOverview() {
                       <div>
                         <strong>#{o.id}</strong>
                         <small>
-                          {o.customer.name} · {o.service}
+                          {o.customer.name} · {adminText(o.service)}
                         </small>
                       </div>
                       <StatusBadge status={o.status} />
@@ -99,10 +101,10 @@ export function OperationsOverview() {
               </div>
             </section>
             <section className="ap-panel ap-prose">
-              <h2>Order status overview</h2>
+              <h2>Tổng quan trạng thái đơn</h2>
               {["PENDING", "IN_PROGRESS", "COMPLETED"].map((status) => (
                 <div className="op-status-metric" key={status}>
-                  <span>{status.replaceAll("_", " ").toLowerCase()}</span>
+                  <span>{adminText(status)}</span>
                   <strong>
                     {orders.filter((o) => o.status === status).length}
                   </strong>
@@ -122,26 +124,27 @@ export function OperationsOverview() {
       <div className="op-quick-links">
         {allowed && (
           <Link href="/admin/incoming-orders">
-            Review incoming orders <ArrowUpRight size={16} />
+            Duyệt đơn mới <ArrowUpRight size={16} />
           </Link>
         )}
         {allowed && can("order.assign") && (
           <Link href="/admin/assignments">
-            Assign orders <ArrowUpRight size={16} />
+            Phân công đơn <ArrowUpRight size={16} />
           </Link>
         )}
         {chat && (
           <Link href="/admin/chat">
             <MessageSquare size={16} />
             <span>
-              Chat activity <small>{unread} unread messages · Open chat</small>
+              Hoạt động trò chuyện{" "}
+              <small>{unread} tin nhắn chưa đọc · Mở trò chuyện</small>
             </span>
             <ArrowUpRight size={16} />
           </Link>
         )}
         {can("employee.application.view") && (
           <Link href="/admin/employee-applications">
-            Review employee applications <ArrowUpRight size={16} />
+            Xét duyệt hồ sơ ứng tuyển <ArrowUpRight size={16} />
           </Link>
         )}
       </div>

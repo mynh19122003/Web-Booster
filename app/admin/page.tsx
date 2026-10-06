@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Dashboard } from "@/components/admin/portal/Dashboard";
 export const metadata: Metadata = {
-  title: "Admin Workspace",
+  title: "Không gian quản trị",
   robots: { index: false, follow: false },
   alternates: { canonical: "/admin" },
 };

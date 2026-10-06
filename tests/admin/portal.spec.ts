@@ -3,10 +3,10 @@ async function login(page: Page, viewer = false) {
   await page.goto("/admin/login");
   if (viewer)
     await page
-      .getByRole("button", { name: "View-only staff", exact: true })
+      .getByRole("button", { name: "Nhân sự chỉ xem", exact: true })
       .click();
   await page.locator('input[name="password"]').fill("DemoPass123!");
-  await page.getByRole("button", { name: "Sign in to workspace" }).click();
+  await page.getByRole("button", { name: "Đăng nhập" }).click();
   await expect(page).toHaveURL(/\/admin$/);
 }
 test("owner workspace and all routes render without runtime errors", async ({
@@ -43,29 +43,29 @@ test("view-only staff cannot manage staff or approve applications", async ({
   await login(page, true);
   await page.goto("/admin/staff");
   await expect(
-    page.getByText("This area is restricted", { exact: true }),
+    page.getByText("Bạn không có quyền truy cập", { exact: true }),
   ).toBeVisible();
   await page.goto("/admin/employee-applications");
-  await page.getByRole("link", { name: "Review Daniel Nguyen" }).click();
+  await page.getByRole("link", { name: "Xem hồ sơ Daniel Nguyen" }).click();
+  await expect(page.getByRole("button", { name: "Duyệt hồ sơ" })).toHaveCount(
+    0,
+  );
   await expect(
-    page.getByRole("button", { name: "Approve application" }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Reject", exact: true }),
+    page.getByRole("button", { name: "Từ chối", exact: true }),
   ).toHaveCount(0);
 });
 test("invitation accepts once and persists after reload", async ({ page }) => {
   await page.goto("/admin/accept-invitation?token=demo-invitation");
   await page.locator('input[name="password"]').fill("StrongDemo123!");
   await page.locator('input[name="confirmation"]').fill("StrongDemo123!");
-  await page.getByRole("button", { name: "Accept invitation" }).click();
-  await expect(page.getByText("You’re part of the team.")).toBeVisible();
+  await page.getByRole("button", { name: "Chấp nhận lời mời" }).click();
+  await expect(page.getByText("Bạn đã gia nhập đội ngũ.")).toBeVisible();
   await page.reload();
   await page.locator('input[name="password"]').fill("StrongDemo123!");
   await page.locator('input[name="confirmation"]').fill("StrongDemo123!");
-  await page.getByRole("button", { name: "Accept invitation" }).click();
+  await page.getByRole("button", { name: "Chấp nhận lời mời" }).click();
   await expect(page.locator(".ap-error[role=alert]")).toContainText(
-    "already been used",
+    "đã được sử dụng",
   );
 });
 test("mobile workspace fits the viewport", async ({ page }) => {
@@ -85,26 +85,30 @@ test("mobile workspace fits the viewport", async ({ page }) => {
 test("approve and reject decisions persist", async ({ page }) => {
   await login(page);
   await page.goto("/admin/employee-applications/app-1048");
+  await page.getByRole("button", { name: "Duyệt hồ sơ", exact: true }).click();
   await page
-    .getByRole("button", { name: "Approve application", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Approve & send credentials" })
+    .getByRole("button", { name: "Duyệt và gửi thông tin đăng nhập" })
     .click();
   await expect(
-    page.getByRole("button", { name: "Resend credentials", exact: true }),
+    page.getByRole("button", {
+      name: "Gửi lại thông tin đăng nhập",
+      exact: true,
+    }),
   ).toBeVisible();
   await page.reload();
   await expect(
-    page.getByRole("button", { name: "Resend credentials", exact: true }),
+    page.getByRole("button", {
+      name: "Gửi lại thông tin đăng nhập",
+      exact: true,
+    }),
   ).toBeVisible();
   await page.goto("/admin/employee-applications/app-1047");
-  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  await page.getByRole("button", { name: "Từ chối", exact: true }).click();
   await page
-    .getByLabel("Rejection reason")
+    .getByLabel("Lý do từ chối")
     .fill("More coaching experience is required.");
   await page
-    .getByRole("button", { name: "Reject application", exact: true })
+    .getByRole("button", { name: "Từ chối hồ sơ", exact: true })
     .click();
   await expect(
     page.getByText("More coaching experience is required.", { exact: true }),
@@ -116,19 +120,19 @@ test("staff can be suspended and reactivated", async ({ page }) => {
   await page.goto("/admin/staff");
   const row = page.getByRole("row").filter({ hasText: "olivia@ascend.demo" });
   await row.locator("summary").click();
-  await row.getByRole("button", { name: "Suspend", exact: true }).click();
+  await row.getByRole("button", { name: "Tạm khóa", exact: true }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Suspend", exact: true })
+    .getByRole("button", { name: "Tạm khóa", exact: true })
     .click();
-  await expect(row).toContainText("suspended");
+  await expect(row).toContainText("Tạm khóa");
   await row.locator("summary").click();
-  await row.getByRole("button", { name: "Activate", exact: true }).click();
+  await row.getByRole("button", { name: "Kích hoạt", exact: true }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Activate", exact: true })
+    .getByRole("button", { name: "Kích hoạt", exact: true })
     .click();
-  await expect(row.locator(".ap-badge")).toContainText("active");
+  await expect(row.locator(".ap-badge")).toContainText("Đang hoạt động");
 });
 
 test("password change signs out and guards private routes", async ({
@@ -137,16 +141,16 @@ test("password change signs out and guards private routes", async ({
   await login(page);
   await page.goto("/admin/profile");
   await page
-    .getByLabel("Current password", { exact: true })
+    .getByLabel("Mật khẩu hiện tại", { exact: true })
     .fill("DemoPass123!");
   await page
-    .getByLabel("New password", { exact: true })
+    .getByLabel("Mật khẩu mới", { exact: true })
     .fill("NewDemoPass123!");
   await page
-    .getByLabel("Confirm new password", { exact: true })
+    .getByLabel("Xác nhận mật khẩu mới", { exact: true })
     .fill("NewDemoPass123!");
   await page
-    .getByRole("button", { name: "Update password & sign out" })
+    .getByRole("button", { name: "Cập nhật mật khẩu và đăng xuất" })
     .click();
   await expect(page).toHaveURL(/\/admin\/login\?changed=1/);
   await page.goto("/admin/staff");
