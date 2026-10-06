@@ -322,9 +322,11 @@ export function FormModal({
   onClose,
   onSubmit,
   children,
+  className = "",
 }: {
   title: string;
   description: string;
+  className?: string;
   submit?: string;
   danger?: boolean;
   onClose: () => void;
@@ -333,15 +335,23 @@ export function FormModal({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const submitting = useRef(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     const dialog = ref.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     dialog?.showModal();
-    return () => dialog?.close();
+    return () => {
+      dialog?.close();
+      document.body.style.overflow = previousOverflow;
+    };
   }, []);
   async function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setPending(true);
     setError("");
     try {
@@ -352,13 +362,14 @@ export function FormModal({
         e instanceof Error ? e.message : "Something went wrong. Please retry.",
       );
     } finally {
+      submitting.current = false;
       setPending(false);
     }
   }
   return (
     <dialog
       ref={ref}
-      className="ap-modal"
+      className={`ap-modal ${className}`}
       aria-labelledby={titleId}
       onCancel={(e) => {
         e.preventDefault();

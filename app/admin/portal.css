@@ -1319,10 +1319,10 @@
   font-size: 10px;
   color: #8996a8;
 }
-.ap-root input:not([type="checkbox"]),
+.ap-root input:not([type="checkbox"]):not([type="radio"]),
 .ap-root select,
 .ap-root textarea,
-.ap-modal input:not([type="checkbox"]),
+.ap-modal input:not([type="checkbox"]):not([type="radio"]),
 .ap-modal select,
 .ap-modal textarea {
   width: 100%;
@@ -2072,4 +2072,46 @@
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Keep dialog controls visible while only the body scrolls. */
+.ap-modal {
+  max-height: min(85dvh, 800px);
+  overflow: hidden;
+}
+.ap-modal > form {
+  display: flex;
+  flex-direction: column;
+  max-height: min(85dvh, 800px);
+  min-height: 0;
+}
+.ap-modal > form > header,
+.ap-modal > form > footer {
+  flex: 0 0 auto;
+}
+.ap-modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #59616f #171b22;
+}
+.ap-modal header > div,
+.ap-person > div,
+.ap-field {
+  min-width: 0;
+}
+.ap-modal header button {
+  flex-shrink: 0;
+}
+.ap-person strong,
+.ap-person small,
+.ap-modal-body dd {
+  overflow-wrap: anywhere;
+}
+.ap-modal-body input,
+.ap-modal-body select,
+.ap-modal-body textarea {
+  min-width: 0;
+  max-width: 100%;
 }

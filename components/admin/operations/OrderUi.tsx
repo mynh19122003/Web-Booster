@@ -164,7 +164,13 @@ export function EmployeeCandidateCard({
           Avg. completion<strong>{employee.averageHours}h</strong>
         </span>
       </div>
-      {disabled && <small>Unavailable for this order or at capacity</small>}
+      {disabled && (
+        <small className="op-unavailable-badge">
+          {active >= employee.maxActiveOrders
+            ? "At capacity"
+            : "Unavailable for this order"}
+        </small>
+      )}
     </label>
   );
 }
@@ -194,6 +200,7 @@ export function AssignEmployeeModal({
   );
   return (
     <FormModal
+      className="op-assign-modal"
       title={
         order.employeeId
           ? `Reassign #${order.id}`
@@ -420,6 +427,72 @@ export function OrderActions({
             notice("Order updated in this demo workspace.");
           }}
         >
+          {action === "review" ? (
+            <dl className="op-review-summary">
+              <div>
+                <dt>Customer</dt>
+                <dd>
+                  {order.customer.name}
+                  <small>{order.customer.email}</small>
+                </dd>
+              </div>
+              <div>
+                <dt>Game</dt>
+                <dd>{order.game}</dd>
+              </div>
+              <div>
+                <dt>Service</dt>
+                <dd>{order.service}</dd>
+              </div>
+              <div>
+                <dt>Current</dt>
+                <dd>{order.currentRank}</dd>
+              </div>
+              <div>
+                <dt>Target</dt>
+                <dd>{order.targetRank}</dd>
+              </div>
+              <div>
+                <dt>Region</dt>
+                <dd>{order.region}</dd>
+              </div>
+              <div>
+                <dt>Price</dt>
+                <dd>{money(order.amount)}</dd>
+              </div>
+              <div>
+                <dt>Options</dt>
+                <dd>
+                  {[order.priority, order.queue, ...order.options].join(" / ")}
+                </dd>
+              </div>
+              <div>
+                <dt>Submitted</dt>
+                <dd>{dateTime(order.createdAt)}</dd>
+              </div>
+            </dl>
+          ) : (
+            <dl className="op-review-summary">
+              <div>
+                <dt>Customer</dt>
+                <dd>{order.customer.name}</dd>
+              </div>
+              <div>
+                <dt>Service</dt>
+                <dd>
+                  {order.game} / {order.service}
+                </dd>
+              </div>
+              <div>
+                <dt>Current</dt>
+                <dd>{order.currentRank}</dd>
+              </div>
+              <div>
+                <dt>Target</dt>
+                <dd>{order.targetRank}</dd>
+              </div>
+            </dl>
+          )}
           {action === "cancel" && (
             <Field label="Cancellation reason">
               <textarea
