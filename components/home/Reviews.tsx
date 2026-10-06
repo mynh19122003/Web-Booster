@@ -1,42 +1,9 @@
 "use client";
 
-import { useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+
+import { useEffect, useState } from "react";
 import type { Review } from "@/types/review";
 import { reviews as defaultReviews } from "@/data/reviews";
-
-function Counter({ value }: { value: number }) {
-  const [n, setN] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const reduced = useReducedMotion();
-
-  useEffect(() => {
-    if (reduced) {
-      const frame = requestAnimationFrame(() => setN(value));
-      return () => cancelAnimationFrame(frame);
-    }
-    let frame = 0;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      let start: number;
-      const tick = (time: number) => {
-        start ??= time;
-        const p = Math.min((time - start) / 1000, 1);
-        setN(Math.round(value * p));
-        if (p < 1) frame = requestAnimationFrame(tick);
-      };
-      frame = requestAnimationFrame(tick);
-      obs.disconnect();
-    });
-    if (ref.current) obs.observe(ref.current);
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(frame);
-    };
-  }, [value, reduced]);
-
-  return <span ref={ref}>{n}</span>;
-}
 
 function ReviewCard({ review }: { review: Review }) {
   return (

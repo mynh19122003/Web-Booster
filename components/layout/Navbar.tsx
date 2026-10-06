@@ -28,6 +28,14 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [userMenu, setUserMenu] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
+
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setOpen(false);
+    setSearch(false);
+    setUserMenu(false);
+  }
 
   const headerRef = useRef<HTMLElement | null>(null);
   const gamesButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -79,12 +87,6 @@ export function Navbar() {
     window.addEventListener("scroll", scroll, { passive: true });
     return () => window.removeEventListener("scroll", scroll);
   }, []);
-
-  useEffect(() => {
-    setOpen(false);
-    setSearch(false);
-    setUserMenu(false);
-  }, [pathname]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
