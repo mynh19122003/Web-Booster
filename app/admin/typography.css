@@ -1,0 +1,451 @@
+/* Admin-only readability floor for the reviewed 8-11px labels and metadata.
+   The shared employee preview and public typography remain unchanged. */
+.ap-root[lang="vi"] small,
+.ap-root[lang="vi"] .ap-brand small,
+.ap-root[lang="vi"] .ap-workspace-label,
+.ap-root[lang="vi"] .ap-workspace-label small,
+.ap-root[lang="vi"] .ap-nav-label,
+.ap-root[lang="vi"] .ap-sidebar nav a b,
+.ap-root[lang="vi"] .ap-demo-card strong,
+.ap-root[lang="vi"] .ap-demo-card p,
+.ap-root[lang="vi"] .ap-demo-card > span,
+.ap-root[lang="vi"] .ap-public-link,
+.ap-root[lang="vi"] .ap-collapse,
+.ap-root[lang="vi"] .ap-breadcrumb,
+.ap-root[lang="vi"] .ap-top-search,
+.ap-root[lang="vi"] .ap-demo-tag,
+.ap-root[lang="vi"] .ap-notification-popover a,
+.ap-root[lang="vi"] .ap-account-menu summary,
+.ap-root[lang="vi"] .ap-account-menu small,
+.ap-root[lang="vi"] .ap-avatar,
+.ap-root[lang="vi"] .ap-person strong,
+.ap-root[lang="vi"] .ap-person small,
+.ap-root[lang="vi"] .ap-eyebrow,
+.ap-root[lang="vi"] .ap-page-header p,
+.ap-root[lang="vi"] .ap-date,
+.ap-root[lang="vi"] .ap-button,
+.ap-root[lang="vi"] .ap-button.small,
+.ap-root[lang="vi"] .ap-stat-top,
+.ap-root[lang="vi"] .ap-stat-bottom,
+.ap-root[lang="vi"] .ap-stat-bottom small,
+.ap-root[lang="vi"] .ap-panel-heading p,
+.ap-root[lang="vi"] .ap-panel-heading > a,
+.ap-root[lang="vi"] th,
+.ap-root[lang="vi"] td,
+.ap-root[lang="vi"] .ap-badge,
+.ap-root[lang="vi"] .ap-spotlight p,
+.ap-root[lang="vi"] .ap-spotlight-bottom small,
+.ap-root[lang="vi"] .ap-stack .ap-avatar,
+.ap-root[lang="vi"] .ap-invitation-list strong,
+.ap-root[lang="vi"] .ap-invitation-list small,
+.ap-root[lang="vi"] .ap-panel-footnote,
+.ap-root[lang="vi"] .ap-timeline p,
+.ap-root[lang="vi"] .ap-timeline small,
+.ap-root[lang="vi"] .ap-quick-actions > a > span,
+.ap-root[lang="vi"] .ap-quick-actions small,
+.ap-root[lang="vi"] .ap-updated,
+.ap-root[lang="vi"] .ap-workspace-footer,
+.ap-root[lang="vi"] .ap-inline-summary,
+.ap-root[lang="vi"] .ap-filter-select,
+.ap-root[lang="vi"] .ap-filter-select select,
+.ap-root[lang="vi"] .ap-table-footer,
+.ap-root[lang="vi"] .ap-role,
+.ap-root[lang="vi"] .ap-permissions span,
+.ap-root[lang="vi"] .ap-cell-stack small,
+.ap-root[lang="vi"] .ap-action-menu button,
+.ap-root[lang="vi"] .ap-info-strip p,
+.ap-root[lang="vi"] .ap-info-strip > span,
+.ap-root[lang="vi"] .ap-tabs button,
+.ap-root[lang="vi"] .ap-tabs button span,
+.ap-root[lang="vi"] .ap-back,
+.ap-root[lang="vi"] .ap-profile-banner p,
+.ap-root[lang="vi"] .ap-rank-pill,
+.ap-root[lang="vi"] .ap-detail-facts > div > span:first-child,
+.ap-root[lang="vi"] .ap-review-timeline b,
+.ap-root[lang="vi"] .ap-review-timeline small,
+.ap-root[lang="vi"] .ap-side-note p,
+.ap-root[lang="vi"] .ap-success small,
+.ap-root[lang="vi"] .ap-error,
+.ap-root[lang="vi"] .ap-field,
+.ap-root[lang="vi"] .ap-field > small,
+.ap-root[lang="vi"] .ap-text-link,
+.ap-root[lang="vi"] .ap-modal header p,
+.ap-root[lang="vi"] .ap-permission-fields legend,
+.ap-root[lang="vi"] .ap-permission-fields strong,
+.ap-root[lang="vi"] .ap-permission-fields small,
+.ap-root[lang="vi"] .ap-art-label,
+.ap-root[lang="vi"] .ap-auth-story footer,
+.ap-root[lang="vi"] .ap-auth-top,
+.ap-root[lang="vi"] .ap-auth-description,
+.ap-root[lang="vi"] .ap-demo-switch > span,
+.ap-root[lang="vi"] .ap-demo-switch button,
+.ap-root[lang="vi"] .ap-login-help,
+.ap-root[lang="vi"] .ap-login-help button,
+.ap-root[lang="vi"] .ap-auth-invitation,
+.ap-root[lang="vi"] .ap-auth-bottom,
+.ap-root[lang="vi"] .ap-detail-facts,
+.ap-root[lang="vi"] .ap-sidebar nav .ap-nav-label,
+.ap-root[lang="vi"] .op-muted,
+.ap-root[lang="vi"] .op-demo-label,
+.ap-root[lang="vi"] .op-filter-chips button,
+.ap-root[lang="vi"] .op-order-table .ap-avatar,
+.ap-root[lang="vi"] .op-order-actions > .ap-button,
+.ap-root[lang="vi"] .op-progress > div:first-child,
+.ap-root[lang="vi"] .op-lane-heading p,
+.ap-root[lang="vi"] .op-card-top .ap-badge,
+.ap-root[lang="vi"] .op-queue-facts span,
+.ap-root[lang="vi"] .op-queue-facts strong,
+.ap-root[lang="vi"] .op-option-tags span,
+.ap-root[lang="vi"] .op-received,
+.ap-root[lang="vi"] .op-order-card > .ap-text-link,
+.ap-root[lang="vi"] .op-assignment-board .ap-person strong,
+.ap-root[lang="vi"] .op-assignment-board .ap-person small,
+.ap-root[lang="vi"] .op-assignment-board .op-rank-path,
+.ap-root[lang="vi"] .op-assignee,
+.ap-root[lang="vi"] .op-offer-state > strong,
+.ap-root[lang="vi"] .op-offer-state > a,
+.ap-root[lang="vi"] .op-countdown,
+.ap-root[lang="vi"] .op-step,
+.ap-root[lang="vi"] .op-history-list > div,
+.ap-root[lang="vi"] .op-assignment-target > span:not(.ap-badge),
+.ap-root[lang="vi"] .op-candidate > p,
+.ap-root[lang="vi"] .op-candidate-facts > span,
+.ap-root[lang="vi"] .op-candidate-facts strong,
+.ap-root[lang="vi"] .op-facts > div,
+.ap-root[lang="vi"] .op-milestones li,
+.ap-root[lang="vi"] .op-milestones li > small,
+.ap-root[lang="vi"] .op-note > span,
+.ap-root[lang="vi"] .op-assignment-history p,
+.ap-root[lang="vi"] .op-section-title a,
+.ap-root[lang="vi"] .op-quick-links a,
+.ap-root[lang="vi"] .op-quick-links small,
+.ap-root[lang="vi"] .op-notification-item > span,
+.ap-root[lang="vi"] .op-conversation-list .ap-search input,
+.ap-root[lang="vi"] .op-chat-filters button,
+.ap-root[lang="vi"] .op-conversation-row > .ap-avatar,
+.ap-root[lang="vi"] .op-conversation-row strong,
+.ap-root[lang="vi"] .op-conversation-row strong small,
+.ap-root[lang="vi"] .op-chat-meta,
+.ap-root[lang="vi"] .op-message-snippet,
+.ap-root[lang="vi"] .op-unread,
+.ap-root[lang="vi"] .op-chat-header > .ap-badge,
+.ap-root[lang="vi"] .op-chat-header-actions .ap-button,
+.ap-root[lang="vi"] .op-chat-tabs button,
+.ap-root[lang="vi"] .op-internal-banner,
+.ap-root[lang="vi"] .op-message-sender,
+.ap-root[lang="vi"] .op-message-sender .ap-avatar,
+.ap-root[lang="vi"] .op-message-sender > span:not(.ap-avatar),
+.ap-root[lang="vi"] .op-message-attachment,
+.ap-root[lang="vi"] .op-message-attachment small,
+.ap-root[lang="vi"] .op-typing-row,
+.ap-root[lang="vi"] .op-composer footer > small,
+.ap-root[lang="vi"] .op-composer footer > .ap-button,
+.ap-root[lang="vi"] .op-composer-locked,
+.ap-root[lang="vi"] .op-attach-menu > div small,
+.ap-root[lang="vi"] .op-attach-menu > div button,
+.ap-root[lang="vi"] .op-attachment-chip,
+.ap-root[lang="vi"] .op-chat-context .ap-eyebrow,
+.ap-root[lang="vi"] .op-context-order p,
+.ap-root[lang="vi"] .op-chat-context .op-rank-path,
+.ap-root[lang="vi"] .op-chat-context > .ap-button,
+.ap-root[lang="vi"] .op-employee-switch label,
+.ap-root[lang="vi"] .op-info-banner,
+.ap-root[lang="vi"] .op-recent-orders .ap-badge,
+.ap-root[lang="vi"] .op-recent-orders > a > strong,
+.ap-root[lang="vi"] .op-chat-header small,
+.ap-root[lang="vi"] .op-employee-switch > .ap-button,
+.ap-root[lang="vi"] .op-review-summary dt {
+  font-size: 12px;
+}
+
+.ap-root[lang="vi"] .ap-count,
+.ap-root[lang="vi"] .ap-search input,
+.ap-root[lang="vi"] .ap-success,
+.ap-root[lang="vi"] .ap-form-hint,
+.ap-root[lang="vi"] .ap-demo-disclaimer,
+.ap-root[lang="vi"] .op-message-time {
+  font-size: 12px !important;
+}
+/* Scale and Vietnamese line boxes. This scope does not match employee preview. */
+.ap-root[lang="vi"] {
+  font-family: var(--font-admin), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.ap-root[lang="vi"] h1,
+.ap-root[lang="vi"] .ap-page-header h1 {
+  font-size: 28px;
+  line-height: 1.3;
+}
+.ap-root[lang="vi"] h2 {
+  font-size: 18px;
+  line-height: 1.3;
+}
+.ap-root[lang="vi"] .ap-modal h2 {
+  font-size: 20px;
+}
+.ap-root[lang="vi"] .ap-modal {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.ap-root[lang="vi"] .ap-page-header p {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-sidebar nav a {
+  font-size: 14px;
+  gap: 9px;
+  padding-inline: 10px;
+}
+.ap-root[lang="vi"] .ap-sidebar nav .ap-nav-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.ap-root[lang="vi"] .ap-sidebar nav a b {
+  font-size: 12px;
+}
+.ap-root[lang="vi"] .ap-button,
+.ap-root[lang="vi"] .ap-button.small,
+.ap-root[lang="vi"] .op-order-actions > .ap-button,
+.ap-root[lang="vi"] .op-chat-header-actions .ap-button,
+.ap-root[lang="vi"] .op-composer footer > .ap-button,
+.ap-root[lang="vi"] .op-chat-context > .ap-button {
+  font-size: 14px;
+  min-height: 40px;
+}
+.ap-root[lang="vi"] .ap-button.primary {
+  font-size: 15px;
+}
+.ap-root[lang="vi"] .ap-badge,
+.ap-root[lang="vi"] .op-chat-header > .ap-badge,
+.ap-root[lang="vi"] .op-recent-orders .ap-badge {
+  font-size: 12px;
+  padding: 6px 9px;
+  text-transform: none;
+}
+.ap-root[lang="vi"] .ap-stat-top {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-stat > strong {
+  font-size: 38px;
+  line-height: 1.4;
+}
+.ap-root[lang="vi"] .ap-stat-bottom,
+.ap-root[lang="vi"] .ap-stat-bottom small {
+  font-size: 12px;
+}
+.ap-root[lang="vi"] th {
+  font-size: 13px;
+  font-weight: 600;
+}
+.ap-root[lang="vi"] td {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-person strong,
+.ap-root[lang="vi"] .ap-cell-stack > strong,
+.ap-root[lang="vi"] .op-order-id {
+  font-size: 14px;
+  font-weight: 600;
+}
+.ap-root[lang="vi"] .ap-cell-stack small,
+.ap-root[lang="vi"] td small {
+  font-size: 12px;
+}
+.ap-root[lang="vi"] .ap-field {
+  line-height: 1.4;
+}
+.ap-root[lang="vi"] .ap-field > span {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-field input:not([type="checkbox"]):not([type="radio"]),
+.ap-root[lang="vi"] .ap-field select,
+.ap-root[lang="vi"] .ap-field textarea,
+.ap-root[lang="vi"] .ap-filter-select select {
+  font-size: 15px;
+  min-height: 46px;
+  padding-inline: 14px;
+}
+.ap-root[lang="vi"] select option {
+  font-size: 15px;
+}
+.ap-root[lang="vi"] .ap-search input {
+  font-size: 15px !important;
+}
+.ap-root[lang="vi"] input::placeholder,
+.ap-root[lang="vi"] textarea::placeholder {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-panel-heading h2 {
+  font-size: 18px;
+}
+.ap-root[lang="vi"] .ap-tabs button,
+.ap-root[lang="vi"] .ap-action-menu button,
+.ap-root[lang="vi"] .ap-action-menu a {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .ap-auth-form-inner h2 {
+  font-size: 26px;
+}
+.ap-root[lang="vi"] .ap-auth-copy h1 {
+  font-size: 32px;
+}
+
+/* Keep controls compact without constraining the order table. */
+.ap-root[lang="vi"] .op-order-filters {
+  max-width: 1280px;
+  gap: 16px;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.ap-root[lang="vi"] .op-order-filters > .ap-search {
+  width: 520px;
+  max-width: 100%;
+  min-height: 46px;
+}
+.ap-root[lang="vi"] .op-order-filters > .op-filter-grid {
+  grid-template-columns: repeat(4, minmax(180px, 260px));
+  gap: 16px;
+  justify-content: start;
+}
+
+/* Readable inbox and intrinsic-width message bubbles. */
+.ap-root[lang="vi"] .op-chat-layout {
+  grid-template-columns: 300px minmax(0, 1fr);
+}
+.ap-root[lang="vi"] .op-chat-layout.with-context {
+  grid-template-columns: 300px minmax(0, 1fr) 280px;
+}
+.ap-root[lang="vi"] .op-conversation-row strong {
+  font-size: 15px;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+.ap-root[lang="vi"] .op-conversation-row strong small {
+  font-size: 12px;
+  font-weight: 400;
+}
+.ap-root[lang="vi"] .op-chat-meta {
+  font-size: 12px;
+}
+.ap-root[lang="vi"] .op-message-snippet {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ap-root[lang="vi"] .op-chat-header h2 {
+  font-size: 18px;
+}
+.ap-root[lang="vi"] .op-chat-tabs {
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ap-root[lang="vi"] .op-chat-tabs button {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .op-message {
+  width: fit-content;
+  max-width: 80%;
+  margin-bottom: 22px;
+}
+.ap-root[lang="vi"] .op-message-sender {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.ap-root[lang="vi"] .op-message-sender > span:not(.ap-avatar) {
+  font-size: 12px;
+  font-weight: 400;
+}
+.ap-root[lang="vi"] .op-message-bubble {
+  padding: 12px 16px;
+}
+.ap-root[lang="vi"] .op-message-bubble p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.ap-root[lang="vi"] .op-message-time {
+  font-size: 12px !important;
+  flex-wrap: wrap;
+}
+.ap-root[lang="vi"] .op-composer textarea {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.ap-root[lang="vi"] .op-composer footer {
+  flex-wrap: wrap;
+}
+.ap-root[lang="vi"] .op-composer footer > small {
+  font-size: 12px;
+  min-width: 140px;
+}
+.ap-root[lang="vi"] .op-chat-context {
+  padding: 18px;
+}
+.ap-root[lang="vi"] .op-context-order h2 {
+  font-size: 22px;
+}
+.ap-root[lang="vi"] .op-context-order p {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .op-chat-context .op-facts dt {
+  font-size: 13px;
+}
+.ap-root[lang="vi"] .op-chat-context .op-facts dd {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.ap-root[lang="vi"] .op-chat-context .op-rank-path {
+  font-size: 14px;
+}
+.ap-root[lang="vi"] .op-chat-header-actions {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1450px) {
+  .ap-root[lang="vi"] .op-chat-layout.with-context {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+  .ap-root[lang="vi"] .op-chat-context {
+    width: 280px;
+  }
+}
+@media (max-width: 1350px) {
+  .ap-root[lang="vi"] .op-order-filters > .op-filter-grid {
+    grid-template-columns: repeat(2, minmax(180px, 260px));
+  }
+}
+@media (max-width: 760px) {
+  .ap-root[lang="vi"] .ap-page-header h1 {
+    font-size: 26px;
+  }
+  .ap-root[lang="vi"] .op-order-filters {
+    padding: 20px;
+  }
+  .ap-root[lang="vi"] .op-order-filters > .op-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ap-root[lang="vi"] .op-message {
+    max-width: 90%;
+  }
+  .ap-root[lang="vi"] .op-chat-header {
+    padding: 14px;
+    gap: 10px;
+  }
+  .ap-root[lang="vi"] .op-chat-header h2 {
+    font-size: 16px;
+  }
+  .ap-root[lang="vi"] .op-chat-context {
+    width: min(320px, 100%);
+  }
+  .ap-root[lang="vi"] .op-chat-context > header {
+    gap: 10px;
+  }
+  .ap-root[lang="vi"] .op-message-log {
+    padding: 18px;
+  }
+}
+@media (max-width: 480px) {
+  .ap-root[lang="vi"] .op-order-filters > .op-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

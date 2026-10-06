@@ -34,7 +34,10 @@ test("owner workspace and all routes render without runtime errors", async ({
     await page.goto(`/admin/${route}`);
     await expect(page.locator("h1")).toBeVisible();
   }
-  await expect(page.locator(".ap-root")).toHaveCSS("font-family", /Sora/);
+  await expect(page.locator(".ap-root")).toHaveCSS(
+    "font-family",
+    /Be Vietnam Pro/,
+  );
   expect(errors).toEqual([]);
 });
 test("view-only staff cannot manage staff or approve applications", async ({

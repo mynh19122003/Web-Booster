@@ -1,6 +1,7 @@
 ﻿import { test, expect, type Page } from "@playwright/test";
 const sizes = [
   [1920, 1080],
+  [1600, 900],
   [1440, 900],
   [1366, 768],
   [1280, 720],
@@ -43,16 +44,16 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
     await page.setViewportSize({ width, height });
     for (const route of [
       "",
-      "đơn hàng",
+      "orders",
       "incoming-orders",
       "assignments",
       "orders/ASC-1049",
       "chat",
-      "Nhân sự quản trị",
+      "staff",
       "staff/invitations",
       "employee-applications",
       "employee-applications/app-1048",
-      "BẢO MẬT",
+      "security",
       "profile",
     ]) {
       await page.goto("/admin/" + route);
