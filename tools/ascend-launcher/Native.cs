@@ -8,6 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace AscendLauncher {
 internal static class Native {
+ [StructLayout(LayoutKind.Sequential)] internal struct CopyData {internal IntPtr marker;internal int bytes;internal IntPtr data;}
+ [DllImport("user32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern IntPtr SendMessageTimeout(IntPtr window,uint message,IntPtr wParam,ref CopyData data,uint flags,uint timeout,out IntPtr result);
+ internal static void ForwardRequest(IntPtr window,string uri){if(!LauncherEngine.ValidRequest(new[]{uri}))return;var pointer=Marshal.StringToHGlobalUni(uri);try{var data=new CopyData{marker=new IntPtr(0x415343),bytes=(uri.Length+1)*2,data=pointer};IntPtr result;SendMessageTimeout(window,0x004A,IntPtr.Zero,ref data,2,1000,out result);}finally{Marshal.FreeHGlobal(pointer);}}
  internal delegate bool EnumProc(IntPtr window, IntPtr data);
  [DllImport("user32.dll")] internal static extern bool EnumWindows(EnumProc callback, IntPtr data);
  [DllImport("user32.dll")] internal static extern bool IsWindowVisible(IntPtr h);

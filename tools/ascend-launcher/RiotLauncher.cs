@@ -20,8 +20,17 @@ internal sealed class LauncherEngine {
  readonly int timeout;
  DateTime lastLaunch=DateTime.MinValue;
  internal LauncherEngine(IRiotPlatform platform,int timeout=TimeoutMilliseconds) { this.platform=platform; this.timeout=timeout; }
- internal static bool ValidRequest(string[] args) { return args.Length==1 && (args[0]=="ascendriot://open/league" || args[0]=="ascendriot://open/riot"); }
+ internal static bool IsTest(string action) {return action=="ascendriot://test" || action=="ascendriot://test/";}
+ internal static bool ValidRequest(string[] args) { return args.Length==1 && (IsTest(args[0]) || args[0]=="ascendriot://open/league" || args[0]=="ascendriot://open/riot"); }
+ internal IList<string> PrepareCountdown() {
+  string client=platform.FindClient();platform.Verify(client);string root=Path.GetDirectoryName(client);var paths=new List<string>();
+  foreach(string path in new[]{Path.Combine(root,"RiotClientElectron","Riot Client.exe"),Path.Combine(root,"UX","RiotClientUx.exe")})if(platform.Exists(path)){platform.Verify(path);paths.Add(path);}
+  if(paths.Count==0)paths.Add(client);return paths;
+ }
+ internal bool HasRunningWindow(IList<string> paths){return platform.FindWindow(paths,true)!=IntPtr.Zero;}
  internal async Task Run(string action, Action<LaunchState,string> state, CancellationToken cancel) {
+  if(!ValidRequest(new[]{action})) throw new LauncherError("Yêu cầu mở client không hợp lệ.");
+  if(IsTest(action)) {cancel.ThrowIfCancellationRequested();state(LaunchState.SUCCESS,"ASCEND Launcher hoạt động.");return;}
   var duration=Stopwatch.StartNew();
   state(LaunchState.FINDING_RIOT,"Đang tìm Riot Client...");
   string client=platform.FindClient(); platform.Verify(client);

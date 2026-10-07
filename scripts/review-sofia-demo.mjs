@@ -36,17 +36,14 @@ try {
  await expect(page.getByRole("dialog")).toContainText("450.000");
  await page.getByRole("button",{name:"Xác nhận nhận đơn",exact:true}).click();
  await expect(page).toHaveURL(base+"/employee/orders/ASC-1054");
- await expect(page.getByRole("button",{name:"MỞ RIOT CLIENT",exact:true})).toBeEnabled();
+ await expect(page.getByRole("link",{name:"MỞ RIOT CLIENT",exact:true})).toBeEnabled();
  const chat=page.getByRole("textbox",{name:"Nội dung tin nhắn",exact:true});
  await expect(chat).toBeEnabled();await chat.fill("Sofia đã nhận đơn, mình sẽ cập nhật tiến độ tại đây.");
  await expect(page.getByText("Chào Sofia, bạn cập nhật tiến độ giúp mình tại đây nhé.",{exact:true})).toBeVisible();
  await page.getByRole("button",{name:"Gửi",exact:true}).click();
  await expect(page.getByText("Sofia đã nhận đơn, mình sẽ cập nhật tiến độ tại đây.", {exact:true})).toBeVisible();
  s=await snapshot();expect(s.orders.find(o=>o.id==="ASC-1054")).toMatchObject({status:"IN_PROGRESS",employeeId:"emp-sofia"});
- await page.getByRole("button",{name:"MỞ RIOT CLIENT",exact:true}).click();
- await expect(page.getByText("Đã gửi yêu cầu mở Riot Client.",{exact:true})).toBeVisible();
- expect(protocols).toContain("ascendriot://open/league");
- await page.reload();await expect(page.getByRole("button",{name:"MỞ RIOT CLIENT",exact:true})).toBeEnabled();
+ await page.reload();await expect(page.getByRole("link",{name:"MỞ RIOT CLIENT",exact:true})).toBeEnabled();
  expect((await snapshot()).orders.find(o=>o.id==="ASC-1054").employeeId).toBe("emp-sofia");
  await page.goto(base+"/employee/orders/available");
  await expect(page.getByText("Bạn đã đạt giới hạn đơn đang thực hiện.",{exact:true})).toBeVisible();
@@ -57,5 +54,9 @@ try {
  await adminPage.goto(base+"/admin/login");await adminPage.locator('input[name="password"]').fill("Ascend@123");
  await adminPage.getByRole("button",{name:"Đăng nhập",exact:true}).click();await expect(adminPage).toHaveURL(base+"/admin");
  await adminContext.close();
+ await page.goto(base+"/employee/orders/ASC-1054");
+ await page.getByRole("link",{name:"MỞ RIOT CLIENT",exact:true}).click();
+ await expect(page.getByText("Đã gửi yêu cầu mở Riot Client.",{exact:true})).toBeVisible();
+ expect(protocols).toContain("ascendriot://open/league");
  console.log(JSON.stringify({result:"PASS",account:"sofia@ascend.demo",initial:"0/1",claimed:"ASC-1054",chat:"unlocked/send PASS",limit:"1/1 blocks other claims",persistence:"reload PASS",protocols,apiRequests:api.length,pageErrors:errors},null,2));
 } finally {await browser.close();}

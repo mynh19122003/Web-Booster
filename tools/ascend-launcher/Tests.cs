@@ -22,10 +22,12 @@ internal static class Tests {
  static int Main(){
   try {
    ConfigTests();
+   foreach(string uri in new[]{"ascendriot://test","ascendriot://test/"}){var selfTest=new FakePlatform{missing=true,badSignature=true};Run(selfTest,uri);Check(selfTest.spawns==0&&selfTest.checks==0,"self-test touched Riot");}
+   foreach(string uri in new[]{"ascendriot://test?x=1","ascendriot://test/#x","ascendriot://test//","ascendriot://test/extra","ascendriot://TEST"})Check(!LauncherEngine.ValidRequest(new[]{uri}),"self-test allowlist widened");
    string[] rejected={"","ASCENDRIOT://open/league","ascendriot://open/league/","ascendriot://open/league?x=1","ascendriot://open/league#x","ascendriot://open/%6ceague","ascendriot://open/x/../league","ascendriot://run/calc","ascendriot://open/riot\n"};
    foreach(string value in rejected) Check(!LauncherEngine.ValidRequest(new[]{value}),"URI accepted");
    Check(!LauncherEngine.ValidRequest(new string[0])&&!LauncherEngine.ValidRequest(new[]{"ascendriot://open/riot","extra"}),"argument count");
-   Check(LauncherEngine.ValidRequest(new[]{"ascendriot://open/riot"})&&LauncherEngine.ValidRequest(new[]{"ascendriot://open/league"}),"allowlist");
+   Check(LauncherEngine.ValidRequest(new[]{"ascendriot://test"})&&LauncherEngine.ValidRequest(new[]{"ascendriot://open/riot"})&&LauncherEngine.ValidRequest(new[]{"ascendriot://open/league"}),"allowlist");
    var existing=new FakePlatform{existing=true}; Run(existing,"ascendriot://open/league"); Check(existing.spawns==0&&existing.focus==1,"existing window duplicated");
    var cold=new FakePlatform(); Run(cold,"ascendriot://open/league"); Check(cold.spawns==2&&cold.leagueFlags[0]&&!cold.leagueFlags[1],"League fixed mapping");
    var riot=new FakePlatform(); Run(riot,"ascendriot://open/riot"); Check(riot.spawns==1&&!riot.leagueFlags[0],"Riot UI mapping");

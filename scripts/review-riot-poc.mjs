@@ -61,7 +61,9 @@ const writeState = async (change) => {
   await page.locator(".ap-content, .wf-login").first().waitFor();
 };
 const launch = () =>
-  page.getByRole("button", { name: "MỞ RIOT CLIENT", exact: true });
+  page.getByRole("button", { name: "MỞ RIOT CLIENT", exact: true }).or(
+    page.getByRole("link", { name: "MỞ RIOT CLIENT", exact: true }),
+  );
 const help = () =>
   page.getByRole("button", {
     name: "Hướng dẫn thiết lập",

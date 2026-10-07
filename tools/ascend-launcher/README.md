@@ -4,6 +4,8 @@ Small C# / Windows Forms application, compiled as x64 `WinExe` using the Windows
 
 ## Build and install
 
+For another PC, use the standalone `AscendLauncher_0.1.0_x64-setup.exe` built by `build-setup.ps1 -Test`. It installs into `%LOCALAPPDATA%\ASCEND\Launcher`, registers/repairs `ascendriot`, and supplies an uninstall entry without requiring repo scripts. See [distribution instructions](DISTRIBUTION.md) and [multi-PC validation matrix](MULTI-PC-RESULTS.md). The commands below are the legacy developer PoC setup, not the Employee distribution flow.
+
 From the `employee-riot-launch-poc` worktree:
 
 ```powershell
@@ -24,9 +26,11 @@ Installer copies the single resource-embedded executable into `%LOCALAPPDATA%\AS
 
 ## Behavior
 
-- Borderless 460 × 260 centered window, dark background, gold accent, existing transparent `public/brand/logo-icon.png` embedded unchanged. Indeterminate animated ring; no fake percentage.
+Current Home/protocol/countdown behavior is documented in [COUNTDOWN-RESULTS.md](COUNTDOWN-RESULTS.md). Manual startup opens Home; protocol opening prepares Riot then counts down 60 seconds unless Riot is already running. Explicit install/repair/remove actions live in Home. Setup no longer silently registers on a fresh install. The launch-engine details below still apply after Open Now/countdown.
+
+- Borderless 460 × 440 centered window, dark background, gold accent, existing transparent `public/brand/logo-icon.png` embedded unchanged. Real monotonic countdown and gold progress bar; no fake loading percentage.
 - States: STARTING, FINDING_RIOT, LAUNCHING, WAITING_FOR_WINDOW, SUCCESS, ERROR. UI remains responsive while the worker verifies and opens Riot.
-- Only one exact raw URI argument: `ascendriot://open/league` or `ascendriot://open/riot`. No decoding, case normalization, trailing slash, query, fragment, extra argument or arbitrary executable/flags.
+- Only one allowlisted URI argument: `ascendriot://open/league`, `ascendriot://open/riot`, or `ascendriot://test` (also its Windows-normalized `ascendriot://test/`). Self-test displays success for two seconds without looking for or opening Riot. No decoding, query, fragment, extra argument or arbitrary executable/flags; Riot actions retain exact matching.
 - Discovery validates `%LOCALAPPDATA%\ASCEND\launcher-config.json` (`riotClientPath`) first, then fixed installation candidates on OS drive, Program Files, C:, D:, E:, then the existing owned HKCU ClientPath. Invalid saved paths fall through. No recursive disk scan.
 - Missing installation expands the branded window to 460 × 330 and offers a native Windows file picker. Only a readable absolute regular `RiotClientServices.exe` with trusted Riot Games signature can be saved. Selection persists locally and automatically resumes opening; cancellation leaves the fallback screen. Error screens offer Retry, change path and Close. See [path-picker validation report](PATH-PICKER-RESULTS.md) for test results and remaining manual review.
 - WinVerifyTrust validates embedded Authenticode trust; the signer organization must be Riot Games. UI sibling is verified independently. No launching unsigned or another publisher's same-name file.
