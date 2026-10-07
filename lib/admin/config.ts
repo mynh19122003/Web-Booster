@@ -34,6 +34,31 @@ export const permissionOptions: {
     label: "Gửi tin nhắn",
     description: "Trả lời, thêm ghi chú nội bộ và lưu trữ trò chuyện.",
   },
+  {
+    value: "employee.view",
+    label: "Xem nhân viên",
+    description: "Xem đơn, hoạt động và metadata phiên nhân viên.",
+  },
+  {
+    value: "employee.manage",
+    label: "Quản lý nhân viên",
+    description: "Cấp giới hạn, đình chỉ và thu hồi phiên.",
+  },
+  {
+    value: "complaint.view",
+    label: "Xem khiếu nại",
+    description: "Xem nội dung và bằng chứng khiếu nại.",
+  },
+  {
+    value: "complaint.manage",
+    label: "Xử lý khiếu nại",
+    description: "Xem xét, cảnh cáo và quyết định khiếu nại.",
+  },
+  {
+    value: "finance.manage",
+    label: "Xử lý tài chính",
+    description: "Hoàn tiền và áp dụng khoản xử phạt.",
+  },
 ];
 export const allPermissions = permissionOptions.map((p) => p.value);
 export const adminNav = [
@@ -47,7 +72,7 @@ export const adminNav = [
   },
   {
     href: "/admin/incoming-orders",
-    label: "Đơn mới",
+    label: "Đơn chờ nhân viên",
     icon: "incoming",
     group: "ĐƠN HÀNG",
     permission: "order.view" as Permission,
@@ -74,11 +99,25 @@ export const adminNav = [
     group: "NHÂN SỰ",
   },
   {
+    href: "/admin/employees",
+    label: "Nhân viên",
+    icon: "employees",
+    group: "NHÂN SỰ",
+    permission: "employee.view" as Permission,
+  },
+  {
     href: "/admin/chat",
     label: "Tin nhắn",
     icon: "chat",
     group: "LIÊN LẠC",
     permission: "chat.view" as Permission,
+  },
+  {
+    href: "/admin/complaints",
+    label: "Khiếu nại",
+    icon: "complaints",
+    group: "VẬN HÀNH",
+    permission: "complaint.view" as Permission,
   },
   {
     href: "/admin/security",

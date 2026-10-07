@@ -1,4 +1,4 @@
-import { AssignmentsPage } from "@/components/admin/operations/QueuePages";
+import { AdminOrders } from "@/components/workflow/AdminOrders";
 export default function Page() {
-  return <AssignmentsPage />;
+  return <AdminOrders assignments />;
 }

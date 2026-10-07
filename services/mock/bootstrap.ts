@@ -56,6 +56,16 @@ export function initializeReviewData() {
             : [],
         initialized: true,
       });
+    // Operational candidates now belong to EMPLOYEE, not the Staff directory.
+    // Keep all original fixtures; the Employee projection uses these same people.
+    if (dataSource.staff === "mock") {
+      const employeeIds = new Set(mockStaffCandidates.map((e) => e.id));
+      useAdminStore.setState({
+        staff: useAdminStore
+          .getState()
+          .staff.filter((s) => !employeeIds.has(s.id)),
+      });
+    }
     useAdminStore.setState({ ready: true });
     useOperations.setState({ ready: true });
   })());

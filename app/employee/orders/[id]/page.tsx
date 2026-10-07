@@ -1,9 +1,9 @@
-import { AdminOrderDetail } from "@/components/workflow/AdminOrders";
+import { EmployeeOrderDetail } from "@/components/workflow/EmployeePages";
 export default async function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <AdminOrderDetail id={id} />;
+  return <EmployeeOrderDetail id={id} />;
 }

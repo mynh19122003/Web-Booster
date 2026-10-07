@@ -1,4 +1,9 @@
 export type Permission =
+  | "employee.view"
+  | "employee.manage"
+  | "complaint.view"
+  | "complaint.manage"
+  | "finance.manage"
   | "order.view"
   | "order.assign"
   | "order.update"

@@ -36,10 +36,9 @@ import { initializeAdminWorkspace } from "@/services/auth.service";
 import { adminAuthService } from "@/services/admin";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Avatar } from "./Ui";
-import { useOperations } from "@/lib/admin/operations-store";
-import { useOperationsHydration } from "@/lib/admin/use-operations";
-import { incomingStatuses } from "@/services/operations";
 import { can } from "@/services/admin";
+import { useWorkflow } from "@/lib/workflow/store";
+import { useWorkflowReady } from "@/services/workflow-adapter";
 const Notice = createContext<(text: string) => void>(() => {});
 export const useNotice = () => useContext(Notice);
 const icons = {
@@ -52,17 +51,27 @@ const icons = {
   incoming: Inbox,
   assignments: GitBranch,
   chat: MessageSquare,
+  employees: Users,
+  complaints: ShieldCheck,
 };
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, ready } = useAdminStore();
-  const operationsReady = useOperationsHydration();
-  const {
-    orders,
-    conversations,
-    notifications: operationNotifications,
-  } = useOperations();
+  const workflowReady = useWorkflowReady();
+  const workflow = useWorkflow();
+  const operationNotifications = workflow.activities
+    .filter((a) => a.orderId)
+    .slice(-30)
+    .reverse()
+    .map((a) => ({
+      id: a.id,
+      title: a.title,
+      detail: `#${a.orderId} · ${a.detail}`,
+      href: `/admin/orders/${a.orderId}`,
+      at: a.at,
+      scope: "order.view" as const,
+    }));
   const [collapsed, setCollapsed] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [notice, setNotice] = useState("");
@@ -88,7 +97,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         n.href === pathname ||
         (n.href !== "/admin" && pathname.startsWith(n.href + "/")),
     );
-  if (!ready || !operationsReady)
+  if (!ready || !workflowReady)
     return (
       <div className="ap-loading" aria-label="Đang tải trang quản trị">
         <div className="ap-skeleton" />
@@ -134,10 +143,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
               const Icon = icons[n.icon as keyof typeof icons];
               const count =
                 n.icon === "incoming"
-                  ? orders.filter((o) => incomingStatuses.includes(o.status))
-                      .length
+                  ? workflow.orders.filter((o) => o.status === "OPEN").length
                   : n.icon === "chat"
-                    ? conversations
+                    ? workflow.conversations
                         .filter((c) => !c.archived)
                         .reduce((sum, c) => sum + c.unread, 0)
                     : 0;

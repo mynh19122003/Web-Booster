@@ -1,4 +1,4 @@
-import { OrdersPage } from "@/components/admin/operations/OrdersPage";
+import { AdminOrders } from "@/components/workflow/AdminOrders";
 export default function Page() {
-  return <OrdersPage />;
+  return <AdminOrders />;
 }

@@ -1,1 +1,1 @@
-export { SecurityPage as default } from "@/components/admin/portal/SecurityProfile";
+export { AdminSecurity as default } from "@/components/workflow/AdminSecurity";

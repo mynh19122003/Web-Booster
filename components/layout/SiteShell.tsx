@@ -17,7 +17,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     path.startsWith("/register/");
   const isAdminRoute = path === "/admin" || path.startsWith("/admin/");
 
-  if (isAdminRoute) return <main id="main">{children}</main>;
+  const isEmployeeRoute = path === "/employee" || path.startsWith("/employee/");
+  if (isAdminRoute || isEmployeeRoute) return <main id="main">{children}</main>;
   if (isAuthRoute)
     return (
       <>

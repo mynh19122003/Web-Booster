@@ -5,5 +5,5 @@ export default async function Page({
   searchParams: Promise<{ conversation?: string }>;
 }) {
   const { conversation } = await searchParams;
-  return <WorkflowChat mode="admin" initialConversation={conversation} />;
+  return <WorkflowChat mode="employee" initialConversation={conversation} />;
 }
