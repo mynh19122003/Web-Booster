@@ -4,18 +4,13 @@ import { FAQ } from "@/components/home/FAQ";
 import { metadata as makeMetadata } from "@/lib/seo";
 export const metadata = makeMetadata(
   "Help center",
-  "Find answers and explore the support request demo.",
+  "Find answers and prepare a support request.",
   "/support",
 );
 export default function Page() {
   return (
     <>
-      <PageIntro
-        eyebrow="WE’RE IN YOUR CORNER"
-        title="A little guidance"
-        description="Start with our answers below, or draft a question using the demonstration form."
-        path="/support"
-      />
+      <PageIntro pageKey="support" path="/support" />
       <div className="container">
         <SupportForm />
       </div>

@@ -11,12 +11,7 @@ export const metadata = makeMetadata(
 export default function Page() {
   return (
     <>
-      <PageIntro
-        eyebrow="INSIGHTS / THE PLAYBOOK"
-        title="Play with intention"
-        description="Small ideas for a better climb. Original articles on focus, practice, and teamplay."
-        path="/blog"
-      />
+      <PageIntro pageKey="blog" path="/blog" />
       <div className="container article-grid section">
         {articles.map((a, i) => (
           <Link className="article-card" href={`/blog/${a.slug}`} key={a.slug}>

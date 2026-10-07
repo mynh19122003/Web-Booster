@@ -21,6 +21,8 @@ export async function generateMetadata({
     `/services/${slug}`,
   );
 }
+import { Suspense } from "react";
+
 export default async function ServicePage({
   params,
   searchParams,
@@ -35,11 +37,13 @@ export default async function ServicePage({
   if (!s) notFound();
   return (
     <>
-      <GameSync
-        slug={game?.slug}
-        service={slug}
-        queue={slug === "duo-boost" ? "Duo" : "Solo"}
-      />
+      <Suspense fallback={null}>
+        <GameSync
+          slug={game?.slug}
+          service={slug}
+          queue={slug === "duo-boost" ? "Duo" : "Solo"}
+        />
+      </Suspense>
       <PageIntro
         eyebrow="PERSONALIZED GAMING SERVICES"
         title={s.name}

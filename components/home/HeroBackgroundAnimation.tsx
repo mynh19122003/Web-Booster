@@ -34,12 +34,10 @@ export function HeroBackgroundAnimation() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let isReducedMotion = mediaQuery.matches;
 
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      isReducedMotion = e.matches;
-    };
-    mediaQuery.addEventListener("change", handleMotionChange);
-
     let animationFrameId: number;
+    let isVisible = true;
+    let isPageVisible = !document.hidden;
+    let isRunning = false;
     let width = (canvas.width = container.offsetWidth);
     let height = (canvas.height = container.offsetHeight);
 
@@ -64,8 +62,36 @@ export function HeroBackgroundAnimation() {
       mouseRef.current.targetY = -1000;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("pointermove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
+
+    const stop = () => {
+      isRunning = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+    const start = () => {
+      if (isRunning || !isVisible || !isPageVisible || isReducedMotion) return;
+      isRunning = true;
+      animationFrameId = requestAnimationFrame(render);
+    };
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) start();
+      else stop();
+    });
+    visibilityObserver.observe(container);
+    const handleVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+      if (isPageVisible) start();
+      else stop();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      isReducedMotion = e.matches;
+      if (isReducedMotion) stop();
+      else start();
+    };
+    mediaQuery.addEventListener("change", handleMotionChange);
 
     // Particle colors: Prime Gold & Burnt Orange
     const colors = ["#FF9F3C", "#D97706", "#F59E0B"];
@@ -95,9 +121,11 @@ export function HeroBackgroundAnimation() {
     initParticles();
 
     let frame = 0;
-    const render = () => {
+    function render() {
+      const context = ctx;
+      if (!context) return;
       frame++;
-      ctx.clearRect(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
 
       // Smooth spotlight interpolation
       const mouse = mouseRef.current;
@@ -105,7 +133,7 @@ export function HeroBackgroundAnimation() {
       mouse.y += (mouse.targetY - mouse.y) * 0.08;
 
       if (mouse.x > -500 && mouse.y > -500 && !isReducedMotion) {
-        const spotlight = ctx.createRadialGradient(
+        const spotlight = context.createRadialGradient(
           mouse.x,
           mouse.y,
           0,
@@ -116,8 +144,8 @@ export function HeroBackgroundAnimation() {
         spotlight.addColorStop(0, "rgba(255, 159, 60, 0.09)");
         spotlight.addColorStop(0.5, "rgba(217, 119, 6, 0.04)");
         spotlight.addColorStop(1, "rgba(0, 0, 0, 0)");
-        ctx.fillStyle = spotlight;
-        ctx.fillRect(0, 0, width, height);
+        context.fillStyle = spotlight;
+        context.fillRect(0, 0, width, height);
       }
 
       // Render Embers
@@ -141,26 +169,28 @@ export function HeroBackgroundAnimation() {
 
         const clampedAlpha = Math.max(0.1, Math.min(0.75, p.alpha));
 
-        ctx.save();
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = p.size * 3;
-        ctx.globalAlpha = clampedAlpha;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        context.save();
+        context.shadowColor = p.color;
+        context.shadowBlur = p.size * 3;
+        context.globalAlpha = clampedAlpha;
+        context.fillStyle = p.color;
+        context.beginPath();
+        context.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
       }
 
-      animationFrameId = requestAnimationFrame(render);
-    };
+      if (isRunning) animationFrameId = requestAnimationFrame(render);
+    }
 
-    render();
+    start();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("pointermove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       mediaQuery.removeEventListener("change", handleMotionChange);
     };

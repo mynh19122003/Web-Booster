@@ -72,14 +72,15 @@ export function ranksFor(game: string) {
 }
 export function initialRanks(game: string) {
   return game === "valorant"
-    ? { current: 9, target: 15 }
-    : { current: 12, target: 24 };
+    ? { current: 9, target: 15, currentLp: 0, targetLp: 0 }
+    : { current: 12, target: 24, currentLp: 0, targetLp: 0 };
 }
 export function servicesFor(game: string) {
   return services.filter(
     (service) =>
       game !== "teamfight-tactics" ||
       service.slug === "rank-boost" ||
+      service.slug === "placements" ||
       service.slug === "coaching",
   );
 }

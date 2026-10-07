@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { CreditCard } from "lucide-react";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 const paymentLogos = [
   ["Visa", "visa.svg", 72, "max-w-[72px]"],
@@ -19,11 +20,12 @@ const paymentLogos = [
 ] as const;
 
 export function Footer() {
+  const { t } = useLanguage();
   return (
     <footer className="footer">
-      <div className="max-w-7xl mx-auto px-6 border-t border-white/[0.08] pt-6 pb-6 mt-12">
-        <p className="text-xs font-mono uppercase tracking-widest text-[#FF9F3C] flex items-center gap-2 mb-4"><CreditCard size={14} aria-hidden="true" />Accepted payments</p>
-        <div aria-label="Accepted payment methods" className="ascend-payment-strip w-full flex items-center justify-between gap-6 md:gap-8 overflow-x-auto scrollbar-none py-2">
+      <div className="site-container border-t border-white/[0.08] pt-6 pb-6 mt-12">
+        <p className="text-xs font-mono uppercase tracking-widest text-[#FF9F3C] flex items-center gap-2 mb-4"><CreditCard size={14} aria-hidden="true" />{t("acceptedPayments")}</p>
+        <div aria-label={t("acceptedPaymentMethods")} className="ascend-payment-strip w-full flex items-center justify-between gap-6 md:gap-8 overflow-x-auto scrollbar-none py-2">
           {paymentLogos.map(([name, file, width, maxWidth]) => (
             <div
               key={name}

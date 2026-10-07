@@ -3,6 +3,8 @@ import { useEffect, useId } from "react";
 import { motion } from "motion/react";
 import { Coins } from "lucide-react";
 import { useStore } from "@/store/useStore";
+import { useLanguage } from "@/components/ui/LanguageProvider";
+import { intlLocales } from "@/lib/i18n";
 
 export function CurrencyProvider() {
   useEffect(() => {
@@ -79,6 +81,7 @@ export function CurrencySwitch({
   className?: string;
   layoutId?: string;
 }) {
+  const { t } = useLanguage();
   const currency = useStore((s) => s.currency);
   const set = useStore((s) => s.set);
   const autoId = useId();
@@ -97,7 +100,7 @@ export function CurrencySwitch({
     <div
       className={`h-9 inline-flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-full p-1 backdrop-blur-md shrink-0 ${className}`}
       role="group"
-      aria-label="Display currency"
+      aria-label={t("displayCurrency")}
     >
       {!compact && <div className="pl-2 pr-1 flex items-center justify-center text-[#FF9F3C]/80 shrink-0 select-none">
         <Coins size={13} aria-hidden="true" />
@@ -132,6 +135,7 @@ export function CurrencySwitch({
 }
 
 export function useMoney() {
+  const { language, t } = useLanguage();
   const currency = useStore((s) => s.currency);
   const usdPerEur = useStore((s) => s.usdPerEur);
   const rateDate = useStore((s) => s.rateDate);
@@ -141,8 +145,8 @@ export function useMoney() {
   const format = (usd: number) => {
     const value = amount(usd);
     return value === null
-      ? "EUR unavailable"
-      : new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
+      ? t("eurUnavailable")
+      : new Intl.NumberFormat(intlLocales[language], { style: "currency", currency }).format(
           value,
         );
   };

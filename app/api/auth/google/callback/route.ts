@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       user = createGoogleUser(profile.name?.slice(0, 80) || profile.email.split("@")[0], profile.email, profile.sub);
     }
     const session = createSession(user.id);
-    const response = NextResponse.redirect(new URL("/account", request.url));
+    const response = NextResponse.redirect(new URL("/", request.url));
     setSessionCookie(response, session.token, session.expiresAt);
     return clearOauthCookies(response);
   } catch {

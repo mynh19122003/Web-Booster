@@ -7,19 +7,22 @@ import { useState, type FormEvent } from "react";
 import { ArrowUpRight, Eye, EyeOff } from "lucide-react";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { BackToHomeButton } from "@/components/ui/BackToHomeButton";
+import { useLanguage } from "@/components/ui/LanguageProvider";
+import type { MessageKey } from "@/lib/i18n";
 
 type Mode = "login" | "register";
 
-const googleErrors: Record<string, string> = {
-  "google-unconfigured": "Google sign-in is not configured yet. You can use email and password.",
-  "google-email-exists": "An account already uses this email. Sign in with your password first.",
-  "google-failed": "Google sign-in could not be completed. Please try again.",
+const googleErrors: Record<string, MessageKey> = {
+  "google-unconfigured": "googleUnconfigured",
+  "google-email-exists": "googleEmailExists",
+  "google-failed": "googleFailed",
 };
 
-export function AuthPanel({ initialMode, googleConfigured, error }: { initialMode: Mode; googleConfigured: boolean; error?: string }) {
+export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/" }: { initialMode: Mode; googleConfigured: boolean; error?: string; returnTo?: string }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const [mode, setMode] = useState(initialMode);
-  const [message, setMessage] = useState(error ? googleErrors[error] || "Sign-in could not be completed." : "");
+  const [message, setMessage] = useState(error ? t(googleErrors[error] ?? "authFailed") : "");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,7 +34,7 @@ export function AuthPanel({ initialMode, googleConfigured, error }: { initialMod
     const form = new FormData(event.currentTarget);
     const payload = Object.fromEntries(form.entries());
     if (mode === "register" && payload.password !== payload.confirmPassword) {
-      setMessage("Your passwords do not match.");
+      setMessage(t("passwordMismatch"));
       setBusy(false);
       return;
     }
@@ -42,11 +45,11 @@ export function AuthPanel({ initialMode, googleConfigured, error }: { initialMod
         body: JSON.stringify(payload),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Unable to sign in.");
-      router.push("/account");
+      if (!response.ok) throw new Error(result.error || t("unableSignIn"));
+      router.replace(returnTo);
       router.refresh();
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "Unable to sign in right now.");
+      setMessage(caught instanceof Error ? caught.message : t("unableSignInNow"));
       setBusy(false);
     }
   }
@@ -60,40 +63,40 @@ export function AuthPanel({ initialMode, googleConfigured, error }: { initialMod
             <AscendLogo variant="horizontal" size="md" />
           </Link>
           <div className="auth-aside-copy">
-            <p className="eyebrow">YOUR ASCEND SPACE</p>
-            <h1>Every plan,<br />in your corner.</h1>
-            <p>Keep your game plans close and pick up where you left off.</p>
+            <p className="eyebrow">{t("authSpace")}</p>
+            <h1>{t("authPlanLead")}<br />{t("authPlanFinish")}</h1>
+            <p>{t("authKeepPlans")}</p>
           </div>
-          <span className="auth-aside-index">PLAYER ACCOUNT <span>01 / 03</span></span>
+          <span className="auth-aside-index">{t("playerAccount")} <span>01 / 03</span></span>
         </aside>
 
         <section className="auth-content" aria-labelledby="auth-heading">
           <div className="auth-form-wrap">
-            <div className="auth-tabs" role="tablist" aria-label="Account access">
-              <button role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setMessage(""); }}>Sign in</button>
-              <button role="tab" aria-selected={mode === "register"} onClick={() => { setMode("register"); setMessage(""); }}>Create account</button>
+            <div className="auth-tabs" role="tablist" aria-label={t("accountAccess")}>
+              <button role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setMessage(""); }}>{t("signIn")}</button>
+              <button role="tab" aria-selected={mode === "register"} onClick={() => { setMode("register"); setMessage(""); }}>{t("createAccount")}</button>
             </div>
-            <p className="eyebrow">WELCOME {mode === "login" ? "BACK" : "TO ASCEND"}</p>
-            <h2 id="auth-heading">{mode === "login" ? "Sign in." : "Create your account."}</h2>
-            <p className="auth-description">{mode === "login" ? "Enter your details to continue." : "A few details and your space is ready."}</p>
+            <p className="eyebrow">{mode === "login" ? t("welcomeBack") : t("welcomeAscend")}</p>
+            <h2 id="auth-heading">{mode === "login" ? t("signInTitle") : t("createAccountTitle")}</h2>
+            <p className="auth-description">{mode === "login" ? t("signInDescription") : t("createAccountDescription")}</p>
 
             <form className="auth-form" onSubmit={submit}>
-              {mode === "register" && <label>Full name<input name="name" autoComplete="name" minLength={2} maxLength={80} placeholder="Your name" required /></label>}
-              <label>Email address<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="you@example.com" required /></label>
-              <label>Password<div className="password-field"><input name="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} maxLength={128} placeholder="At least 8 characters" required /><button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>
-              {mode === "register" && <label>Confirm password<div className="password-field"><input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" minLength={8} maxLength={128} placeholder="Enter password again" required /><button type="button" aria-label={showConfirmPassword ? "Hide confirmation password" : "Show confirmation password"} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>}
-              <button className="button auth-submit" disabled={busy} type="submit">{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}<ArrowUpRight size={16} /></button>
+              {mode === "register" && <label>{t("fullName")}<input name="name" autoComplete="name" minLength={2} maxLength={80} placeholder={t("yourName")} required /></label>}
+              <label>{t("emailAddress")}<input name="email" type="email" autoComplete="email" maxLength={254} placeholder="you@example.com" required /></label>
+              <label>{t("password")}<div className="password-field"><input name="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} maxLength={128} placeholder={t("passwordHint")} required /><button type="button" aria-label={showPassword ? t("hidePassword") : t("showPassword")} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>
+              {mode === "register" && <label>{t("confirmPassword")}<div className="password-field"><input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" minLength={8} maxLength={128} placeholder={t("passwordAgain")} required /><button type="button" aria-label={showConfirmPassword ? t("hideConfirmation") : t("showConfirmation")} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>}
+              <button className="button auth-submit" disabled={busy} type="submit">{busy ? t("pleaseWait") : mode === "login" ? t("signIn") : t("createAccount")}<ArrowUpRight size={16} /></button>
               {message && <p className="auth-message" role="alert">{message}</p>}
             </form>
 
-            <div className="auth-divider"><span>OR CONTINUE WITH</span></div>
+            <div className="auth-divider"><span>{t("continueWith")}</span></div>
             <div className="auth-providers">
-              <a className="auth-provider" href="/api/auth/google" aria-disabled={!googleConfigured} onClick={(event) => { if (!googleConfigured) { event.preventDefault(); setMessage("Add Google OAuth credentials to .env.local to enable Google sign-in."); } }}>
+              <a className="auth-provider" href="/api/auth/google" aria-disabled={!googleConfigured} onClick={(event) => { if (!googleConfigured) { event.preventDefault(); setMessage(t("googleUnconfigured")); } }}>
                 <GoogleMark /> <span>Google</span>
               </a>
-              <button className="auth-provider" type="button" onClick={() => setMessage("Riot Games sign-in is a visual preview and is not connected.")}><Image src="/images/logos/riot-games-mark.png" alt="" width={20} height={20} style={{ objectFit: "contain" }} /><span>Riot Games</span></button>
+              <button className="auth-provider" type="button" disabled><Image src="/images/logos/riot-games-mark.png" alt="" width={20} height={20} style={{ objectFit: "contain" }} /><span>Riot Games</span></button>
             </div>
-            <p className="auth-legal">By continuing, you agree to our <Link href="/legal/terms">Terms</Link> and <Link href="/legal/privacy">Privacy Policy</Link>.</p>
+            <p className="auth-legal">{t("authLegalStart")} <Link href="/legal/terms">{t("terms")}</Link> {t("authLegalAnd")} <Link href="/legal/privacy">{t("privacyPolicy")}</Link>.</p>
           </div>
         </section>
       </div>

@@ -1,0 +1,2634 @@
+[
+  {
+    "region": "NA",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "NA",
+    "rank": 0,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "NA",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "NA",
+    "rank": 1,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "NA",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "NA",
+    "rank": 2,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "NA",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "NA",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "NA",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "NA",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "NA",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "NA",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "NA",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "NA",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "NA",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "NA",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "NA",
+    "rank": 10,
+    "gain": "28-30 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "NA",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.03
+  },
+  {
+    "region": "NA",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "NA",
+    "rank": 11,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "NA",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "NA",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "NA",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "NA",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "NA",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "NA",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "NA",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "NA",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "NA",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "NA",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 24.99,
+    "price": 25.01
+  },
+  {
+    "region": "NA",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "NA",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "NA",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 34.99,
+    "price": 35.01
+  },
+  {
+    "region": "NA",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 37.99,
+    "price": 38.01
+  },
+  {
+    "region": "NA",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 44.99,
+    "price": 45.01
+  },
+  {
+    "region": "NA",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 63.99,
+    "price": 64.01
+  },
+  {
+    "region": "NA",
+    "rank": 25,
+    "gain": "28-30 LP",
+    "source": 74.99,
+    "price": 75.01
+  },
+  {
+    "region": "NA",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 89.99,
+    "price": 90.01
+  },
+  {
+    "region": "NA",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 129.99,
+    "price": 130.01
+  },
+  {
+    "region": "NA",
+    "rank": 27,
+    "gain": "25-28 LP",
+    "source": 137.99,
+    "price": 139.01
+  },
+  {
+    "region": "NA",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 155.99,
+    "price": 156.01
+  },
+  {
+    "region": "EUW",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUW",
+    "rank": 0,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUW",
+    "rank": 1,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUW",
+    "rank": 2,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUW",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 4,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "EUW",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 5,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "EUW",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUW",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUW",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUW",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUW",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUW",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUW",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUW",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUW",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUW",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUW",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUW",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUW",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "EUW",
+    "rank": 11,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "EUW",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "EUW",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "EUW",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "EUW",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "EUW",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "EUW",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 14.99,
+    "price": 15.01
+  },
+  {
+    "region": "EUW",
+    "rank": 15,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "EUW",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "EUW",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "EUW",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "EUW",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "EUW",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 25.99,
+    "price": 26.01
+  },
+  {
+    "region": "EUW",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "EUW",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 31.99,
+    "price": 32.01
+  },
+  {
+    "region": "EUW",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "EUW",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 39.99,
+    "price": 40.01
+  },
+  {
+    "region": "EUW",
+    "rank": 24,
+    "gain": "28-30 LP",
+    "source": 44.99,
+    "price": 47.01
+  },
+  {
+    "region": "EUW",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 53.99,
+    "price": 54.01
+  },
+  {
+    "region": "EUW",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 70.99,
+    "price": 71.01
+  },
+  {
+    "region": "EUW",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 103.99,
+    "price": 104.01
+  },
+  {
+    "region": "EUW",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 139.99,
+    "price": 140.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 0,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 1,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 2,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 4,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "EUNE",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 5,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "EUNE",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "EUNE",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 11,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 14.99,
+    "price": 15.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 15,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 25.99,
+    "price": 26.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 31.99,
+    "price": 32.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 39.99,
+    "price": 40.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 24,
+    "gain": "28-30 LP",
+    "source": 44.99,
+    "price": 47.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 53.99,
+    "price": 54.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 70.99,
+    "price": 71.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 103.99,
+    "price": 104.01
+  },
+  {
+    "region": "EUNE",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 139.99,
+    "price": 140.01
+  },
+  {
+    "region": "OCE",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "OCE",
+    "rank": 0,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "OCE",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "OCE",
+    "rank": 1,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "OCE",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "OCE",
+    "rank": 2,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "OCE",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "OCE",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "OCE",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "OCE",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "OCE",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "OCE",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "OCE",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "OCE",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "OCE",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.03
+  },
+  {
+    "region": "OCE",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "OCE",
+    "rank": 10,
+    "gain": "28-30 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "OCE",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.03
+  },
+  {
+    "region": "OCE",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "OCE",
+    "rank": 11,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "OCE",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "OCE",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "OCE",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "OCE",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "OCE",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "OCE",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "OCE",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "OCE",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "OCE",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "OCE",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 24.99,
+    "price": 25.01
+  },
+  {
+    "region": "OCE",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "OCE",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "OCE",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 34.99,
+    "price": 35.01
+  },
+  {
+    "region": "OCE",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 37.99,
+    "price": 38.01
+  },
+  {
+    "region": "OCE",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 44.99,
+    "price": 45.01
+  },
+  {
+    "region": "OCE",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 63.99,
+    "price": 64.01
+  },
+  {
+    "region": "OCE",
+    "rank": 25,
+    "gain": "28-30 LP",
+    "source": 74.99,
+    "price": 75.01
+  },
+  {
+    "region": "OCE",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 89.99,
+    "price": 90.01
+  },
+  {
+    "region": "OCE",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 129.99,
+    "price": 130.01
+  },
+  {
+    "region": "OCE",
+    "rank": 27,
+    "gain": "25-28 LP",
+    "source": 137.99,
+    "price": 139.01
+  },
+  {
+    "region": "OCE",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 155.99,
+    "price": 156.01
+  },
+  {
+    "region": "KR",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "KR",
+    "rank": 0,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "KR",
+    "rank": 1,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "KR",
+    "rank": 2,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "KR",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 4,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "KR",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 5,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "KR",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "KR",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "KR",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "KR",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "KR",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "KR",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "KR",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "KR",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "KR",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "KR",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "KR",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "KR",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "KR",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "KR",
+    "rank": 11,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "KR",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "KR",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "KR",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "KR",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "KR",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "KR",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 14.99,
+    "price": 15.01
+  },
+  {
+    "region": "KR",
+    "rank": 15,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "KR",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "KR",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "KR",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "KR",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "KR",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 25.99,
+    "price": 26.01
+  },
+  {
+    "region": "KR",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "KR",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 31.99,
+    "price": 32.01
+  },
+  {
+    "region": "KR",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "KR",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 39.99,
+    "price": 40.01
+  },
+  {
+    "region": "KR",
+    "rank": 24,
+    "gain": "28-30 LP",
+    "source": 44.99,
+    "price": 47.01
+  },
+  {
+    "region": "KR",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 53.99,
+    "price": 54.01
+  },
+  {
+    "region": "KR",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 70.99,
+    "price": 71.01
+  },
+  {
+    "region": "KR",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 103.99,
+    "price": 104.01
+  },
+  {
+    "region": "KR",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 139.99,
+    "price": 140.01
+  },
+  {
+    "region": "CN",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "CN",
+    "rank": 0,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "CN",
+    "rank": 1,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "CN",
+    "rank": 2,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "CN",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 4,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "CN",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 5,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "CN",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "CN",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "CN",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "CN",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "CN",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "CN",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "CN",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "CN",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "CN",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "CN",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "CN",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "CN",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "CN",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "CN",
+    "rank": 11,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "CN",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "CN",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "CN",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "CN",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "CN",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "CN",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 14.99,
+    "price": 15.01
+  },
+  {
+    "region": "CN",
+    "rank": 15,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "CN",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "CN",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "CN",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "CN",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "CN",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 25.99,
+    "price": 26.01
+  },
+  {
+    "region": "CN",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "CN",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 31.99,
+    "price": 32.01
+  },
+  {
+    "region": "CN",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "CN",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 39.99,
+    "price": 40.01
+  },
+  {
+    "region": "CN",
+    "rank": 24,
+    "gain": "28-30 LP",
+    "source": 44.99,
+    "price": 47.01
+  },
+  {
+    "region": "CN",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 53.99,
+    "price": 54.01
+  },
+  {
+    "region": "CN",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 70.99,
+    "price": 71.01
+  },
+  {
+    "region": "CN",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 103.99,
+    "price": 104.01
+  },
+  {
+    "region": "CN",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 139.99,
+    "price": 140.01
+  },
+  {
+    "region": "SEA",
+    "rank": 0,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "SEA",
+    "rank": 0,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 0,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 1,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "SEA",
+    "rank": 1,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 1,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 2,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "SEA",
+    "rank": 2,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 2,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 3,
+    "gain": "28-30 LP",
+    "source": 3.99,
+    "price": 4.01
+  },
+  {
+    "region": "SEA",
+    "rank": 3,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 3,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 4,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 4,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 4,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "SEA",
+    "rank": 5,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 5,
+    "gain": "22-25 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 5,
+    "gain": "19-22 LP",
+    "source": 4.99,
+    "price": 5.05
+  },
+  {
+    "region": "SEA",
+    "rank": 6,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 6,
+    "gain": "22-25 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "SEA",
+    "rank": 6,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "SEA",
+    "rank": 7,
+    "gain": "28-30 LP",
+    "source": 4.99,
+    "price": 5.01
+  },
+  {
+    "region": "SEA",
+    "rank": 7,
+    "gain": "25-28 LP",
+    "source": 4.99,
+    "price": 5.03
+  },
+  {
+    "region": "SEA",
+    "rank": 7,
+    "gain": "19-22 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "SEA",
+    "rank": 8,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "SEA",
+    "rank": 8,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "SEA",
+    "rank": 8,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "SEA",
+    "rank": 9,
+    "gain": "28-30 LP",
+    "source": 5.99,
+    "price": 6.01
+  },
+  {
+    "region": "SEA",
+    "rank": 9,
+    "gain": "25-28 LP",
+    "source": 5.99,
+    "price": 6.03
+  },
+  {
+    "region": "SEA",
+    "rank": 9,
+    "gain": "19-22 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "SEA",
+    "rank": 10,
+    "gain": "25-28 LP",
+    "source": 6.99,
+    "price": 7.01
+  },
+  {
+    "region": "SEA",
+    "rank": 10,
+    "gain": "19-22 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "SEA",
+    "rank": 11,
+    "gain": "25-28 LP",
+    "source": 7.99,
+    "price": 8.01
+  },
+  {
+    "region": "SEA",
+    "rank": 11,
+    "gain": "19-22 LP",
+    "source": 8.99,
+    "price": 9.01
+  },
+  {
+    "region": "SEA",
+    "rank": 12,
+    "gain": "28-30 LP",
+    "source": 9.99,
+    "price": 10.01
+  },
+  {
+    "region": "SEA",
+    "rank": 12,
+    "gain": "19-22 LP",
+    "source": 11.99,
+    "price": 12.01
+  },
+  {
+    "region": "SEA",
+    "rank": 13,
+    "gain": "19-22 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "SEA",
+    "rank": 14,
+    "gain": "25-28 LP",
+    "source": 12.99,
+    "price": 13.01
+  },
+  {
+    "region": "SEA",
+    "rank": 14,
+    "gain": "19-22 LP",
+    "source": 14.99,
+    "price": 15.01
+  },
+  {
+    "region": "SEA",
+    "rank": 15,
+    "gain": "25-28 LP",
+    "source": 13.99,
+    "price": 14.01
+  },
+  {
+    "region": "SEA",
+    "rank": 15,
+    "gain": "19-22 LP",
+    "source": 15.99,
+    "price": 16.01
+  },
+  {
+    "region": "SEA",
+    "rank": 16,
+    "gain": "19-22 LP",
+    "source": 17.99,
+    "price": 18.01
+  },
+  {
+    "region": "SEA",
+    "rank": 17,
+    "gain": "19-22 LP",
+    "source": 19.99,
+    "price": 20.01
+  },
+  {
+    "region": "SEA",
+    "rank": 18,
+    "gain": "19-22 LP",
+    "source": 21.99,
+    "price": 22.01
+  },
+  {
+    "region": "SEA",
+    "rank": 19,
+    "gain": "19-22 LP",
+    "source": 25.99,
+    "price": 26.01
+  },
+  {
+    "region": "SEA",
+    "rank": 20,
+    "gain": "19-22 LP",
+    "source": 29.99,
+    "price": 30.01
+  },
+  {
+    "region": "SEA",
+    "rank": 21,
+    "gain": "19-22 LP",
+    "source": 31.99,
+    "price": 32.01
+  },
+  {
+    "region": "SEA",
+    "rank": 22,
+    "gain": "19-22 LP",
+    "source": 33.99,
+    "price": 34.01
+  },
+  {
+    "region": "SEA",
+    "rank": 23,
+    "gain": "19-22 LP",
+    "source": 39.99,
+    "price": 40.01
+  },
+  {
+    "region": "SEA",
+    "rank": 24,
+    "gain": "28-30 LP",
+    "source": 44.99,
+    "price": 47.01
+  },
+  {
+    "region": "SEA",
+    "rank": 24,
+    "gain": "19-22 LP",
+    "source": 53.99,
+    "price": 54.01
+  },
+  {
+    "region": "SEA",
+    "rank": 25,
+    "gain": "19-22 LP",
+    "source": 70.99,
+    "price": 71.01
+  },
+  {
+    "region": "SEA",
+    "rank": 26,
+    "gain": "19-22 LP",
+    "source": 103.99,
+    "price": 104.01
+  },
+  {
+    "region": "SEA",
+    "rank": 27,
+    "gain": "19-22 LP",
+    "source": 139.99,
+    "price": 140.01
+  }
+]

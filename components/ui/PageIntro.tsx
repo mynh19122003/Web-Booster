@@ -1,29 +1,38 @@
+"use client";
+
 import Link from "next/link";
 import { siteUrl } from "@/lib/seo";
+import { useLanguage } from "@/components/ui/LanguageProvider";
+import { pageCopyFor, type PageCopyKey } from "@/data/page-copy";
+
+type PageIntroProps = { path: string } & (
+  | { pageKey: PageCopyKey; eyebrow?: never; title?: never; description?: never }
+  | { pageKey?: never; eyebrow: string; title: string; description: string }
+);
+
 export function PageIntro({
   eyebrow,
   title,
   description,
   path,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  path: string;
-}) {
+  pageKey,
+}: PageIntroProps) {
+  const { language, t } = useLanguage();
+  const sourceCopy = pageKey ? pageCopyFor(language, pageKey) : { eyebrow: eyebrow!, title: title!, description: description! };
+  const copy = pageKey === "about" ? { ...sourceCopy, title: "ASCEND" } : sourceCopy;
   return (
     <section className="page-intro container">
-      <nav aria-label="Breadcrumb">
-        <Link href="/">Home</Link>
+      <nav aria-label={t("breadcrumb")}>
+        <Link href="/">{t("home")}</Link>
         <span>/</span>
-        <span>{title}</span>
+        <span>{copy.title}</span>
       </nav>
-      <p className="eyebrow">{eyebrow}</p>
+      <p className="eyebrow">{copy.eyebrow}</p>
       <h1>
-        {title}
+        {copy.title}
         <span className="gold">.</span>
       </h1>
-      <p>{description}</p>
+      {(!pageKey || !["support", "contact", "boosters", "reviews", "about"].includes(pageKey)) && <p>{copy.description}</p>}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -31,11 +40,11 @@ export function PageIntro({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+              { "@type": "ListItem", position: 1, name: t("home"), item: siteUrl },
               {
                 "@type": "ListItem",
                 position: 2,
-                name: title,
+                name: copy.title,
                 item: `${siteUrl}${path}`,
               },
             ],

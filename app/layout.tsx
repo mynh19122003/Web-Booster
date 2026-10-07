@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Rajdhani, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Rajdhani, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "./glass.css";
+import "./public-product.css";
 
 const rajdhani = Rajdhani({
   subsets: ["latin"],
@@ -17,8 +18,10 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+const interPrice = Inter({ subsets: ["latin"], weight: ["600"], variable: "--font-price", display: "swap", preload: false });
+
 import { SiteShell } from "@/components/layout/SiteShell";
-import { SkipLink } from "@/components/admin/SkipLink";
+import { SiteSkipLink } from "@/components/layout/SiteSkipLink";
 import { metadata as makeMetadata, siteUrl } from "@/lib/seo";
 export const metadata: Metadata = { ...metadataBase() };
 function metadataBase(): Metadata {
@@ -41,9 +44,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${rajdhani.variable} ${plusJakartaSans.variable}`}>
+    <html lang="en" className={`${rajdhani.variable} ${plusJakartaSans.variable} ${interPrice.variable}`}>
       <body className="font-body text-zinc-300 antialiased leading-relaxed">
-        <SkipLink />
+        <SiteSkipLink />
         <SiteShell>{children}</SiteShell>
         <script
           type="application/ld+json"
