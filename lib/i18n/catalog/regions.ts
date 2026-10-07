@@ -1,0 +1,38 @@
+export const regionsMessages = {
+  en: {
+    region: "Region",
+    selectRegion: "Select region",
+    closeRegion: "Close region selector",
+    searchRegion: "Search region",
+    searchRegionHint: "Search by name or code",
+    availableRegions: "Available region options",
+    noRegions: "No regions found.",
+  },
+  vi: {
+    region: "Khu vực",
+    selectRegion: "Chọn khu vực",
+    closeRegion: "Đóng phần chọn khu vực",
+    searchRegion: "Tìm khu vực",
+    searchRegionHint: "Tìm theo tên hoặc mã",
+    availableRegions: "Các khu vực có thể chọn",
+    noRegions: "Không tìm thấy khu vực.",
+  },
+  zh: {
+    region: "地区",
+    selectRegion: "选择地区",
+    closeRegion: "关闭地区选择器",
+    searchRegion: "搜索地区",
+    searchRegionHint: "按名称或代码搜索",
+    availableRegions: "可选地区",
+    noRegions: "未找到地区。",
+  },
+  ko: {
+    region: "지역",
+    selectRegion: "지역 선택",
+    closeRegion: "지역 선택 닫기",
+    searchRegion: "지역 검색",
+    searchRegionHint: "이름 또는 코드로 검색",
+    availableRegions: "선택 가능한 지역",
+    noRegions: "지역을 찾을 수 없습니다.",
+  },
+} as const;

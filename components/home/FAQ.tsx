@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { faqs } from "@/data/faqs";
+import { faqsFor } from "@/data/faqs";
 import {
   Plus,
   ArrowUpRight,
@@ -11,8 +11,11 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import Link from "next/link";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 export function FAQ() {
+  const { language, t } = useLanguage();
+  const faqs = faqsFor(language);
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
 
@@ -36,29 +39,29 @@ export function FAQ() {
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-8 py-20">
+      <div className="site-container py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
           {/* 2. LEFT COLUMN (HERO & NAVIGATION) */}
           <div className="flex h-full flex-col lg:col-span-5" data-reveal>
             <p className="text-[#FF9F3C] text-xs font-heading font-bold tracking-widest uppercase mb-3">
-              A LITTLE MORE CLARITY
+              {t("faqEyebrow")}
             </p>
             <h2 className="text-3xl md:text-5xl font-heading font-extrabold uppercase text-white tracking-tight leading-[1.15] mb-8">
-              Good questions.
+              {t("faqLead")}
               <br />
-              <span className="text-zinc-500 font-light">Straight answers.</span>
+              <span className="text-zinc-500 font-light">{t("faqFinish")}</span>
             </h2>
 
             {/* Topic Navigation */}
             <div className="mb-8">
               <span className="flex items-center gap-2 text-[10px] font-heading font-bold tracking-widest text-zinc-500 uppercase mb-3">
-                <Compass size={14} className="text-[#FF9F3C]" /> JUMP TO A TOPIC
+                <Compass size={14} className="text-[#FF9F3C]" /> {t("faqTopics")}
               </span>
               <div className="flex flex-wrap gap-2.5">
                 {[
-                  ["Account safety", 1],
-                  ["Delivery", 3],
-                  ["Tracking", 5],
+                  [t("faqAccount"), 1],
+                  [t("faqDelivery"), 3],
+                  [t("faqTracking"), 5],
                 ].map(([label, index]) => {
                   const isActive = open === index;
                   return (
@@ -88,19 +91,19 @@ export function FAQ() {
                 </div>
                 <div>
                   <small className="block text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
-                    NEED A HAND?
+                    {t("faqHelp")}
                   </small>
                   <strong className="block text-sm font-semibold text-white group-hover:text-[#F5D7A1] transition-colors">
-                    We’re here to help.
+                    {t("faqHelpTitle")}
                   </strong>
                   <p className="text-xs text-zinc-400 mt-0.5">
-                    Browse support or get in touch.
+                    {t("faqHelpDescription")}
                   </p>
                 </div>
               </div>
               <Link
                 href="/support"
-                aria-label="Visit the help center"
+                aria-label={t("helpCenterLink")}
                 className="w-9 h-9 rounded-lg bg-white/5 border border-white/5 hover:border-[#FF9F3C]/40 flex items-center justify-center text-zinc-400 group-hover:text-[#FF9F3C] transition-all shrink-0 cursor-pointer"
               >
                 <ArrowUpRight
@@ -112,7 +115,7 @@ export function FAQ() {
 
             <p className="mt-8 flex items-center gap-2 text-xs leading-relaxed text-zinc-500 lg:mt-auto lg:pt-8">
               <ShieldCheck size={15} className="text-[#FF9F3C] shrink-0" />
-              <span>Average response time: &lt; 2 minutes. 24/7 dedicated coverage.</span>
+              <span>{t("faqResponse")}</span>
             </p>
           </div>
 

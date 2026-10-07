@@ -4,43 +4,36 @@ import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { Review } from "@/types/review";
 import { reviews as defaultReviews } from "@/data/reviews";
+import { useLanguage } from "@/components/ui/LanguageProvider";
+import { reviewTextFor } from "@/data/review-copy";
+import type { LanguageCode } from "@/lib/i18n";
 
-function Counter({ value }: { value: number }) {
-  const [n, setN] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const reduced = useReducedMotion();
+const mockReviewGames = new Set([
+  "League of Legends",
+  "Teamfight Tactics",
+  "Valorant",
+]);
 
-  useEffect(() => {
-    if (reduced) {
-      const frame = requestAnimationFrame(() => setN(value));
-      return () => cancelAnimationFrame(frame);
-    }
-    let frame = 0;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      let start: number;
-      const tick = (time: number) => {
-        start ??= time;
-        const p = Math.min((time - start) / 1000, 1);
-        setN(Math.round(value * p));
-        if (p < 1) frame = requestAnimationFrame(tick);
-      };
-      frame = requestAnimationFrame(tick);
-      obs.disconnect();
-    });
-    if (ref.current) obs.observe(ref.current);
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(frame);
-    };
-  }, [value, reduced]);
+function mergeReviews(remoteReviews: Review[]) {
+  const combined = [...remoteReviews, ...defaultReviews];
+  const seen = new Set<string>();
 
-  return <span ref={ref}>{n}</span>;
+  return combined.filter((review) => {
+    if (!mockReviewGames.has(review.game)) return false;
+
+    const key = `${review.name}|${review.game}|${review.text}`.toLowerCase();
+    if (seen.has(key)) return false;
+
+    seen.add(key);
+    return true;
+  });
 }
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ review, language }: { review: Review; language: LanguageCode }) {
   return (
-    <article className="flex-none w-[340px] md:w-[380px] snap-start bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_12px_32px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 hover:border-[#FF9F3C]/50 hover:shadow-[0_0_20px_rgba(255,159,60,0.15)] flex flex-col justify-between select-none">
+    <article
+      className="review-card min-h-[230px] w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_12px_32px_rgba(0,0,0,0.5)] hover:border-[#FF9F3C]/50 hover:shadow-[0_0_20px_rgba(255,159,60,0.15)] flex flex-col justify-between select-none"
+    >
       <div>
         {/* Header: Star Rating */}
         <div className="flex items-center gap-1 mb-3.5">
@@ -51,7 +44,7 @@ function ReviewCard({ review }: { review: Review }) {
 
         {/* Punchy 2-Line Quote */}
         <p className="text-zinc-200 text-sm leading-relaxed font-normal line-clamp-2 min-h-[2.75rem]">
-          “{review.text}”
+          “{reviewTextFor(language, review)}”
         </p>
       </div>
 
@@ -78,14 +71,30 @@ function ReviewCard({ review }: { review: Review }) {
 }
 
 export function Reviews() {
-  const [cards, setCards] = useState<Review[]>(defaultReviews);
+  const { language, t } = useLanguage();
+  const [cards, setCards] = useState<Review[]>(mergeReviews(defaultReviews));
+  const [inView, setInView] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const element = carouselRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.1 },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     fetch("/api/reviews?limit=50")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && Array.isArray(data.items) && data.items.length > 0) {
-          setCards(data.items);
+        if (data && Array.isArray(data.items)) {
+          setCards(mergeReviews(data.items));
         }
       })
       .catch(() => {
@@ -95,14 +104,14 @@ export function Reviews() {
 
   return (
     <section className="section reviews-section" id="reviews">
-      <div className="container">
+      <div className="site-container">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow text-[#FF9F3C]">PLAYER REVIEWS</p>
+            <p className="eyebrow text-[#FF9F3C]">{t("playerReviews")}</p>
             <h2>
-              Trusted by players.
+              {t("trustedPlayers")}
               <br />
-              <span className="muted">Proven results.</span>
+              <span className="muted">{t("provenResults")}</span>
             </h2>
           </div>
         </div>
@@ -110,48 +119,57 @@ export function Reviews() {
         <div className="trust-stats">
           <div>
             <strong className="font-heading font-extrabold tabular-nums">15,000+</strong>
-            <span className="font-heading tracking-wider">COMPLETED ORDERS</span>
+            <span className="font-heading tracking-wider">{t("completedOrdersLabel")}</span>
           </div>
           <div>
             <strong className="font-heading font-extrabold tabular-nums">99.4%</strong>
-            <span className="font-heading tracking-wider">ORDER SATISFACTION</span>
+            <span className="font-heading tracking-wider">{t("satisfaction")}</span>
           </div>
           <div>
             <strong className="font-heading font-extrabold tabular-nums">4.9 / 5</strong>
-            <span className="font-heading tracking-wider">COMMUNITY RATING</span>
+            <span className="font-heading tracking-wider">{t("communityRating")}</span>
+          </div>
+        </div>
+      <div
+        ref={carouselRef}
+        className="reviews-marquee relative w-full overflow-hidden py-4"
+        role="region"
+        aria-label={t("playerComments")}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false);
+        }}
+      >
+        <div className="reviews-viewport overflow-hidden" tabIndex={0} aria-label={t("playerComments")} aria-live="off">
+          <div
+            className="reviews-track flex"
+            style={{
+              animationDuration: `${Math.max(cards.length, 1) * 4}s`,
+              animationPlayState:
+                inView && !paused && !reduceMotion ? "running" : "paused",
+            }}
+          >
+            {[0, 1].map((group) => (
+              <div
+                key={group}
+                className="reviews-group"
+                aria-hidden={group === 1 ? "true" : undefined}
+              >
+                {cards.map((review, index) => (
+                  <div
+                    key={`${review.name}-${review.initials}-${index}`}
+                    className="review-slide"
+                  >
+                    <ReviewCard review={review} language={language} />
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      <div
-        className="group relative w-full overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]"
-        role="region"
-        aria-label="Player comments"
-      >
-        <div className="flex w-max snap-x snap-mandatory">
-          {/* Primary Track */}
-          <div className="flex shrink-0 gap-6 pr-6 animate-marquee group-hover:[animation-play-state:paused] hover:[animation-play-state:paused]">
-            {cards.map((review, index) => (
-              <ReviewCard
-                key={`primary-${review.name}-${index}`}
-                review={review}
-              />
-            ))}
-          </div>
-
-          {/* Seamless Duplicate Track for Infinite Loop */}
-          <div
-            aria-hidden="true"
-            className="flex shrink-0 gap-6 pr-6 animate-marquee group-hover:[animation-play-state:paused] hover:[animation-play-state:paused]"
-          >
-            {cards.map((review, index) => (
-              <ReviewCard
-                key={`duplicate-${review.name}-${index}`}
-                review={review}
-              />
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );

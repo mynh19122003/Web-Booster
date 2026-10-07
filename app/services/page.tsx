@@ -10,12 +10,7 @@ export const metadata = makeMetadata(
 export default function ServicesPage() {
   return (
     <>
-      <PageIntro
-        eyebrow="FIND YOUR NEXT STEP"
-        title="Gaming services"
-        description="Choose your game and the support that fits your next goal."
-        path="/services"
-      />
+      <PageIntro pageKey="services" path="/services" />
       <ServiceConfigurator />
       <ServiceCatalog />
     </>

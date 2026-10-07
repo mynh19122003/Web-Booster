@@ -1,12 +1,15 @@
+"use client";
 import Link from "next/link";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 export default function NotFound() {
+  const { t } = useLanguage();
   return (
     <section className="container page-intro">
-      <p className="eyebrow">404 / OFF THE MAP</p>
-      <h1>Let’s get you back.</h1>
-      <p>This page isn’t in the lineup.</p>
+      <p className="eyebrow">{t("notFoundEyebrow")}</p>
+      <h1>{t("notFoundTitle")}</h1>
+      <p>{t("notFoundDescription")}</p>
       <Link className="button" href="/">
-        Return to home
+        {t("returnHome")}
       </Link>
     </section>
   );

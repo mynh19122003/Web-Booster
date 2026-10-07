@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 export function SupportForm() {
+  const { t } = useLanguage();
   const [done, setDone] = useState(false);
   return (
     <form
@@ -10,28 +12,27 @@ export function SupportForm() {
         setDone(true);
       }}
     >
-      <h2>Draft a support request.</h2>
-      <p>This form validates your request locally. No message is sent.</p>
+      <h2>{t("howCanHelp")}</h2>
       <label>
-        Your email
+        {t("yourEmail")}
         <input required type="email" placeholder="you@example.com" />
       </label>
       <label>
-        How can we help?
+        {t("howCanHelp")}
         <textarea
           required
           minLength={10}
           maxLength={2000}
           rows={5}
-          placeholder="Tell us a little about your question…"
+          placeholder={t("supportQuestionHint")}
         />
       </label>
       <button className="button" type="submit">
-        Send message
+        {t("sendMessage")}
       </button>
       {done && (
         <p role="status">
-          Thank you. Your message has been received and our 24/7 team will respond shortly.
+          {t("supportDraftSaved")}
         </p>
       )}
     </form>

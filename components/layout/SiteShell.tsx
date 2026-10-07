@@ -8,6 +8,9 @@ import { SceneLoader } from "@/components/three/SceneLoader";
 import { PointerEffects } from "@/components/ui/PointerEffects";
 import { InitialLoader } from "@/components/ui/InitialLoader";
 import { CurrencyProvider } from "@/components/ui/Currency";
+import { LanguageProvider } from "@/components/ui/LanguageProvider";
+import { SkipLink } from "@/components/ui/SkipLink";
+import { Suspense } from "react";
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
@@ -15,23 +18,27 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   if (isAdminRoute || isAuthRoute)
     return (
-      <>
+      <LanguageProvider>
+        <SkipLink />
         <CurrencyProvider />
         <main id="main">{children}</main>
-      </>
+      </LanguageProvider>
     );
   return (
-    <>
+    <LanguageProvider>
+      <SkipLink />
       <CurrencyProvider />
       <SceneLoader />
       <InitialLoader />
       <PointerEffects />
-      <Header />
+      <Header key={path} />
       <Experience>
         <main id="main">{children}</main>
       </Experience>
       <Footer />
-      <Dialogs />
-    </>
+      <Suspense fallback={null}>
+        <Dialogs />
+      </Suspense>
+    </LanguageProvider>
   );
 }

@@ -9,12 +9,7 @@ export const metadata = makeMetadata(
 export default function CareersPage() {
   return (
     <>
-      <PageIntro
-        eyebrow="CAREERS AT ASCEND"
-        title="Bring your best game"
-        description="We welcome skilled players and thoughtful coaches. Tell us who you are and where you excel."
-        path="/careers"
-      />
+      <PageIntro pageKey="careers" path="/careers" />
       <RecruitmentSection />
     </>
   );

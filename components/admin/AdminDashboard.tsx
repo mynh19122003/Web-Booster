@@ -178,7 +178,6 @@ export function AdminDashboard() {
         <header className="admin-topbar">
           <span>Admin / {title}</span>
           <div>
-            <span className="local-notice">Local preview</span>
             <button className="admin-theme-toggle" type="button" onClick={toggleTheme} aria-label={darkMode ? "Use light mode" : "Use dark mode"} title={darkMode ? "Light mode" : "Dark mode"}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button>
           </div>
         </header>
@@ -186,7 +185,7 @@ export function AdminDashboard() {
           <div className="admin-heading">
             <div>
               <h1>{title}</h1>
-              <p>Manage records saved on this browser.</p>
+              <p>Manage applications, requests and your team.</p>
             </div>
             <button
               className="admin-button"
@@ -209,7 +208,6 @@ export function AdminDashboard() {
               </form>
               <div className="staff-list">{staff.map((member) => <div className="staff-row" key={member.id}><span className="user-avatar">{member.name.charAt(0).toUpperCase()}</span><span><strong>{member.name}</strong><small>{member.email} · {member.role}</small></span><div className="staff-actions"><button type="button" aria-label={`Edit ${member.name}`} title="Edit staff member" onClick={() => { setEditingStaff(member.id); setStaffName(member.name); setStaffEmail(member.email); setStaffRole(member.role); }}><Pencil size={15} /></button><button type="button" aria-label={`Delete ${member.name}`} title="Delete staff member" disabled={member.id === "staff-admin"} onClick={() => { if (window.confirm(`Delete ${member.name}?`)) { deleteStaff(member.id); setNotice("Staff member deleted."); } }}><Trash2 size={15} /></button></div></div>)}</div>
               {editingStaff && <button className="text-link" type="button" onClick={() => { setEditingStaff(null); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); }}>Cancel editing</button>}
-              <p className="admin-notice">Role permissions are a local preview. Production use needs server-side authentication and authorization.</p>
             </section>
           ) : tab === "overview" ? (
             <>
@@ -369,8 +367,8 @@ export function AdminDashboard() {
                             r.rank
                           ) : (
                             <>
-                              {serviceName(r.service)}
-                              <small>{money.format(r.priceUsd)}</small>
+                              {r.categoryName ?? serviceName(r.service)}
+                              <small>{r.quoteRequired ? "Quote pending" : money.format(r.priceUsd)}</small>
                             </>
                           )}
                         </td>
@@ -528,17 +526,17 @@ function RecordDetails({
         ) : (
           <>
             <dt>Service</dt>
-            <dd>{serviceName(record.service)}</dd>
+            <dd>{record.categoryName ?? serviceName(record.service)}</dd>
             <dt>Plan</dt>
             <dd>
-              {record.service === "coaching"
+              {record.categoryName ? `${record.from} to ${record.to}` : record.service === "coaching"
                 ? `${record.units} coaching hours`
                 : record.service === "placements"
                   ? `${record.units} placement matches`
                   : `${record.from} to ${record.to}`}
             </dd>
             <dt>Estimate</dt>
-            <dd>{money.format(record.priceUsd)}</dd>
+            <dd>{record.quoteRequired ? "Quote pending confirmation" : money.format(record.priceUsd)}</dd>
             <dt>Region / queue</dt>
             <dd>
               {record.region} / {record.queue}

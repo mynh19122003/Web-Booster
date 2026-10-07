@@ -1,19 +1,21 @@
+"use client";
+
 import { boosters } from "@/data/boosters";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 export function BoosterSection() {
+  const { t } = useLanguage();
   return (
     <section className="section" id="pros">
-      <div className="container">
+      <div className="site-container">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow text-[#FF9F3C]">VERIFIED TALENT</p>
-            <h2>Meet our pros.</h2>
+            <p className="eyebrow text-[#FF9F3C]">{t("verifiedTalent")}</p>
+            <h2>{t("meetPros")}</h2>
           </div>
           <p>
-            Top 0.1% Challenger & Radiant players,
-            <br />
-            vetted for consistency, speed, and professionalism.
+            {t("prosDescription")}
           </p>
         </div>
         <div className="booster-grid">
@@ -34,7 +36,7 @@ export function BoosterSection() {
                 </div>
                 <span className="player-watermark">{b.name}</span>
                 <span className="player-online">
-                  <span className="status-dot" /> ONLINE & AVAILABLE
+                  <span className="status-dot" /> {t("onlineAvailable")}
                 </span>
               </div>
               <div className="player-info">
@@ -46,19 +48,19 @@ export function BoosterSection() {
                 <div className="player-stats">
                   <div>
                     <strong>{b.win}</strong>
-                    <small>WIN RATE</small>
+                    <small>{t("winRate")}</small>
                   </div>
                   <div>
                     <strong>{b.orders}</strong>
-                    <small>ORDERS</small>
+                    <small>{t("ordersLabel")}</small>
                   </div>
                   <div>
                     <strong>{b.rating}</strong>
-                    <small>RATING</small>
+                    <small>{t("rating")}</small>
                   </div>
                 </div>
-                <Link href="/#configure" className="text-link">
-                  Build a plan <ArrowUpRight size={16} />
+                <Link href="/#services" className="text-link">
+                  {t("buildAPlan")} <ArrowUpRight size={16} />
                 </Link>
               </div>
             </article>
