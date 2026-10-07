@@ -8,7 +8,7 @@ import {
   orderService,
   employeeAuthService,
   isActive,
-  workload,
+  employeeActiveOrders as workload,
   WorkflowError,
   employeeService,
 } from "@/services/workflow-adapter";
@@ -31,11 +31,13 @@ import {
 } from "./Shared";
 import type { AvailableOrder } from "@/types/workflow";
 import { WorkflowChat } from "./WorkflowChat";
+import { RiotClientCard } from "./RiotClientCard";
+import { employeeDemo } from "@/lib/workflow/demo";
 
 export function EmployeeLogin() {
   const employees = useWorkflow((s) => s.employees);
   const router = useRouter();
-  const [id, setId] = useState("emp-nova");
+  const [id, setId] = useState<string>(employeeDemo.id);
   const [error, setError] = useState("");
   return (
     <div className="wf-login">
@@ -47,7 +49,8 @@ export function EmployeeLogin() {
           onSubmit={async (event) => {
             event.preventDefault();
             try {
-              await employeeAuthService.login(id);
+              if (id === employeeDemo.id) await employeeAuthService.loginDemo(employeeDemo.email, employeeDemo.password);
+              else await employeeAuthService.login(id);
               router.push("/employee");
             } catch (e) {
               setError((e as Error).message);
@@ -80,6 +83,17 @@ export function EmployeeLogin() {
           </button>
         </form>
         <Link href="/admin/login">Trang quản trị ↗</Link>
+        {process.env.NODE_ENV === "development" && (
+          <button
+            className="ap-button"
+            onClick={async () => {
+              await employeeAuthService.prepareRiotFixture();
+              setId("emp-riot-poc");
+            }}
+          >
+            Chuẩn bị nhân viên Riot PoC (Development)
+          </button>
+        )}
       </Panel>
     </div>
   );
@@ -104,6 +118,7 @@ export function EmployeeDashboard() {
       </PageHeader>
       <Stats
         items={[
+          ["Trạng thái", e.online ? "Online / Sẵn sàng" : "Ngoại tuyến"],
           ["Đơn đang thực hiện", workload(e.id)],
           ["Giới hạn nhận đơn", `${workload(e.id)} / ${e.maxActiveOrders}`],
           ["Đơn hoàn thành", e.completedOrders],
@@ -117,6 +132,11 @@ export function EmployeeDashboard() {
       />
       <div className="wf-two">
         <Panel title="Đơn hiện tại">
+          {own.filter(isActive).length === 0 && (
+            <EmptyState title="Chưa có đơn đang thực hiện" text="Bạn hiện chưa nhận đơn nào. Hãy nhận một đơn để bắt đầu làm việc và mở Riot Client.">
+              <Link className="ap-button primary" href="/employee/orders/available">Xem đơn có thể nhận</Link>
+            </EmptyState>
+          )}
           {own.filter(isActive).map((o) => (
             <Link
               className="wf-row"
@@ -198,6 +218,7 @@ function Claim({
             order.service === "Coaching" ? "Huấn luyện" : "Nâng hạng",
           ],
           ["Lộ trình", `${order.currentRank} → ${order.targetRank}`],
+          ["Khu vực", order.region],
           ["Dự kiến", order.estimatedDuration],
           ["Hoa hồng", money(order.reward)],
         ]}
@@ -241,7 +262,7 @@ export function EmployeeOrders({
         }
         description={
           kind === "available"
-            ? "Đơn đã thanh toán và phù hợp năng lực của bạn. Người nhận hợp lệ đầu tiên sẽ giữ đơn."
+            ? "Đơn đã thanh toán và phù hợp năng lực của bạn. Nhận đơn để bắt đầu xử lý."
             : "Theo dõi các đơn thuộc trách nhiệm của bạn."
         }
       >
@@ -250,9 +271,7 @@ export function EmployeeOrders({
         </span>
       </PageHeader>
       {full && kind === "available" && (
-        <p className="wf-banner">
-          Bạn đã đạt giới hạn đơn hàng đang thực hiện.
-        </p>
+        <p className="wf-banner">Bạn đã đạt giới hạn đơn đang thực hiện.</p>
       )}
       <label className="ap-search wf-search">
         <span>Tìm đơn</span>
@@ -309,7 +328,7 @@ export function EmployeeOrders({
                   disabled={full}
                   title={
                     full
-                      ? "Bạn đã đạt giới hạn đơn hàng đang thực hiện."
+                      ? "Bạn đã đạt giới hạn đơn đang thực hiện."
                       : "Nhận đơn"
                   }
                   onClick={() => setClaim(o)}
@@ -363,111 +382,89 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
       >
         <Badge status={projected.status} />
       </PageHeader>
-      <div className="wf-two">
-        <Panel title="Thông tin dịch vụ">
-          <Facts
-            items={[
-              ["Khu vực", projected.region],
-              ["Dự kiến", projected.estimatedDuration],
-              ["Hoa hồng", money(projected.reward)],
-              ["Điều kiện", projected.options.join(" · ") || "—"],
-              ...(own
-                ? ([
-                    ["Khách hàng", own.customer.name],
-                    ["Bắt đầu", date(own.startedAt)],
-                    ["Dự kiến hoàn thành", date(own.deadline)],
-                    ["Hướng dẫn", own.instructions],
-                  ] as [string, string][])
-                : []),
-            ]}
-          />
-          {own ? (
-            <>
-              <Progress value={own.progress} />
-              <div className="wf-actions">
-                {own.status === "IN_PROGRESS" && (
-                  <>
-                    <button
-                      className="ap-button"
-                      onClick={() => setAction("progress")}
-                    >
-                      Cập nhật tiến độ
-                    </button>
-                    <button
-                      className="ap-button primary"
-                      onClick={() => setAction("complete")}
-                    >
-                      HOÀN THÀNH ĐƠN
-                    </button>
-                  </>
-                )}
-                {isActive(own) && (
-                  <button
-                    className="ap-button"
-                    onClick={() => setAction("issue")}
-                  >
-                    BÁO VẤN ĐỀ
-                  </button>
-                )}
-                {conversation && (
-                  <Link
-                    className="ap-button"
-                    href={`/employee/chat?conversation=${conversation.id}`}
-                  >
-                    Mở trò chuyện ↗
-                  </Link>
-                )}
-              </div>
-              {own.status === "PENDING_REVIEW" && (
-                <p className="wf-banner">
-                  Bạn đã hoàn tất công việc. Đang chờ khách hàng xác nhận.
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <p className="wf-banner">
-                Thông tin khách hàng và trò chuyện được mở sau khi nhận đơn.
-              </p>
-              <button
-                className="ap-button primary"
-                disabled={full}
-                onClick={() => setAction("claim")}
-              >
-                NHẬN ĐƠN
-              </button>
-            </>
-          )}
-        </Panel>
-        {own && (
-          <Panel title="Timeline">
-            <Timeline orderId={id} />
-          </Panel>
-        )}
-      </div>
-      {own && (
-        <>
-          <Panel title="RIOT">
+      <div className="riot-detail-layout">
+        <div className="riot-detail-main">
+          <Panel title="Thông tin dịch vụ">
             <Facts
               items={[
-                ["Riot ID", e.riotId],
-                ["Khu vực", own.region],
-                ["Hạng", own.currentRank],
-                ["Kết nối", e.verified ? "Đã kết nối" : "Chưa kết nối"],
-                ["Xác minh", e.verified ? "Đã xác minh" : "Chưa xác minh"],
-                ["Client", e.clientOpen ? "Client đã mở" : "Client chưa mở"],
+                ["Dịch vụ", projected.service],
+                ["Khu vực", projected.region],
+                ["Dự kiến", projected.estimatedDuration],
+                ["Hoa hồng", money(projected.reward)],
+                ["Điều kiện", projected.options.join(" · ") || "—"],
+                ...(own
+                  ? ([
+                      ["Khách hàng", own.customer.name],
+                      ["Bắt đầu", date(own.startedAt)],
+                      ["Dự kiến hoàn thành", date(own.deadline)],
+                      ["Hướng dẫn", own.instructions],
+                    ] as [string, string][])
+                  : []),
               ]}
             />
-            <button
-              className="ap-button"
-              onClick={async () => {
-                await employeeService.openClient();
-                notify("Đang mở Riot Client...");
-              }}
-            >
-              MỞ RIOT CLIENT
-            </button>
+            {own ? (
+              <>
+                <Progress value={own.progress} />
+                <div className="wf-actions">
+                  {own.status === "IN_PROGRESS" && (
+                    <>
+                      <button
+                        className="ap-button"
+                        onClick={() => setAction("progress")}
+                      >
+                        Cập nhật tiến độ
+                      </button>
+                      <button
+                        className="ap-button primary"
+                        onClick={() => setAction("complete")}
+                      >
+                        HOÀN THÀNH ĐƠN
+                      </button>
+                    </>
+                  )}
+
+                  {conversation && (
+                    <Link
+                      className="ap-button"
+                      href={`/employee/chat?conversation=${conversation.id}`}
+                    >
+                      Mở trò chuyện ↗
+                    </Link>
+                  )}
+                </div>
+                {own.status === "PENDING_REVIEW" && (
+                  <p className="wf-banner">
+                    Bạn đã hoàn tất công việc. Đang chờ khách hàng xác nhận.
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="wf-banner">
+                  Thông tin khách hàng và trò chuyện được mở sau khi nhận đơn.
+                </p>
+                <button
+                  className="ap-button primary"
+                  disabled={full}
+                  onClick={() => setAction("claim")}
+                >
+                  NHẬN ĐƠN
+                </button>
+              </>
+            )}
           </Panel>
+          {own && (
+            <Panel title="Timeline">
+              <Timeline orderId={id} />
+            </Panel>
+          )}
+          {!own && (
+            <Panel title="Trao đổi với khách hàng">
+              <p className="wf-banner">
+                Bạn cần nhận đơn trước khi có thể trò chuyện với khách hàng.
+              </p>
+            </Panel>
+          )}
           {conversation && (
             <Panel title="Trao đổi với khách hàng">
               <WorkflowChat
@@ -476,8 +473,30 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
               />
             </Panel>
           )}
-        </>
-      )}
+        </div>
+        <aside className="riot-detail-sidebar">
+          <RiotClientCard key={id} order={projected} />
+          {own && isActive(own) && (
+            <Panel title="Cần hỗ trợ?">
+              <button
+                className="ap-button full"
+                onClick={() => setAction("issue")}
+              >
+                BÁO VẤN ĐỀ
+              </button>
+            </Panel>
+          )}
+          <Panel title="Trạng thái đơn">
+            <Badge status={projected.status} />
+            <Facts
+              items={[
+                ["Hoa hồng", money(projected.reward)],
+                ["Khách hàng", own?.customer.name || "Mở sau khi nhận đơn"],
+              ]}
+            />
+          </Panel>
+        </aside>
+      </div>
       {action === "claim" && (
         <Claim order={projected} onClose={() => setAction(null)} />
       )}

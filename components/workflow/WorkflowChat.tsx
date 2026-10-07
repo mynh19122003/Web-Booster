@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Send, MessageSquare, LockKeyhole } from "lucide-react";
 import { useWorkflow } from "@/lib/workflow/store";
-import { chatService, isActive } from "@/services/workflow-adapter";
+import { chatService } from "@/services/workflow-adapter";
 import { PageHeader, EmptyState } from "@/components/admin/portal/Ui";
 import { useAllowed, Badge, Facts, date } from "./Shared";
 export function WorkflowChat({
@@ -66,7 +66,7 @@ export function WorkflowChat({
     !conversation.archived &&
     (mode === "admin"
       ? adminSend
-      : order?.employeeId === s.employeeId && isActive(order));
+      : order?.employeeId === s.employeeId && order?.status === "IN_PROGRESS");
   useEffect(() => {
     log.current?.scrollTo({ top: log.current.scrollHeight });
   }, [visible.length, conversation?.id, channel]);

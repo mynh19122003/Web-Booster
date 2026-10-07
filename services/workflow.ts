@@ -1,7 +1,12 @@
 "use client";
 import { useEffect } from "react";
-import { useWorkflow as store, type WorkflowState } from "@/lib/workflow/store";
+import {
+  useWorkflow as store,
+  isWorkflowSnapshot,
+  type WorkflowState,
+} from "@/lib/workflow/store";
 import { workflowFixtures } from "@/mocks/workflow";
+import { employeeDemo } from "@/lib/workflow/demo";
 import { can } from "@/services/admin";
 import { useAdminStore } from "@/lib/admin/store";
 import type { Permission } from "@/types/admin";
@@ -48,6 +53,9 @@ export const activeStatuses = [
 export const isActive = (o: Order) => activeStatuses.includes(o.status);
 export const workload = (id: string, s = store.getState()) =>
   s.orders.filter((o) => o.employeeId === id && isActive(o)).length;
+export const employeeActiveOrders = (id: string, s = store.getState()) =>
+  s.orders.filter((o) => o.employeeId === id && o.status === "IN_PROGRESS")
+    .length;
 export const timestamp = () => new Date().toISOString();
 const uid = () => crypto.randomUUID();
 function admin(permission: Permission) {
@@ -146,12 +154,28 @@ function patchOrder(
 let initialization: Promise<void> | undefined;
 export function initializeWorkflow() {
   return (initialization ??= (async () => {
-    const identity = JSON.parse(
-      sessionStorage.getItem("ascend-employee-identity") || "null",
-    ) as { id: string; session: string } | null;
+    let identity: { id: string; session: string } | null = null;
+    try {
+      identity = JSON.parse(
+        sessionStorage.getItem("ascend-employee-identity") || "null",
+      );
+    } catch {
+      /* Corrupt mock identity requires login again. */
+    }
     await store.persist.rehydrate();
     if (!store.getState().initialized)
       store.setState({ ...workflowFixtures(), initialized: true });
+    // Add the new demo to older saved projections without resetting claims.
+    const saved = store.getState();
+    const fixtures = workflowFixtures();
+    store.setState({
+      employees: saved.employees.some((e) => e.id === employeeDemo.id)
+        ? saved.employees
+        : [...saved.employees, fixtures.employees.find((e) => e.id === employeeDemo.id)!],
+      orders: saved.orders.some((o) => o.id === employeeDemo.orderId)
+        ? saved.orders
+        : [...saved.orders, fixtures.orders.find((o) => o.id === employeeDemo.orderId)!],
+    });
     store.setState({
       ready: true,
       employeeId: identity?.id ?? null,
@@ -169,8 +193,13 @@ export function useWorkflowReady() {
         employeeId: store.getState().employeeId,
         employeeSessionId: store.getState().employeeSessionId,
       };
-      const state = JSON.parse(event.newValue).state as WorkflowState;
-      store.setState({ ...state, ...identity, ready: true });
+      try {
+        const state = JSON.parse(event.newValue).state as WorkflowState;
+        if (isWorkflowSnapshot(state))
+          store.setState({ ...state, ...identity, ready: true });
+      } catch {
+        /* Ignore malformed cross-tab mock data. */
+      }
     };
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
@@ -178,6 +207,35 @@ export function useWorkflowReady() {
   return ready;
 }
 export const employeeAuthMockService = {
+  async loginDemo(email: string, password: string) {
+    if (email.trim().toLowerCase() !== employeeDemo.email || password !== employeeDemo.password)
+      throw new Error("Email hoặc mật khẩu demo không đúng.");
+    await initializeWorkflow();
+    await employeeAuthMockService.login(employeeDemo.id);
+    // Employee demo must not retain a previous admin identity in this tab.
+    useAdminStore.setState({ user: null });
+  },
+  async prepareRiotFixture() {
+    if (process.env.NODE_ENV !== "development")
+      throw new Error("Chỉ dành cho development.");
+    const s = store.getState();
+    if (s.employees.some((e) => e.id === "emp-riot-poc")) return;
+    const template = s.employees.find((e) => e.id === "emp-nova")!;
+    store.setState({
+      employees: [
+        ...s.employees,
+        {
+          ...template,
+          id: "emp-riot-poc",
+          name: "Riot PoC",
+          maxActiveOrders: 1,
+          riotId: "MockPlayer#VN2",
+          clientOpen: false,
+          verified: false,
+        },
+      ],
+    });
+  },
   async login(id: string) {
     const s = store.getState();
     const e = s.employees.find((e) => e.id === id && e.status === "ACTIVE");
@@ -253,12 +311,18 @@ export const orderMockService: EmployeeOrderService = {
         employeeSessionId: store.getState().employeeSessionId,
       };
       const saved = localStorage.getItem("ascend-order-flow-v1");
-      if (saved)
-        store.setState({
-          ...JSON.parse(saved).state,
-          ...identity,
-          ready: true,
-        });
+      if (saved) {
+        try {
+          const state = JSON.parse(saved).state;
+          if (!isWorkflowSnapshot(state)) throw new Error("Invalid snapshot");
+          store.setState({ ...state, ...identity, ready: true });
+        } catch {
+          throw new WorkflowError(
+            "INVALID_STATE",
+            "Dữ liệu mock đã lưu bị lỗi. Hãy tải lại trang trước khi thử nhận đơn.",
+          );
+        }
+      }
       const e = employee();
       const o = order(id);
       const s = store.getState();
@@ -272,7 +336,7 @@ export const orderMockService: EmployeeOrderService = {
           "FORBIDDEN",
           "Bạn chưa đủ điều kiện nhận đơn này.",
         );
-      if (workload(e.id) >= e.maxActiveOrders)
+      if (employeeActiveOrders(e.id) >= e.maxActiveOrders)
         throw new WorkflowError(
           "ORDER_LIMIT",
           "Bạn đã đạt giới hạn đơn hàng đang thực hiện.",
@@ -720,7 +784,11 @@ export const chatMockService = {
     if (mode === "employee") {
       const e = employee();
       const o = order(c.orderId);
-      if (channel !== "CUSTOMER" || o.employeeId !== e.id || !isActive(o))
+      if (
+        channel !== "CUSTOMER" ||
+        o.employeeId !== e.id ||
+        o.status !== "IN_PROGRESS"
+      )
         throw new Error(
           "Bạn không còn quyền gửi tin nhắn trong cuộc trò chuyện này.",
         );

@@ -1,0 +1,38 @@
+﻿.riot-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 20px;
+  margin-top: 20px;
+  align-items: start;
+}
+.riot-detail-main,
+.riot-detail-sidebar {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.riot-card {
+  display: grid;
+  gap: 14px;
+}
+.riot-card p {
+  margin: 0;
+}
+.riot-card small {
+  color: var(--ap-muted, #a7a5ad);
+  line-height: 1.6;
+}
+.riot-card .wf-banner {
+  margin: 0;
+}
+.riot-help {
+  padding-left: 24px;
+  display: grid;
+  gap: 16px;
+  line-height: 1.6;
+}
+@media (max-width: 1024px) {
+  .riot-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

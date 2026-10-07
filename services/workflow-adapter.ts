@@ -54,5 +54,6 @@ export {
   useWorkflowReady,
   isActive,
   workload,
+  employeeActiveOrders,
   WorkflowError,
 } from "./workflow";

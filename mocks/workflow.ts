@@ -4,6 +4,7 @@ import { mockConversations } from "./conversations";
 import { mockMessages } from "./messages";
 import type { WorkflowState } from "@/lib/workflow/store";
 import type { OrderStatus, Order } from "@/types/workflow";
+import { employeeDemo } from "@/lib/workflow/demo";
 
 const statuses: Record<string, OrderStatus> = {
   PENDING: "PENDING_PAYMENT",
@@ -54,6 +55,30 @@ export function workflowFixtures(): Omit<
     phone: "",
     timezone: "Asia/Ho_Chi_Minh",
   }));
+  employees.push({
+    ...structuredClone(employees[0]),
+    id: employeeDemo.id,
+    name: "Sofia",
+    games: ["League of Legends", "Teamfight Tactics"],
+    maxActiveOrders: 1,
+    completedOrders: 0,
+    riotId: "PlayerSofia#VN2",
+    clientOpen: false,
+  });
+  orders.push({
+    ...structuredClone(orders.find((o) => o.id === "ASC-1047")!),
+    id: employeeDemo.orderId,
+    game: "League of Legends",
+    service: "Rank Boost",
+    status: "OPEN",
+    currentRank: "Emerald IV",
+    targetRank: "Diamond IV",
+    region: "VN2",
+    reward: 450000,
+    progress: 0,
+    employeeId: undefined,
+    startedAt: undefined,
+  });
   const disputed = orders.find((o) => o.status === "DISPUTED")!;
   disputed.complaintStatus = "OPEN";
   return {
@@ -111,7 +136,18 @@ export function workflowFixtures(): Omit<
           updatedAt: o.updatedAt,
         })),
     ],
-    messages: structuredClone(mockMessages),
+    messages: [
+      ...structuredClone(mockMessages),
+      {
+        id: "msg-sofia-demo-welcome",
+        conversationId: `chat-${employeeDemo.orderId}`,
+        sender: { id: "customer-sofia-demo", name: "Khách hàng", role: "CUSTOMER" as const },
+        body: "Chào Sofia, bạn cập nhật tiến độ giúp mình tại đây nhé.",
+        at: ago(5),
+        channel: "CUSTOMER" as const,
+        read: false,
+      },
+    ],
     complaints: [
       {
         id: "KN-1001",
