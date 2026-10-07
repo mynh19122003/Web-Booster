@@ -62,7 +62,14 @@ export function OrderDetail({ id }: { id: string }) {
   const order = orders.find((o) => o.id === id);
   if (!order)
     return (
-      <ErrorPanel error="Không tìm thấy đơn hàng này." retry={load.retry} />
+      <ErrorPanel
+        error={
+          load.unavailable
+            ? "Không tìm thấy dữ liệu đơn hàng. Dữ liệu chưa khả dụng."
+            : "Không tìm thấy dữ liệu đơn hàng."
+        }
+        retry={load.retry}
+      />
     );
   const employee = employees.find((e) => e.id === order.employeeId);
   const history = assignments.filter((a) => a.orderId === id).toReversed();
@@ -99,7 +106,7 @@ export function OrderDetail({ id }: { id: string }) {
                 <TrendingUp size={18} />
                 Tiến độ hiện tại{" "}
               </h2>
-              <span className="op-demo-label">Cập nhật dùng thử cục bộ</span>
+
               {edit && order.status === "IN_PROGRESS" && (
                 <button
                   className="ap-button"
@@ -225,8 +232,7 @@ export function OrderDetail({ id }: { id: string }) {
               <div className="op-note employee">
                 <span>Ghi chú nhân sự</span>
                 <p>
-                  {adminText(order.employeeNotes) ||
-                    "Chưa có ghi chú nhân sự."}
+                  {adminText(order.employeeNotes) || "Chưa có ghi chú nhân sự."}
                 </p>
               </div>
             </div>
@@ -272,8 +278,8 @@ export function OrderDetail({ id }: { id: string }) {
               </>
             ) : (
               <p>
-                Đơn đang chờ nhân sự phù hợp. Chọn Phân công nhân sự để gửi
-                đề nghị.{" "}
+                Đơn đang chờ nhân sự phù hợp. Chọn Phân công nhân sự để gửi đề
+                nghị.{" "}
               </p>
             )}
           </section>
@@ -339,6 +345,7 @@ export function OrderDetail({ id }: { id: string }) {
       </div>
       {dialog && (
         <FormModal
+          disabled
           title={
             dialog === "progress"
               ? "Cập nhật tiến độ hiện tại"
@@ -346,7 +353,7 @@ export function OrderDetail({ id }: { id: string }) {
           }
           description={
             dialog === "progress"
-              ? "Mô phỏng cập nhật tiến độ. Chọn Hoàn thành đơn khi đạt mục tiêu."
+              ? "Cập nhật tiến độ. Chọn Hoàn thành đơn khi đạt mục tiêu."
               : "Ghi chú quản trị chỉ hiển thị trong không gian vận hành."
           }
           submit="Lưu cập nhật"
@@ -361,7 +368,7 @@ export function OrderDetail({ id }: { id: string }) {
                 Number(data.get("lp")),
                 String(data.get("note")),
               );
-            notice("Đã lưu cập nhật đơn hàng (dùng thử).");
+            notice("Đã lưu cập nhật đơn hàng.");
           }}
         >
           {dialog === "notes" ? (

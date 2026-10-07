@@ -73,6 +73,16 @@ export function OrderTable({ orders }: { orders: Order[] }) {
           </tr>
         </thead>
         <tbody>
+          {!orders.length && (
+            <tr>
+              <td colSpan={11}>
+                <EmptyState
+                  title="Chưa có dữ liệu đơn hàng."
+                  text="Dữ liệu chưa khả dụng."
+                />
+              </td>
+            </tr>
+          )}
           {orders.map((o) => {
             const employee = employees.find((e) => e.id === o.employeeId);
             return (
@@ -220,7 +230,7 @@ export function OrdersPage() {
           <AdminStatCard
             key={s.label}
             label={s.label}
-            value={s.value}
+            value={load.unavailable ? null : s.value}
             icon={<s.icon size={18} />}
             note="Trong hệ thống"
             index={`0${i + 1}`}
@@ -347,19 +357,19 @@ export function OrdersPage() {
             </div>
           )}
         </div>
-        {visible.length ? (
-          <OrderTable orders={visible} />
-        ) : (
-          <EmptyState
-            title="Chưa có đơn hàng"
-            text="Không có đơn phù hợp bộ lọc. Hãy thử tìm kiếm khác."
-          />
-        )}
+        <OrderTable orders={visible} />
         <div className="ap-table-footer">
           <span>
-            {filtered.length ? (currentPage - 1) * 6 + 1 : 0}–
-            {Math.min(currentPage * 6, filtered.length)} trên {filtered.length}{" "}
-            đơn hàng{" "}
+            {load.unavailable
+              ? "—"
+              : filtered.length
+                ? (currentPage - 1) * 6 + 1
+                : 0}
+            –
+            {load.unavailable
+              ? "—"
+              : Math.min(currentPage * 6, filtered.length)}{" "}
+            trên {load.unavailable ? "—" : filtered.length} đơn hàng{" "}
           </span>
           <div className="op-pagination">
             <button
@@ -370,7 +380,8 @@ export function OrdersPage() {
               <ArrowLeft size={16} />
             </button>
             <span>
-              Trang {currentPage} trên {totalPages}
+              Trang {load.unavailable ? "—" : currentPage} trên{" "}
+              {load.unavailable ? "—" : totalPages}
             </span>
             <button
               aria-label="Trang sau"

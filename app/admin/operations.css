@@ -19,7 +19,7 @@
 .ap-root .ap-sidebar-bottom {
   padding-top: 18px;
 }
-.ap-root .ap-sidebar .ap-demo-card {
+.ap-root .ap-sidebar .ap-workspace-card {
   display: none;
 }
 .ap-root .ap-status-confirmed,
@@ -61,8 +61,7 @@
 .ap-root .ap-badge {
   white-space: nowrap;
 }
-.ap-root .op-muted,
-.ap-root .op-demo-label {
+.ap-root .op-muted {
   color: var(--ap-muted);
   font-size: 11px;
 }
@@ -247,9 +246,6 @@
 .op-info-banner small {
   display: block;
   padding-top: 4px;
-}
-.op-info-banner .ap-demo-tag {
-  margin-left: auto;
 }
 .op-queue-grid {
   display: grid;
@@ -1059,35 +1055,6 @@
   font-size: 8px;
   margin-top: 4px;
 }
-.op-typing-row {
-  padding: 0 22px;
-  height: 27px;
-  font-size: 9px;
-  color: var(--ap-muted);
-}
-.op-typing-row > button {
-  color: #89929f;
-}
-.op-typing {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.op-typing i {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  background: var(--ap-accent);
-  border-radius: 50%;
-  animation: op-typing 0.9s 3;
-}
-.op-typing i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-.op-typing i:nth-child(3) {
-  animation-delay: 0.3s;
-  margin-right: 5px;
-}
 .op-composer {
   border-top: 1px solid var(--ap-border);
   padding: 14px 20px;
@@ -1311,9 +1278,6 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .op-info-banner .ap-demo-tag {
-    display: none;
-  }
   .op-milestones li {
     font-size: 8px;
   }
@@ -1418,8 +1382,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ap-root .op-order-card,
-  .ap-root .op-chat-context,
-  .ap-root .op-typing i {
+  .ap-root .op-chat-context {
     animation: none;
   }
   .ap-root .op-progress-track > span {

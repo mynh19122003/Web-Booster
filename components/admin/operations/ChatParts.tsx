@@ -1,8 +1,8 @@
 "use client";
 
-import { adminText, adminError } from "@/lib/admin/vi";
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
-import { useState, useRef, type FormEvent } from "react";
+import { useState } from "react";
 import {
   Search,
   ArrowUpRight,
@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import type { Conversation, ChatMessage as Message } from "@/types/operations";
 import { useOperations } from "@/lib/admin/operations-store";
-import { chatService } from "@/services/operations";
 import { Avatar, StatusBadge, EmptyState, FormModal } from "../portal/Ui";
 import { dateTime, OrderProgressBar, money, usePermission } from "./OrderUi";
 export function ConversationList({
@@ -46,10 +45,7 @@ export function ConversationList({
     <aside className="op-conversation-list">
       <header>
         <h2>
-          Hộp thư{" "}
-          <span className="ap-count">
-            {conversations.filter((c) => !c.archived).length}
-          </span>
+          Hộp thư <span className="ap-count">—</span>
         </h2>
         <span className="op-muted">Kết nối mọi người.</span>
       </header>
@@ -125,7 +121,7 @@ export function ConversationList({
         })}
         {!filtered.length && (
           <EmptyState
-            title="Hộp thư chưa có dữ liệu"
+            title="Chưa có cuộc trò chuyện."
             text="Không có cuộc trò chuyện phù hợp bộ lọc."
           />
         )}
@@ -160,7 +156,7 @@ export function ChatMessage({ message }: { message: Message }) {
             )}
             <span>
               {message.attachment.name}
-              <small>Tệp đính kèm dùng thử · Chưa tải tệp lên</small>
+              <small>Tệp đính kèm</small>
             </span>
           </div>
         )}
@@ -170,7 +166,7 @@ export function ChatMessage({ message }: { message: Message }) {
         {message.sender.role === "ADMIN" && (
           <span>
             <CheckCheck size={12} />
-            {message.read ? "Đã đọc (dùng thử)" : "Đã gửi cục bộ"}
+            {message.read ? "Đã đọc" : "Đã gửi"}
           </span>
         )}
       </small>
@@ -181,141 +177,39 @@ export function ChatComposer({
   conversation,
   channel,
 }: {
-  conversation: Conversation;
+  conversation?: Conversation;
   channel: Message["channel"];
 }) {
   const allowed = usePermission("chat.send");
-  const [body, setBody] = useState("");
-  const [attachment, setAttachment] = useState<Message["attachment"]>();
-  const [attachMenu, setAttachMenu] = useState(false);
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
-  const form = useRef<HTMLFormElement>(null);
-  async function send(e: FormEvent) {
-    e.preventDefault();
-    if (pending || !allowed || conversation.archived) return;
-    setPending(true);
-    setError("");
-    try {
-      await chatService.sendMessage(conversation.id, body, channel, attachment);
-      setBody("");
-      setAttachment(undefined);
-    } catch (error) {
-      setError(adminError(error));
-    } finally {
-      setPending(false);
-    }
-  }
-  if (!allowed || conversation.archived)
-    return (
-      <div className="op-composer-locked">
-        <LockKeyhole size={16} />
-        {conversation.archived
-          ? "Cuộc trò chuyện đã được lưu trữ. Mở lại để trả lời."
-          : "Bạn chỉ có quyền xem cuộc trò chuyện này."}
-      </div>
-    );
   return (
     <form
       className={`op-composer ${channel === "INTERNAL" ? "internal" : ""}`}
-      ref={form}
-      onSubmit={send}
+      onSubmit={(e) => e.preventDefault()}
     >
-      {channel === "INTERNAL" && (
-        <small>
-          <LockKeyhole size={12} />
-          Ghi chú nội bộ — chỉ nhân sự quản trị thấy{" "}
-        </small>
-      )}
-      {attachment && (
-        <div className="op-attachment-chip">
-          {attachment.name}
-          <button
-            type="button"
-            aria-label="Xóa tệp đính kèm"
-            onClick={() => setAttachment(undefined)}
-          >
-            <X size={14} />
-          </button>
-        </div>
-      )}
       <textarea
-        aria-label={
-          channel === "INTERNAL" ? "Viết ghi chú nội bộ" : "Nhập tin nhắn"
-        }
-        placeholder={
-          channel === "INTERNAL"
-            ? "Để lại ghi chú cho đội ngũ…"
-            : "Nhập tin nhắn…"
-        }
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        maxLength={4000}
-        disabled={pending}
+        aria-label="Nhập tin nhắn"
+        placeholder="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
+        disabled
         rows={3}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-            e.preventDefault();
-            if (body.trim() || attachment) form.current?.requestSubmit();
-          }
-        }}
       />
-      {error && (
-        <p role="alert" className="ap-error">
-          {adminError(error)}
-        </p>
-      )}
       <footer>
-        <div className="op-attach-menu">
-          <button
-            type="button"
-            className="ap-icon-button"
-            aria-label="Thêm tệp đính kèm dùng thử"
-            aria-expanded={attachMenu}
-            onClick={() => setAttachMenu(!attachMenu)}
-          >
-            <Plus size={18} />
-          </button>
-          {attachMenu && (
-            <div>
-              <small>Chỉ mô phỏng · Không tải tệp lên</small>
-              <button
-                type="button"
-                onClick={() => {
-                  setAttachment({
-                    name: "session-screenshot.png",
-                    kind: "image",
-                  });
-                  setAttachMenu(false);
-                }}
-              >
-                <ImageIcon size={16} />
-                Ảnh mô phỏng{" "}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAttachment({ name: "session-summary.pdf", kind: "file" });
-                  setAttachMenu(false);
-                }}
-              >
-                <FileText size={16} />
-                Tệp mô phỏng{" "}
-              </button>
-            </div>
-          )}
-        </div>
-        <small>Enter để gửi · Shift+Enter để xuống dòng</small>
         <button
-          className="ap-button primary"
-          disabled={pending || (!body.trim() && !attachment)}
+          type="button"
+          className="ap-icon-button"
+          disabled
+          aria-label="Thêm tệp đính kèm"
         >
-          {pending
-            ? "Đang gửi…"
-            : channel === "INTERNAL"
-              ? "Thêm ghi chú"
-              : "Gửi"}
-          <Send size={15} />
+          <Plus size={18} />
+        </button>
+        <small>
+          {!allowed
+            ? "Bạn chỉ có quyền xem."
+            : !conversation
+              ? "Chưa có cuộc trò chuyện."
+              : "Dữ liệu chưa khả dụng."}
+        </small>
+        <button className="ap-button primary" disabled>
+          Gửi <Send size={15} />
         </button>
       </footer>
     </form>
@@ -411,11 +305,12 @@ export function ChatContextPanel({
       )}
       {person && (
         <FormModal
+          disabled
           title={person === "customer" ? order.customer.name : employee!.name}
           description={
             person === "customer"
-              ? "Hồ sơ khách hàng · Dữ liệu dùng thử"
-              : "Hồ sơ nhân sự · Dữ liệu dùng thử"
+              ? "Hồ sơ khách hàng · Dữ liệu từ máy chủ"
+              : "Hồ sơ nhân sự · Dữ liệu từ máy chủ"
           }
           submit="Đóng"
           onClose={() => setPerson(null)}

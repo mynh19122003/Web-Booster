@@ -12,7 +12,6 @@ const labels: Record<string, string> = {
   "Your operations, elevated.": "Nâng tầm vận hành.",
   "A focused workspace for the people behind every great game.":
     "Không gian làm việc dành cho đội ngũ tạo nên trải nghiệm chơi game tuyệt vời.",
-  "Demo workspace": "Không gian dùng thử",
   "View public website": "Xem trang web",
   "Expand sidebar": "Mở rộng thanh bên",
   "Collapse sidebar": "Thu gọn thanh bên",
@@ -21,10 +20,8 @@ const labels: Record<string, string> = {
   "Application detail": "Chi tiết hồ sơ",
   "Find an order": "Tìm đơn hàng",
   "Find an application": "Tìm hồ sơ",
-  DEMO: "DÙNG THỬ",
   Notifications: "Thông báo",
   "Workspace notifications": "Thông báo quản trị",
-  "· demo": "· dùng thử",
   "applications are waiting for review.": "hồ sơ đang chờ duyệt.",
   "Open applications →": "Mở hồ sơ ứng tuyển →",
   "Super admin": "Quản trị viên cấp cao",
@@ -32,8 +29,6 @@ const labels: Record<string, string> = {
   "My profile": "Hồ sơ cá nhân",
   "Sign out": "Đăng xuất",
   "Team operations": "Vận hành đội ngũ",
-  "Local demo · No live emails or account changes":
-    "Dùng thử cục bộ · Không gửi email hay thay đổi tài khoản thật",
   "Dismiss notification": "Đóng thông báo",
   "FIND YOUR NEXT MVP": "TÌM KIẾM NHÂN TÀI",
   "Employee applications": "Hồ sơ ứng tuyển",
@@ -71,8 +66,6 @@ const labels: Record<string, string> = {
     "Hãy xem xét kinh nghiệm của ứng viên.",
   "Employee credentials have been sent.":
     "Đã gửi thông tin đăng nhập cho nhân sự.",
-  "Simulated delivery in this demo.":
-    "Việc gửi được mô phỏng trong bản dùng thử.",
   "First sign-in requires a password change within 24 hours.":
     "Lần đăng nhập đầu tiên yêu cầu đổi mật khẩu trong vòng 24 giờ.",
   "active orders": "đơn đang thực hiện",
@@ -89,15 +82,11 @@ const labels: Record<string, string> = {
   "Approve & send credentials": "Duyệt và gửi thông tin đăng nhập",
   "Application rejected. Review saved.":
     "Đã từ chối hồ sơ và lưu kết quả xét duyệt.",
-  "Employee credentials have been sent (demo).":
-    "Đã gửi thông tin đăng nhập cho nhân sự (dùng thử).",
   "Employee type": "Loại nhân sự",
   Department: "Bộ phận",
   "Maximum active orders": "Số đơn tối đa đang thực hiện",
   "Rejection reason": "Lý do từ chối",
   "Explain why this application is not a fit…": "Nêu lý do hồ sơ chưa phù hợp…",
-  "This demo records the resend in the audit timeline. No real email is sent.":
-    "Bản dùng thử ghi nhận việc gửi lại vào nhật ký. Không gửi email thật.",
   "A HIGHER STANDARD": "TIÊU CHUẨN CAO HƠN",
   "PRECISION. PEOPLE. PROGRESS.": "CHÍNH XÁC. CON NGƯỜI. TIẾN BỘ.",
   "THE PEOPLE BEHIND THE PROGRESS": "ĐỘI NGŨ TẠO NÊN THÀNH CÔNG",
@@ -116,31 +105,21 @@ const labels: Record<string, string> = {
   "Your workspace awaits.": "Đăng nhập vào trang quản trị.",
   "Sign in to manage your team and keep things moving.":
     "Đăng nhập để quản lý đội ngũ và theo dõi hoạt động.",
-  "Demo password updated. All previous sessions were revoked. Sign in again.":
-    "Đã cập nhật mật khẩu dùng thử và thu hồi các phiên trước. Vui lòng đăng nhập lại.",
   "EXPLORE AS": "DÙNG THỬ VỚI VAI TRÒ",
   Staff: "Nhân sự quản trị",
   "View-only staff": "Nhân sự chỉ xem",
   Password: "Mật khẩu",
-  "Any demo password, 8+ characters": "Mật khẩu dùng thử, ít nhất 8 ký tự",
   "Hide password": "Ẩn mật khẩu",
   "Show password": "Hiện mật khẩu",
-  "Demo session · this tab only": "Phiên dùng thử · chỉ trong thẻ này",
   "Forgot password?": "Quên mật khẩu?",
-  "Password recovery is not connected yet. Contact your workspace owner. For this demo, use any 8+ character password.":
-    "Chưa kết nối chức năng khôi phục mật khẩu. Hãy liên hệ quản trị viên. Bản dùng thử chấp nhận mật khẩu từ 8 ký tự.",
   "Opening workspace…": "Đang đăng nhập…",
   "Sign in to workspace": "Đăng nhập",
-  "You’re exploring a local demo. Use made-up credentials.":
-    "Bạn đang dùng bản thử cục bộ. Hãy sử dụng thông tin giả lập.",
   "No backend requests or real emails are sent.":
     "Không gửi yêu cầu tới máy chủ hay email thật.",
   "Joining the team?": "Bạn muốn gia nhập đội ngũ?",
   "Preview an invitation": "Xem trước lời mời",
   "Unable to accept this invitation.": "Không thể chấp nhận lời mời này.",
   "You’re part of the team.": "Bạn đã gia nhập đội ngũ.",
-  "Your staff account is ready. Sign in using the Staff demo mode to explore your workspace.":
-    "Tài khoản đã sẵn sàng. Đăng nhập với vai trò nhân sự quản trị dùng thử để khám phá.",
   "Continue to sign in": "Tiếp tục đăng nhập",
   "A NEW CHAPTER": "KHỞI ĐẦU MỚI",
   "You’ve been invited.": "Bạn đã nhận được lời mời.",
@@ -156,8 +135,6 @@ const labels: Record<string, string> = {
   "United Kingdom": "Vương quốc Anh",
   "Setting up your account…": "Đang thiết lập tài khoản…",
   "Accept invitation": "Chấp nhận lời mời",
-  "Demo onboarding. No real password is stored.":
-    "Quy trình gia nhập dùng thử. Không lưu mật khẩu thật.",
   "Invitation links expire after 24 hours and can only be used once.":
     "Lời mời hết hạn sau 24 giờ và chỉ dùng được một lần.",
   "Already have an account? Sign in →": "Đã có tài khoản? Đăng nhập →",
@@ -209,7 +186,6 @@ const labels: Record<string, string> = {
   "People, permissions and access": "Nhân sự, quyền hạn và truy cập",
   "Keep your workspace safe": "Bảo vệ không gian làm việc",
   "Sessions and security activity": "Phiên đăng nhập và hoạt động bảo mật",
-  "Demo snapshot ·": "Dữ liệu dùng thử ·",
   "PROTECT YOUR WORKSPACE": "BẢO VỆ KHÔNG GIAN LÀM VIỆC",
   "Security & activity": "Bảo mật và hoạt động",
   "Know who’s signed in. Stay in control of your team’s access.":
@@ -232,12 +208,9 @@ const labels: Record<string, string> = {
   "Audit activity": "Nhật ký hoạt động",
   "A clear record of important workspace changes.":
     "Ghi nhận các thay đổi quan trọng trong hệ thống.",
-  "DEMO EVENTS": "HOẠT ĐỘNG DÙNG THỬ",
   "Revoke this session?": "Thu hồi phiên đăng nhập này?",
   "Revoke session": "Thu hồi phiên đăng nhập",
   "Session revoked successfully.": "Đã thu hồi phiên đăng nhập thành công.",
-  "This is your current demo session. You will be signed out.":
-    "Đây là phiên dùng thử hiện tại. Bạn sẽ bị đăng xuất.",
   "This device will lose access immediately. The user must sign in again to continue.":
     "Thiết bị này sẽ mất quyền truy cập ngay. Người dùng cần đăng nhập lại để tiếp tục.",
   "Unable to change password.": "Không thể đổi mật khẩu.",
@@ -255,21 +228,15 @@ const labels: Record<string, string> = {
   "Current password": "Mật khẩu hiện tại",
   "New password": "Mật khẩu mới",
   "Confirm new password": "Xác nhận mật khẩu mới",
-  "12+ characters, uppercase, lowercase, number and symbol. Demo only: don’t enter a real password.":
-    "Ít nhất 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt. Không nhập mật khẩu thật vào bản dùng thử.",
   "Updating…": "Đang cập nhật…",
   "Update password & sign out": "Cập nhật mật khẩu và đăng xuất",
   "Security at a glance": "Thông tin bảo mật",
   "Your permissions are managed by the workspace owner.":
     "Quyền hạn của bạn do quản trị viên quản lý.",
   "Last sign-in": "Đăng nhập gần nhất",
-  "This demo session": "Phiên dùng thử hiện tại",
   Device: "Thiết bị",
   "Local browser": "Trình duyệt hiện tại",
   "IP address": "Địa chỉ IP",
-  "Not recorded in demo": "Không ghi nhận trong bản dùng thử",
-  "Demo passwords are never saved. Real password checks and session revocation will be handled by the API adapter.":
-    "Không lưu mật khẩu dùng thử. Việc kiểm tra mật khẩu thật và thu hồi phiên sẽ được thực hiện khi kết nối API.",
   "PEOPLE & ACCESS": "NHÂN SỰ VÀ QUYỀN TRUY CẬP",
   "Your team, in sync.": "Đội ngũ cùng nhịp.",
   "Manage the people who keep ASCEND running at its best.":
@@ -314,8 +281,6 @@ const labels: Record<string, string> = {
   "A new teammate. A higher standard. Choose their access below.":
     "Thêm thành viên, nâng tiêu chuẩn. Chọn quyền truy cập bên dưới.",
   "Send invitation": "Gửi lời mời",
-  "Staff invitation sent (demo). No live email was sent.":
-    "Đã gửi lời mời nhân sự (dùng thử). Không gửi email thật.",
   "Full name": "Họ và tên",
   "e.g. Taylor Chen": "Ví dụ: Nguyễn Minh Anh",
   "e.g. Taylor": "Ví dụ: Minh Anh",
@@ -323,7 +288,6 @@ const labels: Record<string, string> = {
     "Liên kết này sẽ hết hiệu lực ngay. Người được mời không thể sử dụng để gia nhập.",
   "A new invitation will replace the previous link and restart the 24-hour expiry.":
     "Lời mời mới sẽ thay thế liên kết cũ và có hiệu lực trong 24 giờ.",
-  "Preview demo invitation": "Xem trước lời mời dùng thử",
   "Not yet signed in": "Chưa đăng nhập",
   "No permissions": "Chưa có quyền",
   "Nothing here yet": "Chưa có dữ liệu",
@@ -367,13 +331,10 @@ const labels: Record<string, string> = {
     "Thêm ghi chú nội bộ đầu tiên cho đội ngũ.",
   "Send a helpful first message below.": "Gửi tin nhắn đầu tiên bên dưới.",
   "is typing…": "đang nhập…",
-  demo: "dùng thử",
-  "Preview typing indicator": "Xem thử trạng thái đang nhập",
   "Select a conversation to start messaging.":
     "Chọn cuộc trò chuyện để bắt đầu nhắn tin.",
   "Customer questions, employee updates, and your team’s private notes — all in one place.":
     "Câu hỏi của khách hàng, cập nhật của nhân sự và ghi chú nội bộ ở cùng một nơi.",
-  "Customer profile · Demo data": "Hồ sơ khách hàng · Dữ liệu dùng thử",
   "Reopen conversation?": "Mở lại cuộc trò chuyện?",
   "Archive conversation?": "Lưu trữ cuộc trò chuyện?",
   "Move this conversation back to the active inbox.":
@@ -396,9 +357,6 @@ const labels: Record<string, string> = {
   "No conversations match this filter.":
     "Không có cuộc trò chuyện phù hợp bộ lọc.",
   "Internal only": "Chỉ nội bộ",
-  "Demo attachment · No file uploaded":
-    "Tệp đính kèm dùng thử · Chưa tải tệp lên",
-  "Read (demo)": "Đã đọc (dùng thử)",
   "Sent locally": "Đã gửi cục bộ",
   "Message could not be sent.": "Không thể gửi tin nhắn.",
   "This conversation is archived. Reopen it to reply.":
@@ -412,10 +370,6 @@ const labels: Record<string, string> = {
   "Type a message": "Nhập tin nhắn",
   "Leave a note for your team…": "Để lại ghi chú cho đội ngũ…",
   "Type a message…": "Nhập tin nhắn…",
-  "Add demo attachment": "Thêm tệp đính kèm dùng thử",
-  "Placeholder only · No upload": "Chỉ mô phỏng · Không tải tệp lên",
-  "Image placeholder": "Ảnh mô phỏng",
-  "File placeholder": "Tệp mô phỏng",
   "Enter to send · Shift+Enter for a new line":
     "Enter để gửi · Shift+Enter để xuống dòng",
   "Sending…": "Đang gửi…",
@@ -432,7 +386,6 @@ const labels: Record<string, string> = {
   "Order value": "Giá trị đơn",
   "Expected completion": "Dự kiến hoàn thành",
   "View employee": "Xem nhân sự",
-  "Employee profile · Demo data": "Hồ sơ nhân sự · Dữ liệu dùng thử",
   "Employee ID": "Mã nhân sự",
   Type: "Loại",
   Capability: "Khả năng xử lý hạng",
@@ -440,7 +393,6 @@ const labels: Record<string, string> = {
   "Order operations": "Vận hành đơn hàng",
   "View all orders": "Xem tất cả đơn hàng",
   "Revenue today": "Doanh thu hôm nay",
-  "Confirmed order value · demo": "Giá trị đơn đã xác nhận · dùng thử",
   "Orders today": "Đơn hàng hôm nay",
   "New customer journeys": "Hành trình khách hàng mới",
   "Active orders": "Đơn đang thực hiện",
@@ -457,7 +409,6 @@ const labels: Record<string, string> = {
   "This order could not be found.": "Không tìm thấy đơn hàng này.",
   "All orders": "Tất cả đơn hàng",
   "Live progress": "Tiến độ hiện tại",
-  "Local demo updates": "Cập nhật dùng thử cục bộ",
   "Update progress": "Cập nhật tiến độ",
   "Current checkpoint": "Mốc tiến độ hiện tại",
   "LP · Target:": "LP · Mục tiêu:",
@@ -503,12 +454,9 @@ const labels: Record<string, string> = {
   "Open full chat": "Mở trò chuyện đầy đủ",
   "Update live progress": "Cập nhật tiến độ hiện tại",
   "Edit internal notes": "Sửa ghi chú nội bộ",
-  "Simulate a progress update. Use Complete order when the target is reached.":
-    "Mô phỏng cập nhật tiến độ. Chọn Hoàn thành đơn khi đạt mục tiêu.",
   "Admin notes stay inside the operations workspace.":
     "Ghi chú quản trị chỉ hiển thị trong không gian vận hành.",
   "Save update": "Lưu cập nhật",
-  "Order update saved (demo).": "Đã lưu cập nhật đơn hàng (dùng thử).",
   "Admin notes": "Ghi chú quản trị",
   "Progress percent": "Phần trăm tiến độ",
   "Update note": "Ghi chú cập nhật",
@@ -596,8 +544,6 @@ const labels: Record<string, string> = {
   "Cancel order": "Hủy đơn",
   "Pause order": "Tạm dừng đơn",
   "Complete order": "Hoàn thành đơn",
-  "This action may require a refund. The demo will close active offers; no payment is changed.":
-    "Thao tác có thể cần hoàn tiền. Bản dùng thử chỉ đóng đề nghị đang hoạt động, không thay đổi thanh toán.",
   "Work will pause until an admin resumes the order.":
     "Công việc sẽ tạm dừng cho tới khi quản trị viên tiếp tục đơn.",
   "Mark the target as reached and release this employee’s workload.":
@@ -606,8 +552,6 @@ const labels: Record<string, string> = {
     "Xác nhận thông tin đơn và chuyển sang hàng chờ phân công.",
   "Move this accepted assignment into active work.":
     "Chuyển phân công đã nhận sang trạng thái đang thực hiện.",
-  "Order updated in this demo workspace.":
-    "Đã cập nhật đơn trong hệ thống dùng thử.",
   Current: "Hiện tại",
   Options: "Tùy chọn",
   "Cancellation reason": "Lý do hủy đơn",
@@ -627,7 +571,6 @@ const labels: Record<string, string> = {
   "Every great experience starts here.": "Trải nghiệm tốt bắt đầu từ đây.",
   "Review new orders and offer them to an available specialist.":
     "Duyệt đơn mới và gửi đề nghị tới nhân sự sẵn sàng.",
-  "DEMO QUEUE": "HÀNG CHỜ DÙNG THỬ",
   "Preferred region": "Khu vực ưu tiên",
   Received: "Đã nhận",
   "minutes ago": "phút trước",
@@ -726,13 +669,10 @@ const labels: Record<string, string> = {
   VN: "Việt Nam",
   US: "Hoa Kỳ",
   GB: "Vương quốc Anh",
-  "Local demo browser": "Trình duyệt dùng thử cục bộ",
   "Your account does not have permission for this action.":
     "Bạn không có quyền thực hiện thao tác này.",
   "You don’t have permission for this action.":
     "Bạn không có quyền thực hiện thao tác này.",
-  "Enter a valid email and at least 8 characters for this demo.":
-    "Vui lòng nhập email hợp lệ và mật khẩu từ 8 ký tự cho bản dùng thử.",
   "This staff account is suspended.": "Tài khoản nhân sự này đang bị tạm khóa.",
   "Use a different, matching password with 12+ characters, upper/lowercase, a number and a symbol.":
     "Mật khẩu mới phải khác mật khẩu cũ, trùng khớp xác nhận, có ít nhất 12 ký tự gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
@@ -793,7 +733,6 @@ const labels: Record<string, string> = {
   "Order created": "Đã tạo đơn",
   "Customer submitted their request.": "Khách hàng đã gửi yêu cầu.",
   "Payment confirmed": "Đã xác nhận thanh toán",
-  "Demo payment received.": "Đã nhận thanh toán dùng thử.",
   "Employee offer sent.": "Đã gửi đề nghị cho nhân sự.",
   "Assignment accepted and workload reserved.":
     "Đã nhận phân công và ghi nhận khối lượng công việc.",
@@ -814,38 +753,12 @@ const labels: Record<string, string> = {
   "Returned to the assignment queue": "Đã chuyển về hàng chờ phân công",
   "Employee started their session": "Nhân sự đã bắt đầu phiên làm việc",
   "Updated account password": "Đã đổi mật khẩu tài khoản",
-  "Updated password and signed out of all sessions (demo)":
-    "Đã đổi mật khẩu và đăng xuất tất cả phiên (dùng thử)",
   "Revoked a pending staff invitation": "Đã thu hồi lời mời nhân sự đang chờ",
   "Updated staff access permissions": "Đã cập nhật quyền truy cập nhân sự",
   "Suspended staff access and revoked sessions":
     "Đã tạm khóa nhân sự và thu hồi các phiên",
   "Restored staff account access": "Đã khôi phục quyền truy cập nhân sự",
   "Revoked all staff sessions": "Đã thu hồi tất cả phiên nhân sự",
-  "Resent employee credentials (demo)":
-    "Đã gửi lại thông tin đăng nhập nhân sự (dùng thử)",
-  "Please play after 18:00 in my timezone. Keep me updated after each session.":
-    "Vui lòng chơi sau 18:00 theo múi giờ của tôi và cập nhật sau mỗi phiên.",
-  "Customer requested a progress update. Keep communication clear.":
-    "Khách yêu cầu cập nhật tiến độ. Hãy trao đổi rõ ràng.",
-  "Session going well. Next update after the evening games.":
-    "Phiên đang diễn ra tốt. Cập nhật tiếp sau các trận buổi tối.",
-  "Three years of competitive play and over 200 successful coaching sessions. I specialize in macro strategy, champion fundamentals, and helping players develop lasting improvement habits.":
-    "Ba năm thi đấu và hơn 200 phiên huấn luyện thành công. Chuyên về chiến thuật tổng thể, kỹ năng tướng và giúp người chơi xây dựng thói quen tiến bộ lâu dài.",
-  "Available on weekdays and weekends, 20–30 hours per week. Fluent in English and Vietnamese. Happy to complete a trial session.":
-    "Có thể làm việc ngày thường và cuối tuần, 20–30 giờ mỗi tuần. Thành thạo tiếng Anh và tiếng Việt, sẵn sàng tham gia buổi thử việc.",
-  "Current rank does not meet the requirements for this position.":
-    "Hạng hiện tại chưa đáp ứng yêu cầu của vị trí này.",
-  "Welcome to ASCEND. Your order is in good hands — we’ll keep you updated here.":
-    "Chào mừng đến ASCEND. Đơn của bạn đang được chăm sóc — chúng tôi sẽ cập nhật tại đây.",
-  "I’m checking my schedule for this offer.":
-    "Tôi đang kiểm tra lịch cho đề nghị này.",
-  "Can you check the progress? I’ll be available this evening.":
-    "Bạn kiểm tra tiến độ giúp tôi nhé? Tôi sẽ rảnh tối nay.",
-  "We’re at 64% now. The next session is planned for tonight.":
-    "Hiện đã đạt 64%. Phiên tiếp theo dự kiến diễn ra tối nay.",
-  "Customer requested faster completion. Please prioritize this order.":
-    "Khách yêu cầu hoàn thành nhanh hơn. Vui lòng ưu tiên đơn này.",
   query: "Tìm kiếm",
   status: "Trạng thái",
   game: "Trò chơi",
@@ -864,10 +777,6 @@ export function adminText(value: string): string {
     [/^(.+) joined the staff team$/, "$1 đã gia nhập đội ngũ quản trị"],
     [/^(.+) accepted an invitation$/, "$1 đã chấp nhận lời mời"],
     [/^Resent invitation to (.+)$/, "Đã gửi lại lời mời cho $1"],
-    [
-      /^Approved (.+) and sent credentials \(demo\)$/,
-      "Đã duyệt $1 và gửi thông tin đăng nhập (dùng thử)",
-    ],
     [/^Reviewed and declined (.+)$/, "Đã xét duyệt và từ chối $1"],
     [/^Revoked (.+)’s session$/, "Đã thu hồi phiên đăng nhập của $1"],
     [/^Assigned to (.+)$/, "Đã phân công cho $1"],

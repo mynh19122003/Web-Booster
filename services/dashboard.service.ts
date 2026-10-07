@@ -1,6 +1,6 @@
-"use client";
-import { getDashboardStats } from "./admin";
+import { unavailable } from "@/lib/api/errors";
 import type { DashboardService } from "./contracts";
 export const dashboardService = {
-  async getStats() { return getDashboardStats(); },
+  getStats: unavailable("dashboard"),
+  getDashboard: unavailable("dashboard"),
 } satisfies DashboardService;

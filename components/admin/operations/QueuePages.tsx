@@ -60,9 +60,10 @@ export function IncomingOrdersPage() {
       >
         <span className="ap-date">
           <Inbox size={16} />
-          {
-            orders.filter((o) => incomingStatuses.includes(o.status)).length
-          }{" "}
+          {load.unavailable
+            ? "—"
+            : orders.filter((o) => incomingStatuses.includes(o.status))
+                .length}{" "}
           đang chờ{" "}
         </span>
         <Link className="ap-button" href="/admin/orders">
@@ -75,7 +76,6 @@ export function IncomingOrdersPage() {
           Trải nghiệm tốt bắt đầu từ đây.{" "}
           <small>Duyệt đơn mới và gửi đề nghị tới nhân sự sẵn sàng. </small>
         </span>
-        <span className="ap-demo-tag">HÀNG CHỜ DÙNG THỬ</span>
       </div>
       <div className="op-queue-grid">
         {sections.map((section) => {
@@ -85,7 +85,9 @@ export function IncomingOrdersPage() {
               <div className="op-lane-heading">
                 <h2>
                   {section.title}{" "}
-                  <span className="ap-count">{queue.length}</span>
+                  <span className="ap-count">
+                    {load.unavailable ? "—" : queue.length}
+                  </span>
                 </h2>
                 <p>{section.description}</p>
               </div>
@@ -127,8 +129,8 @@ export function IncomingOrdersPage() {
               {!queue.length && (
                 <div className="ap-panel">
                   <EmptyState
-                    title="Bạn đã xử lý hết."
-                    text="Hiện không có đơn mới chờ duyệt."
+                    title="Hiện chưa có dữ liệu đơn mới."
+                    text="Dữ liệu chưa khả dụng."
                   />
                 </div>
               )}
@@ -164,8 +166,7 @@ export function AssignmentsPage() {
         eyebrow="NHÂN SỰ × TIẾN ĐỘ"
         title="Phân công"
         description="Đúng nhân sự, đúng đơn hàng. Theo dõi rõ ràng."
-      >
-      </PageHeader>
+      ></PageHeader>
       <div className="op-info-banner">
         <span className="op-step">1</span> Gửi đề nghị <ArrowRight size={16} />
         <span className="op-step">2</span> Nhân sự nhận việc{" "}
@@ -179,7 +180,10 @@ export function AssignmentsPage() {
             <section key={lane.title}>
               <div className="op-lane-heading">
                 <h2>
-                  {lane.title} <span className="ap-count">{items.length}</span>
+                  {lane.title}{" "}
+                  <span className="ap-count">
+                    {load.unavailable ? "—" : items.length}
+                  </span>
                 </h2>
               </div>
               {items.map((o) => {

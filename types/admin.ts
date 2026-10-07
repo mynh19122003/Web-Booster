@@ -1,7 +1,4 @@
 export type Permission =
-  | "employee.application.view"
-  | "employee.application.approve"
-  | "employee.application.reject"
   | "order.view"
   | "order.assign"
   | "order.update"
@@ -56,8 +53,8 @@ export interface AuditActivity {
   at: string;
 }
 export interface DashboardStats {
-  activeStaff: number;
-  pendingInvitations: number;
+  activeStaff: number | null;
+  pendingInvitations: number | null;
 }
 export interface InviteStaffInput {
   email: string;

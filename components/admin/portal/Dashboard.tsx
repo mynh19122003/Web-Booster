@@ -1,5 +1,8 @@
 "use client";
 
+import { useServiceLoad } from "@/lib/admin/use-operations";
+import { dashboardService } from "@/services/dashboard.service";
+import { LoadingPanel, ErrorPanel } from "../operations/OrderUi";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -13,18 +16,14 @@ import {
 import { useAdminStore } from "@/lib/admin/store";
 import { getDashboardStats } from "@/services/admin";
 import { OperationsOverview } from "../operations/OperationsOverview";
-import {
-  PageHeader,
-  AdminStatCard,
-  Avatar,
-  StatusBadge,
-  ActivityTimeline,
-  formatDate,
-} from "./Ui";
+import { PageHeader, AdminStatCard, StatusBadge, ActivityTimeline } from "./Ui";
 export function Dashboard() {
   const { user, invitations, activities } = useAdminStore();
+  const load = useServiceLoad(dashboardService.getDashboard);
   const stats = getDashboardStats();
   const owner = user?.role === "SUPER_ADMIN";
+  if (load.loading) return <LoadingPanel />;
+  if (load.error) return <ErrorPanel {...load} />;
   return (
     <>
       <PageHeader
@@ -33,7 +32,13 @@ export function Dashboard() {
         description="Theo dõi hoạt động của đội ngũ hôm nay."
       >
         <span className="ap-date">
-          <CalendarDays size={16} /> {new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", day: "numeric", month: "long", year: "numeric" })}{" "}
+          <CalendarDays size={16} />{" "}
+          {new Date().toLocaleDateString("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}{" "}
         </span>
         {owner && (
           <Link
@@ -46,10 +51,9 @@ export function Dashboard() {
       </PageHeader>
       <OperationsOverview />
       <div className="ap-stats">
-
         <AdminStatCard
           label="Nhân sự đang hoạt động"
-          value={owner ? stats.activeStaff : 1}
+          value={stats.activeStaff}
           note={
             owner ? "Duy trì hoạt động liên tục" : "Tài khoản nhân sự của bạn"
           }
@@ -58,7 +62,7 @@ export function Dashboard() {
         />
         <AdminStatCard
           label="Lời mời đang chờ"
-          value={owner ? stats.pendingInvitations : 0}
+          value={stats.pendingInvitations}
           note={
             owner
               ? "Đang chờ gia nhập đội ngũ"
@@ -67,7 +71,6 @@ export function Dashboard() {
           icon={<Mail size={19} />}
           index="03"
         />
-
       </div>
       <div className="ap-dashboard-grid">
         <section className="ap-panel ap-spotlight">
@@ -91,11 +94,6 @@ export function Dashboard() {
             <ArrowRight size={16} />
           </Link>
           <div className="ap-spotlight-bottom">
-            <span className="ap-stack">
-              <Avatar name="Olivia Chen" />
-              <Avatar name="Marcus Reed" />
-              <Avatar name="Sofia Laurent" />
-            </span>
             <small>Một đội ngũ. Một tiêu chuẩn cao hơn.</small>
           </div>
         </section>
@@ -117,6 +115,9 @@ export function Dashboard() {
           </div>
           {owner ? (
             <div className="ap-invitation-list">
+              {!invitations.length && (
+                <p className="ap-panel-padding">Chưa có lời mời.</p>
+              )}
               {invitations.slice(0, 3).map((i) => (
                 <div key={i.id}>
                   <span className="ap-mail-icon">
@@ -180,9 +181,7 @@ export function Dashboard() {
           </span>
           <ArrowUpRight size={17} />
         </Link>
-        <span className="ap-updated">
-          Dữ liệu dùng thử · {formatDate("2026-10-05")}
-        </span>
+        <span className="ap-updated">Dữ liệu chưa khả dụng.</span>
       </div>
     </>
   );

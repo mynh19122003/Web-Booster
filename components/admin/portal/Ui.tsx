@@ -182,7 +182,7 @@ export function DataTable<T extends { id: string }>({
   columns: { label: string; render: (row: T) => ReactNode }[];
   label: string;
 }) {
-  return rows.length ? (
+  return (
     <div className="ap-table-wrap">
       <table aria-label={label}>
         <thead>
@@ -193,6 +193,22 @@ export function DataTable<T extends { id: string }>({
           </tr>
         </thead>
         <tbody>
+          {!rows.length && (
+            <tr>
+              <td colSpan={columns.length}>
+                <EmptyState
+                  title={
+                    label === "Nhân sự"
+                      ? "Chưa có nhân sự."
+                      : label.toLowerCase().includes("phiên")
+                        ? "Chưa có dữ liệu phiên đăng nhập."
+                        : "Chưa có lời mời nhân sự."
+                  }
+                  text="Dữ liệu chưa khả dụng."
+                />
+              </td>
+            </tr>
+          )}
           {rows.map((row) => (
             <tr key={row.id}>
               {columns.map((c) => (
@@ -203,14 +219,18 @@ export function DataTable<T extends { id: string }>({
         </tbody>
       </table>
       <div className="ap-table-footer">
-        Hiển thị {rows.length} {label.toLowerCase()}
+        {rows.length
+          ? `Hiển thị ${rows.length} ${label.toLowerCase()}`
+          : "Chưa có dữ liệu."}
         <span>
-          Đã tải toàn bộ dữ liệu <ShieldCheck size={13} />
+          {rows.length > 0 && (
+            <>
+              Đã tải dữ liệu <ShieldCheck size={13} />
+            </>
+          )}
         </span>
       </div>
     </div>
-  ) : (
-    <EmptyState />
   );
 }
 export function ActionMenu({ children }: { children: ReactNode }) {
@@ -239,7 +259,7 @@ export function AdminStatCard({
   index,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   note: string;
   icon: ReactNode;
   index: string;
@@ -250,7 +270,7 @@ export function AdminStatCard({
         <span>{label}</span>
         <span className="ap-stat-icon">{icon}</span>
       </div>
-      <strong>{String(value).padStart(2, "0")}</strong>
+      <strong>{value === null ? "—" : String(value).padStart(2, "0")}</strong>
       <div className="ap-stat-bottom">
         <span>{note}</span>
         <small>
@@ -267,6 +287,7 @@ export function ActivityTimeline({
 }) {
   return (
     <div className="ap-timeline">
+      {!activities.length && <p>Chưa có hoạt động.</p>}
       {activities.map((a) => (
         <div className="ap-timeline-item" key={a.id}>
           <span className="ap-timeline-dot">
@@ -369,10 +390,12 @@ export function FormModal({
   onSubmit,
   children,
   className = "",
+  disabled = false,
 }: {
   title: string;
   description: string;
   className?: string;
+  disabled?: boolean;
   submit?: string;
   danger?: boolean;
   onClose: () => void;
@@ -397,7 +420,7 @@ export function FormModal({
   }, []);
   async function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (submitting.current) return;
+    if (disabled || submitting.current) return;
     submitting.current = true;
     setPending(true);
     setError("");
@@ -447,6 +470,11 @@ export function FormModal({
         </header>
         <div className="ap-modal-body">
           {children}
+          {disabled && (
+            <p className="ap-info-strip">
+              Chức năng sẽ khả dụng sau khi kết nối API.
+            </p>
+          )}
           {error && (
             <p role="alert" className="ap-error">
               {text("Cancel") === "Cancel" ? error : adminError(error)}
@@ -464,7 +492,7 @@ export function FormModal({
           </button>
           <button
             className={`ap-button ${danger ? "danger" : "primary"}`}
-            disabled={pending}
+            disabled={pending || disabled}
           >
             {pending ? text("Saving…") : text(submit)}
           </button>

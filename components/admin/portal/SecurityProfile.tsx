@@ -1,6 +1,8 @@
 "use client";
 
 import { adminText, adminError } from "@/lib/admin/vi";
+import { useServiceLoad } from "@/lib/admin/use-operations";
+import { LoadingPanel, ErrorPanel } from "../operations/OrderUi";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Monitor, LockKeyhole, LogOut } from "lucide-react";
@@ -21,9 +23,12 @@ import {
 } from "./Ui";
 export function SecurityPage() {
   const { sessions, activities, user } = useAdminStore();
+  const load = useServiceLoad(securityService.getSecuritySessions);
   const notice = useNotice();
   const [target, setTarget] = useState<SecuritySession | null>(null);
   const owner = user?.role === "SUPER_ADMIN";
+  if (load.loading) return <LoadingPanel />;
+  if (load.error) return <ErrorPanel {...load} />;
   const visible = sessions.filter((s) => owner || s.userId === user?.id);
   return (
     <>
@@ -53,9 +58,7 @@ export function SecurityPage() {
                 : "Các phiên đăng nhập gần đây của bạn."}
             </p>
           </div>
-          <span className="ap-count">
-            {visible.filter((s) => s.status === "ACTIVE").length} đang hoạt động
-          </span>
+          <span className="ap-count">— đang hoạt động</span>
         </div>
         <DataTable
           rows={visible}
@@ -119,7 +122,6 @@ export function SecurityPage() {
             <h2>Nhật ký hoạt động</h2>
             <p>Ghi nhận các thay đổi quan trọng trong hệ thống.</p>
           </div>
-          <span className="ap-demo-tag">HOẠT ĐỘNG DÙNG THỬ</span>
         </div>
         <ActivityTimeline
           activities={activities.filter(
@@ -129,6 +131,7 @@ export function SecurityPage() {
       </section>
       {target && (
         <FormModal
+          disabled
           title="Thu hồi phiên đăng nhập này?"
           description={`${target.user} · ${adminText(target.device)}`}
           submit="Thu hồi phiên đăng nhập"
@@ -141,7 +144,7 @@ export function SecurityPage() {
         >
           <p>
             {target.current && target.userId === user?.id
-              ? "Đây là phiên dùng thử hiện tại. Bạn sẽ bị đăng xuất."
+              ? "Đây là phiên hiện tại. Bạn sẽ bị đăng xuất."
               : "Thiết bị này sẽ mất quyền truy cập ngay. Người dùng cần đăng nhập lại để tiếp tục."}
           </p>
         </FormModal>
@@ -154,7 +157,7 @@ export function ProfilePage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  if (!user) return null;
+  if (!user) return <LoadingPanel />;
   async function change(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -252,8 +255,8 @@ export function ProfilePage() {
                 </Field>
               </div>
               <p className="ap-form-hint">
-                Ít nhất 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
-                Không nhập mật khẩu thật vào bản dùng thử.{" "}
+                Ít nhất 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc
+                biệt.{" "}
               </p>
               {error && (
                 <p role="alert" className="ap-error">
@@ -280,25 +283,23 @@ export function ProfilePage() {
             <div className="ap-detail-facts">
               <div>
                 <span>Đăng nhập gần nhất</span>
-                {recent
-                  ? formatDate(recent.loginAt)
-                  : "Phiên dùng thử hiện tại"}
+                {recent ? formatDate(recent.loginAt) : "—"}
               </div>
               <div>
                 <span>Thiết bị</span>
-                {recent?.device ?? "Trình duyệt hiện tại"}
+                {recent?.device ?? "—"}
               </div>
               <div>
                 <span>Địa chỉ IP</span>
-                {recent?.ip ?? "Không ghi nhận trong bản dùng thử"}
+                {recent?.ip ?? "—"}
               </div>
             </div>
           </section>
           <div className="ap-side-note">
             <LockKeyhole size={18} />
             <p>
-              Không lưu mật khẩu dùng thử. Việc kiểm tra mật khẩu thật và thu
-              hồi phiên sẽ được thực hiện khi kết nối API.{" "}
+              Mật khẩu được xác minh bởi máy chủ. Không chia sẻ mật khẩu của
+              bạn.{" "}
             </p>
           </div>
         </aside>

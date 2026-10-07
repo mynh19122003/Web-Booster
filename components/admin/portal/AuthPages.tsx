@@ -1,5 +1,6 @@
 "use client";
 
+import { useAdminStore } from "@/lib/admin/store";
 import { adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -67,8 +68,8 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
 }
 export function LoginPage({ changed = false }: { changed?: boolean }) {
   const router = useRouter();
-  const [mode, setMode] = useState<"owner" | "staff" | "viewer">("owner");
-  const [email, setEmail] = useState("alex@ascend.demo");
+  const authError = useAdminStore((s) => s.authError);
+  const [email, setEmail] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -79,7 +80,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
     setPending(true);
     setError("");
     try {
-      await adminAuthService.login(email, String(data.get("password")), mode);
+      await adminAuthService.login(email, String(data.get("password")));
       router.push("/admin");
     } catch (e) {
       setError(
@@ -102,40 +103,18 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
       <p className="ap-auth-description">
         Đăng nhập để quản lý đội ngũ và theo dõi hoạt động.{" "}
       </p>
-      {changed && (
-        <p className="ap-success">
-          Đã cập nhật mật khẩu dùng thử và thu hồi các phiên trước. Vui lòng
-          đăng nhập lại.{" "}
+      {authError && (
+        <p className="ap-error" role="alert">
+          Chưa tải được thông tin tài khoản. {authError}
         </p>
       )}
-      <div className="ap-demo-switch">
-        <span>DÙNG THỬ VỚI VAI TRÒ</span>
-        <div>
-          {(["owner", "staff", "viewer"] as const).map((m) => (
-            <button
-              type="button"
-              key={m}
-              className={mode === m ? "active" : ""}
-              onClick={() => {
-                setMode(m);
-                setEmail(
-                  m === "owner"
-                    ? "alex@ascend.demo"
-                    : m === "staff"
-                      ? "olivia@ascend.demo"
-                      : "sofia@ascend.demo",
-                );
-              }}
-            >
-              {m === "owner"
-                ? "Quản trị viên cấp cao"
-                : m === "staff"
-                  ? "Nhân sự quản trị"
-                  : "Nhân sự chỉ xem"}
-            </button>
-          ))}
-        </div>
-      </div>
+      {changed && (
+        <p className="ap-success">
+          Đã cập nhật mật khẩu và thu hồi các phiên trước. Vui lòng đăng nhập
+          lại.{" "}
+        </p>
+      )}
+
       <form onSubmit={login}>
         <Field label="Địa chỉ email">
           <input
@@ -154,7 +133,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
               name="password"
               minLength={8}
               required
-              placeholder="Mật khẩu dùng thử, ít nhất 8 ký tự"
+              placeholder="Nhập mật khẩu của bạn"
               autoComplete="current-password"
             />
             <button
@@ -167,7 +146,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
           </span>
         </Field>
         <div className="ap-login-help">
-          <span>Phiên dùng thử · chỉ trong thẻ này</span>
+          <span>Đăng nhập bằng tài khoản được cấp</span>
           <button type="button" onClick={() => setHelp(!help)}>
             Quên mật khẩu?{" "}
           </button>
@@ -175,7 +154,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
         {help && (
           <p className="ap-info-strip">
             Chưa kết nối chức năng khôi phục mật khẩu. Hãy liên hệ quản trị
-            viên. Bản dùng thử chấp nhận mật khẩu từ 8 ký tự.{" "}
+            viên.{" "}
           </p>
         )}
         {error && (
@@ -188,14 +167,11 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
           <ArrowRight size={17} />
         </button>
       </form>
-      <p className="ap-demo-disclaimer">
-        Bạn đang dùng bản thử cục bộ. Hãy sử dụng thông tin giả lập. <br />
-        Không gửi yêu cầu tới máy chủ hay email thật.{" "}
-      </p>
+
       <div className="ap-auth-invitation">
         Bạn muốn gia nhập đội ngũ?{" "}
-        <Link href="/admin/accept-invitation?token=demo-invitation">
-          Xem trước lời mời <ArrowUpRight size={14} />
+        <Link href="/admin/accept-invitation">
+          Chấp nhận lời mời <ArrowUpRight size={14} />
         </Link>
       </div>
     </AuthFrame>
@@ -235,8 +211,8 @@ export function AcceptInvitationPage({ token }: { token: string }) {
           <CheckCircle2 size={52} />
           <h2>Bạn đã gia nhập đội ngũ.</h2>
           <p>
-            Tài khoản đã sẵn sàng. Đăng nhập với vai trò nhân sự quản trị dùng
-            thử để khám phá.{" "}
+            Tài khoản đã sẵn sàng. Đăng nhập bằng thông tin tài khoản của
+            bạn.{" "}
           </p>
           <Link className="ap-button primary full" href="/admin/login">
             Tiếp tục đăng nhập <ArrowRight size={17} />
@@ -319,10 +295,7 @@ export function AcceptInvitationPage({ token }: { token: string }) {
               <ArrowRight size={16} />
             </button>
           </form>
-          <p className="ap-demo-disclaimer">
-            Quy trình gia nhập dùng thử. Không lưu mật khẩu thật. <br />
-            Lời mời hết hạn sau 24 giờ và chỉ dùng được một lần.{" "}
-          </p>
+
           <Link className="ap-text-link" href="/admin/login">
             Đã có tài khoản? Đăng nhập →{" "}
           </Link>

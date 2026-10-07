@@ -1,19 +1,18 @@
 /* Admin-only readability floor for the reviewed 8-11px labels and metadata.
-   The shared employee preview and public typography remain unchanged. */
+   Public typography remains unchanged. */
 .ap-root[lang="vi"] small,
 .ap-root[lang="vi"] .ap-brand small,
 .ap-root[lang="vi"] .ap-workspace-label,
 .ap-root[lang="vi"] .ap-workspace-label small,
 .ap-root[lang="vi"] .ap-nav-label,
 .ap-root[lang="vi"] .ap-sidebar nav a b,
-.ap-root[lang="vi"] .ap-demo-card strong,
-.ap-root[lang="vi"] .ap-demo-card p,
-.ap-root[lang="vi"] .ap-demo-card > span,
+.ap-root[lang="vi"] .ap-workspace-card strong,
+.ap-root[lang="vi"] .ap-workspace-card p,
+.ap-root[lang="vi"] .ap-workspace-card > span,
 .ap-root[lang="vi"] .ap-public-link,
 .ap-root[lang="vi"] .ap-collapse,
 .ap-root[lang="vi"] .ap-breadcrumb,
 .ap-root[lang="vi"] .ap-top-search,
-.ap-root[lang="vi"] .ap-demo-tag,
 .ap-root[lang="vi"] .ap-notification-popover a,
 .ap-root[lang="vi"] .ap-account-menu summary,
 .ap-root[lang="vi"] .ap-account-menu small,
@@ -77,8 +76,6 @@
 .ap-root[lang="vi"] .ap-auth-story footer,
 .ap-root[lang="vi"] .ap-auth-top,
 .ap-root[lang="vi"] .ap-auth-description,
-.ap-root[lang="vi"] .ap-demo-switch > span,
-.ap-root[lang="vi"] .ap-demo-switch button,
 .ap-root[lang="vi"] .ap-login-help,
 .ap-root[lang="vi"] .ap-login-help button,
 .ap-root[lang="vi"] .ap-auth-invitation,
@@ -86,7 +83,6 @@
 .ap-root[lang="vi"] .ap-detail-facts,
 .ap-root[lang="vi"] .ap-sidebar nav .ap-nav-label,
 .ap-root[lang="vi"] .op-muted,
-.ap-root[lang="vi"] .op-demo-label,
 .ap-root[lang="vi"] .op-filter-chips button,
 .ap-root[lang="vi"] .op-order-table .ap-avatar,
 .ap-root[lang="vi"] .op-order-actions > .ap-button,
@@ -137,7 +133,6 @@
 .ap-root[lang="vi"] .op-message-sender > span:not(.ap-avatar),
 .ap-root[lang="vi"] .op-message-attachment,
 .ap-root[lang="vi"] .op-message-attachment small,
-.ap-root[lang="vi"] .op-typing-row,
 .ap-root[lang="vi"] .op-composer footer > small,
 .ap-root[lang="vi"] .op-composer footer > .ap-button,
 .ap-root[lang="vi"] .op-composer-locked,
@@ -148,12 +143,10 @@
 .ap-root[lang="vi"] .op-context-order p,
 .ap-root[lang="vi"] .op-chat-context .op-rank-path,
 .ap-root[lang="vi"] .op-chat-context > .ap-button,
-.ap-root[lang="vi"] .op-employee-switch label,
 .ap-root[lang="vi"] .op-info-banner,
 .ap-root[lang="vi"] .op-recent-orders .ap-badge,
 .ap-root[lang="vi"] .op-recent-orders > a > strong,
 .ap-root[lang="vi"] .op-chat-header small,
-.ap-root[lang="vi"] .op-employee-switch > .ap-button,
 .ap-root[lang="vi"] .op-review-summary dt {
   font-size: 12px;
 }
@@ -162,11 +155,10 @@
 .ap-root[lang="vi"] .ap-search input,
 .ap-root[lang="vi"] .ap-success,
 .ap-root[lang="vi"] .ap-form-hint,
-.ap-root[lang="vi"] .ap-demo-disclaimer,
 .ap-root[lang="vi"] .op-message-time {
   font-size: 12px !important;
 }
-/* Scale and Vietnamese line boxes. This scope does not match employee preview. */
+/* Scale and Vietnamese line boxes. This scope applies only to the Admin Portal. */
 .ap-root[lang="vi"] {
   font-family: var(--font-admin), system-ui, sans-serif;
   font-size: 15px;

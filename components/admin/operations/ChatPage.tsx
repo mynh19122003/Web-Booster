@@ -33,7 +33,9 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   const send = usePermission("chat.send");
   const orderView = usePermission("order.view");
   const { conversations, messages, orders } = useOperations();
-  const [selected, setSelected] = useState(orderId ? `chat-${orderId}` : "");
+  const [selected, setSelected] = useState(
+    () => conversations.find((c) => c.orderId === orderId)?.id ?? "",
+  );
   const [channel, setChannel] = useState<"CUSTOMER" | "INTERNAL">("CUSTOMER");
   const [context, setContext] = useState(
     () =>
@@ -43,13 +45,11 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   const [archive, setArchive] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [error, setError] = useState("");
-  const [typing, setTyping] = useState(false);
   const log = useRef<HTMLDivElement>(null);
   const load = useServiceLoad(
     useCallback(async () => {
       await chatService.getConversations();
-      if (orderId) await chatService.ensureOrderConversation(orderId);
-    }, [orderId]),
+    }, []),
   );
   const messageLoad = useServiceLoad(
     useCallback(async () => {
@@ -78,11 +78,6 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   useEffect(() => {
     if (log.current) log.current.scrollTop = log.current.scrollHeight;
   }, [selected, channel, visible.length, messageLoad.loading]);
-  useEffect(() => {
-    if (!typing) return;
-    const timer = setTimeout(() => setTyping(false), 3000);
-    return () => clearTimeout(timer);
-  }, [typing]);
   if (!allowed) return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
   if (load.error) return <ErrorPanel {...load} />;
@@ -95,7 +90,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       >
         <span className="ap-date">
           <MessageSquare size={16} />
-          {conversations
+          {load.unavailable ? "—" : conversations
             .filter((c) => !c.archived)
             .reduce((sum, c) => sum + c.unread, 0)}{" "}
           tin nhắn chưa đọc{" "}
@@ -114,7 +109,6 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
           onSelect={(id) => {
             setSelected(id);
             setChannel("CUSTOMER");
-            setTyping(false);
           }}
         />
         <section className="op-chat-main">
@@ -242,23 +236,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
                   />
                 )}
               </div>
-              {channel === "CUSTOMER" && (
-                <div className="op-typing-row">
-                  {typing ? (
-                    <span className="op-typing">
-                      <i />
-                      <i />
-                      <i />
-                      {conversation.participant.name} đang nhập…{" "}
-                      <small>dùng thử</small>
-                    </span>
-                  ) : (
-                    <button onClick={() => setTyping(true)}>
-                      Xem thử trạng thái đang nhập{" "}
-                    </button>
-                  )}
-                </div>
-              )}
+
               <ChatComposer
                 key={`${selected}-${channel}`}
                 conversation={conversation}
@@ -266,10 +244,13 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
               />
             </>
           ) : (
-            <EmptyState
-              title="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
-              text="Câu hỏi của khách hàng, cập nhật của nhân sự và ghi chú nội bộ ở cùng một nơi."
-            />
+            <>
+              <EmptyState
+                title="Chưa có cuộc trò chuyện."
+                text="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
+              />
+              <ChatComposer channel={channel} />
+            </>
           )}
         </section>
         {context && conversation && (
@@ -281,8 +262,9 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       </div>
       {customerOpen && order && orderView && (
         <FormModal
+          disabled
           title={order.customer.name}
-          description="Hồ sơ khách hàng · Dữ liệu dùng thử"
+          description="Hồ sơ khách hàng · Dữ liệu từ máy chủ"
           submit="Đóng"
           onClose={() => setCustomerOpen(false)}
           onSubmit={async () => {}}
@@ -305,6 +287,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       )}
       {archive && conversation && (
         <FormModal
+          disabled
           title={
             conversation.archived
               ? "Mở lại cuộc trò chuyện?"

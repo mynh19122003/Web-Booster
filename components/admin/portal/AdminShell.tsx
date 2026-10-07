@@ -1,6 +1,6 @@
 "use client";
 
-import { adminText } from "@/lib/admin/vi";
+import { adminError, adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -36,7 +36,7 @@ import { adminAuthService } from "@/services/admin";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Avatar } from "./Ui";
 import { useOperations } from "@/lib/admin/operations-store";
-import { useOperationsHydration } from "@/lib/admin/use-operations";
+import { apiCapabilities } from "@/lib/api/endpoints";
 import { incomingStatuses } from "@/services/operations";
 import { can } from "@/services/admin";
 const Notice = createContext<(text: string) => void>(() => {});
@@ -56,7 +56,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, ready } = useAdminStore();
-  const operationsReady = useOperationsHydration();
   const {
     orders,
     conversations,
@@ -69,8 +68,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const publicPage =
     pathname === "/admin/login" || pathname === "/admin/accept-invitation";
   useEffect(() => {
-    void useAdminStore.persist.rehydrate();
-  }, []);
+    if (publicPage) {
+      useAdminStore.getState().setReady();
+      return;
+    }
+    void adminAuthService.me().catch(() => {});
+  }, [publicPage]);
   useEffect(() => {
     if (ready && !user && !publicPage) router.replace("/admin/login");
   }, [ready, user, publicPage, router]);
@@ -80,6 +83,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
       return () => clearTimeout(timeout);
     }
   }, [notice]);
+  const feature: keyof typeof apiCapabilities =
+    pathname.startsWith("/admin/orders") ||
+    pathname.startsWith("/admin/incoming-orders")
+      ? "orders"
+      : pathname.startsWith("/admin/staff")
+        ? "staff"
+        : pathname.startsWith("/admin/chat")
+          ? "chat"
+          : pathname.startsWith("/admin/assignments")
+            ? "assignments"
+            : pathname.startsWith("/admin/security")
+              ? "security"
+              : pathname === "/admin"
+                ? "dashboard"
+                : "auth";
   const active = [...adminNav]
     .reverse()
     .find(
@@ -87,7 +105,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         n.href === pathname ||
         (n.href !== "/admin" && pathname.startsWith(n.href + "/")),
     );
-  if (!ready || !operationsReady)
+  if (!publicPage && !ready)
     return (
       <div className="ap-loading" aria-label="Đang tải trang quản trị">
         <div className="ap-skeleton" />
@@ -138,7 +156,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   : n.icon === "chat"
                     ? conversations
                         .filter((c) => !c.archived)
-                        .reduce((sum, c) => sum + c.unread, 0) : 0;
+                        .reduce((sum, c) => sum + c.unread, 0)
+                    : 0;
               return (
                 <div key={n.href}>
                   {n.group && n.group !== nav[index - 1]?.group && (
@@ -160,16 +179,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             })}
           </nav>
           <div className="ap-sidebar-bottom">
-            <div className="ap-demo-card">
+            <div className="ap-workspace-card">
               <Zap size={18} />
               <strong>Nâng tầm vận hành.</strong>
               <p>
                 Không gian làm việc dành cho đội ngũ tạo nên trải nghiệm chơi
                 game tuyệt vời.
               </p>
-              <span>
-                <i /> Không gian dùng thử{" "}
-              </span>
             </div>
             <Link href="/" className="ap-public-link">
               Xem trang web <ArrowUpRight size={15} />
@@ -212,18 +228,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <span>{can("order.view") ? "Tìm đơn hàng" : "Tìm hồ sơ"}</span>
                 <kbd>↗</kbd>
               </Link>
-              <span className="ap-demo-tag">DÙNG THỬ</span>
+
               <div className="ap-notifications">
                 <button
                   aria-label="Thông báo"
                   onClick={() => setNotifications(!notifications)}
                 >
                   <Bell size={19} />
-                  <i />
+                  {operationNotifications.length > 0 && <i />}
                 </button>
                 {notifications && (
                   <div className="ap-notification-popover">
                     <strong>Thông báo quản trị</strong>
+                    {!operationNotifications.length && (
+                      <p>Chưa có thông báo. Dữ liệu chưa khả dụng.</p>
+                    )}
                     {operationNotifications
                       .filter((n) => can(n.scope))
                       .slice(0, 5)
@@ -241,7 +260,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}{" "}
-                            · dùng thử{" "}
                           </small>
                         </Link>
                       ))}
@@ -263,9 +281,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <div>
                   <Link href="/admin/profile">Hồ sơ cá nhân</Link>
                   <button
-                    onClick={() => {
-                      void adminAuthService.logout();
-                      router.push("/admin/login");
+                    onClick={async () => {
+                      try {
+                        await adminAuthService.logout();
+                        router.push("/admin/login");
+                      } catch (error) {
+                        setNotice(adminError(error));
+                      }
                     }}
                   >
                     <LogOut size={15} /> Đăng xuất{" "}
@@ -275,16 +297,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </div>
           </header>
           <div className="ap-content" key={pathname}>
+            {!apiCapabilities[feature] && (
+              <p className="ap-info-strip" role="status">
+                Dữ liệu chưa khả dụng.
+              </p>
+            )}
             {children}
           </div>
           <footer className="ap-workspace-footer">
             <span>
               ASCEND <i>/</i> Vận hành đội ngũ{" "}
             </span>
-            <span>
-              <i className="ap-online" /> Dùng thử cục bộ · Không gửi email hay
-              thay đổi tài khoản thật{" "}
-            </span>
+            <span>ASCEND Admin Portal</span>
           </footer>
         </div>
         {notice && (

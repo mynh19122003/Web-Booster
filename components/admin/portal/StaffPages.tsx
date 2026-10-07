@@ -2,6 +2,8 @@
 
 import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
+import { useServiceLoad } from "@/lib/admin/use-operations";
+import { LoadingPanel, ErrorPanel } from "../operations/OrderUi";
 import { useState } from "react";
 import { Plus, Users, ShieldCheck, Mail, ArrowUpRight } from "lucide-react";
 import { useAdminStore } from "@/lib/admin/store";
@@ -24,6 +26,7 @@ import {
 } from "./Ui";
 export function StaffPage() {
   const { staff, user } = useAdminStore();
+  const load = useServiceLoad(staffService.getStaffList);
   const notice = useNotice();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -32,6 +35,8 @@ export function StaffPage() {
     action: string;
   } | null>(null);
   if (user?.role !== "SUPER_ADMIN") return <AccessDenied />;
+  if (load.loading) return <LoadingPanel />;
+  if (load.error) return <ErrorPanel {...load} />;
   const rows = staff.filter(
     (s) =>
       `${s.fullName} ${s.email}`.toLowerCase().includes(query.toLowerCase()) &&
@@ -54,12 +59,11 @@ export function StaffPage() {
       <div className="ap-inline-summary">
         <span>
           <Users size={17} />
-          <b>{staff.length}</b> Thành viên đội ngũ{" "}
+          <b>—</b> Thành viên đội ngũ{" "}
         </span>
         <span>
           <i className="ap-online" />
-          <b>{staff.filter((s) => s.status === "ACTIVE").length}</b> Đang hoạt
-          động{" "}
+          <b>—</b> Đang hoạt động{" "}
         </span>
         <span>
           <ShieldCheck size={17} /> Truy cập theo quyền hạn{" "}
@@ -74,7 +78,7 @@ export function StaffPage() {
           statuses={["ACTIVE", "SUSPENDED"]}
         />
         <DataTable
-          label="Nhân sự quản trị"
+          label="Nhân sự"
           rows={rows}
           columns={[
             {
@@ -139,6 +143,7 @@ export function StaffPage() {
       </section>
       {dialog && (
         <FormModal
+          disabled
           title={adminText(dialog.action)}
           description={`${dialog.member.fullName} · ${dialog.member.email}`}
           submit={
@@ -206,6 +211,7 @@ export function InvitationsPage({
   openInvite?: boolean;
 }) {
   const { invitations, user } = useAdminStore();
+  const load = useServiceLoad(staffService.getStaffInvitations);
   const notice = useNotice();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -215,6 +221,8 @@ export function InvitationsPage({
     action: string;
   } | null>(null);
   if (user?.role !== "SUPER_ADMIN") return <AccessDenied />;
+  if (load.loading) return <LoadingPanel />;
+  if (load.error) return <ErrorPanel {...load} />;
   const rows = invitations.filter(
     (i) =>
       `${i.email} ${i.fullName}`.toLowerCase().includes(query.toLowerCase()) &&
@@ -325,6 +333,7 @@ export function InvitationsPage({
       </section>
       {invite && (
         <FormModal
+          disabled
           title="Mời nhân sự mới"
           description="Thêm thành viên, nâng tiêu chuẩn. Chọn quyền truy cập bên dưới."
           submit="Gửi lời mời"
@@ -336,7 +345,7 @@ export function InvitationsPage({
               displayName: String(data.get("display_name")),
               permissions: data.getAll("permissions") as Permission[],
             });
-            notice("Đã gửi lời mời nhân sự (dùng thử). Không gửi email thật.");
+            notice("Đã gửi lời mời nhân sự.");
           }}
         >
           <div className="ap-form-grid">
@@ -370,6 +379,7 @@ export function InvitationsPage({
       )}
       {dialog && (
         <FormModal
+          disabled
           title={adminText(dialog.action)}
           description={dialog.invitation.email}
           submit={
@@ -383,7 +393,7 @@ export function InvitationsPage({
             if (dialog.action === "Revoke invitation")
               await staffService.revokeStaffInvitation(dialog.invitation.id);
             if (dialog.action !== "Invitation detail")
-              notice(`${adminText(dialog.action)} thành công (dùng thử).`);
+              notice(`${adminText(dialog.action)} thành công.`);
           }}
         >
           <StatusBadge status={dialog.invitation.status} />
@@ -402,7 +412,7 @@ export function InvitationsPage({
                 className="ap-button ap-spaced"
                 href={`/admin/accept-invitation?token=${dialog.invitation.token}`}
               >
-                Xem trước lời mời dùng thử <ArrowUpRight size={15} />
+                Xem lời mời <ArrowUpRight size={15} />
               </Link>
             )}
         </FormModal>

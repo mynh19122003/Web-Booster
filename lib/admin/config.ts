@@ -94,13 +94,3 @@ export const adminNav = [
     group: "BẢO MẬT",
   },
 ];
-export function strongPassword(value: string) {
-  return (
-    value.length >= 12 &&
-    value.length <= 128 &&
-    /[a-z]/.test(value) &&
-    /[A-Z]/.test(value) &&
-    /\d/.test(value) &&
-    /[^a-zA-Z0-9]/.test(value)
-  );
-}

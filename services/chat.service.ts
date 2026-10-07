@@ -1,4 +1,4 @@
 "use client";
-import { chatService as mock } from "./operations";
+import { chatService as adapter } from "./operations";
 import type { ChatService } from "./contracts";
-export const chatService = mock satisfies ChatService;
+export const chatService = adapter satisfies ChatService;

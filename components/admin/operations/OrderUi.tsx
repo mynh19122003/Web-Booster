@@ -211,6 +211,7 @@ export function AssignStaffModal({
   );
   return (
     <FormModal
+      disabled
       className="op-assign-modal"
       title={
         order.employeeId
@@ -303,7 +304,7 @@ export function AssignStaffModal({
         ))}
         {!candidates.length && (
           <EmptyState
-            title="Không tìm thấy nhân sự phù hợp"
+            title="Không có dữ liệu nhân sự khả dụng."
             text="Điều chỉnh bộ lọc để xem thêm nhân sự."
           />
         )}
@@ -409,10 +410,11 @@ export function OrderActions({
       )}
       {action && action !== "assign" && (
         <FormModal
+          disabled
           title={`${labels[action]} #${order.id}?`}
           description={
             action === "cancel"
-              ? "Thao tác có thể cần hoàn tiền. Bản dùng thử chỉ đóng đề nghị đang hoạt động, không thay đổi thanh toán."
+              ? "Thao tác có thể cần hoàn tiền. Kiểm tra trạng thái thanh toán trước khi xác nhận."
               : action === "pause"
                 ? "Công việc sẽ tạm dừng cho tới khi quản trị viên tiếp tục đơn."
                 : action === "complete"
@@ -435,7 +437,7 @@ export function OrderActions({
               await orderService.completeOrder(order.id);
             if (action === "start") await orderService.startOrder(order.id);
             if (action === "review") await orderService.reviewOrder(order.id);
-            notice("Đã cập nhật đơn trong hệ thống dùng thử.");
+            notice("Đã cập nhật đơn hàng.");
           }}
         >
           {action === "review" ? (
