@@ -33,7 +33,7 @@ Unknown admin URLs render a Vietnamese not-found page with `noindex` within the 
 
 `AscendLogo.tsx` uses the supplied images for the public navbar (desktop/mobile), admin sidebar (expanded/collapsed), workspace mark and admin login/invitation branding. Browser metadata and Organization structured data reference the new app icon. Wordmark and tagline are baked into the supplied horizontal image: ASCEND / BOOST YOUR POTENTIAL.
 
-Assets retain the supplied dark background/glow; they are not transparent cutouts. Screen blending adapts the crops to the dark surfaces. Admin accents/focus use Prime Gold `#FF9F3C`, with Charcoal `#0F0F10` and Slate `#1F1F23` surfaces. Layout, animation and fonts remain in place. The shared dependency root is configured for Turbopack so this worktree builds using the repository's node_modules junction.
+The three logo assets now have transparent PNG alpha backgrounds. The shared logo component renders them normally without screen blending, preserving the metallic colors on admin surfaces. Admin accents/focus use Prime Gold `#FF9F3C`, with Charcoal `#0F0F10` and Slate `#1F1F23` surfaces. Layout, animation and fonts remain in place. The shared dependency root is configured for Turbopack so this worktree builds using the repository's node_modules junction.
 
 ## API preparation
 
