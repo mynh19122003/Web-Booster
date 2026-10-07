@@ -27,7 +27,6 @@ test("owner workspace and all routes render without runtime errors", async ({
   for (const route of [
     "staff",
     "staff/invitations",
-    "employee-applications",
     "security",
     "profile",
   ]) {
@@ -48,14 +47,7 @@ test("view-only staff cannot manage staff or approve applications", async ({
   await expect(
     page.getByText("Bạn không có quyền truy cập", { exact: true }),
   ).toBeVisible();
-  await page.goto("/admin/employee-applications");
-  await page.getByRole("link", { name: "Xem hồ sơ Daniel Nguyen" }).click();
-  await expect(page.getByRole("button", { name: "Duyệt hồ sơ" })).toHaveCount(
-    0,
-  );
-  await expect(
-    page.getByRole("button", { name: "Từ chối", exact: true }),
-  ).toHaveCount(0);
+
 });
 test("invitation accepts once and persists after reload", async ({ page }) => {
   await page.goto("/admin/accept-invitation?token=demo-invitation");
@@ -83,39 +75,6 @@ test("mobile workspace fits the viewport", async ({ page }) => {
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-});
-
-test("approve and reject decisions persist", async ({ page }) => {
-  await login(page);
-  await page.goto("/admin/employee-applications/app-1048");
-  await page.getByRole("button", { name: "Duyệt hồ sơ", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Duyệt và gửi thông tin đăng nhập" })
-    .click();
-  await expect(
-    page.getByRole("button", {
-      name: "Gửi lại thông tin đăng nhập",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.reload();
-  await expect(
-    page.getByRole("button", {
-      name: "Gửi lại thông tin đăng nhập",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.goto("/admin/employee-applications/app-1047");
-  await page.getByRole("button", { name: "Từ chối", exact: true }).click();
-  await page
-    .getByLabel("Lý do từ chối")
-    .fill("More coaching experience is required.");
-  await page
-    .getByRole("button", { name: "Từ chối hồ sơ", exact: true })
-    .click();
-  await expect(
-    page.getByText("More coaching experience is required.", { exact: true }),
-  ).toBeVisible();
 });
 
 test("staff can be suspended and reactivated", async ({ page }) => {

@@ -1,9 +1,9 @@
 .ap-root {
-  --ap-bg: #0c0e11;
-  --ap-panel: #14171c;
+  --ap-bg: #0f0f10;
+  --ap-panel: #1f1f23;
   --ap-border: #252930;
   --ap-muted: #929ba9;
-  --ap-accent: #efa76c;
+  --ap-accent: #ff9f3c;
   --ap-text: #e8ebef;
   font-family: var(--font-admin), sans-serif;
   background: var(--ap-bg);
@@ -65,7 +65,7 @@
 }
 .ap-root :focus-visible,
 .ap-modal :focus-visible {
-  outline: 2px solid #efa76c;
+  outline: 2px solid #ff9f3c;
   outline-offset: 3px;
 }
 .ap-root svg {
@@ -1361,7 +1361,7 @@
 }
 .ap-modal {
   --ap-muted: #929ba9;
-  --ap-accent: #efa76c;
+  --ap-accent: #ff9f3c;
   border: 1px solid #414449;
   background: #171b22;
   color: #dce3ec;
@@ -2115,3 +2115,11 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/* ASCEND supplied brand assets */
+.ap-brand .ascend-logo { flex-shrink: 1; }
+.is-collapsed .ap-brand > .ascend-logo { display: inline-flex; }
+.ap-art-logo { position: relative; z-index: 2; }
+.ap-auth-form-inner > .ascend-logo { margin-bottom: 24px; }
+.ap-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 600px) { .ap-stats { grid-template-columns: 1fr; } }

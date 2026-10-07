@@ -63,67 +63,6 @@ test("operations pages render, filter and paginate without backend calls", async
   expect(errors).toEqual([]);
   expect(backendCalls).toEqual([]);
 });
-test("assignment offer, employee decline, reassignment and accept share state", async ({
-  page,
-}) => {
-  await login(page);
-  await page.goto("/admin/orders/ASC-1049");
-  await page
-    .getByRole("button", { name: "Phân công nhân viên", exact: true })
-    .click();
-  await page.locator('input[name="employee_id"][value="emp-nova"]').check();
-  await page.getByRole("button", { name: "Gửi đề nghị", exact: true }).click();
-  await expect(
-    page.getByText("Đã gửi đề nghị · Đang chờ phản hồi", { exact: true }),
-  ).toBeVisible();
-  await page.getByRole("link", { name: "Mở bản xem thử nhân viên" }).click();
-  await expect(
-    page.getByRole("combobox", { name: "Preview employee" }),
-  ).toHaveValue("emp-nova");
-  await page.getByRole("button", { name: "Decline", exact: true }).click();
-  await page
-    .getByLabel("Decline reason")
-    .fill("Currently unavailable for the requested time.");
-  await page
-    .getByRole("button", { name: "Decline offer", exact: true })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: "Offer declined" }),
-  ).toBeVisible();
-  await page.goto("/admin/orders/ASC-1049");
-  await expect(
-    page.getByText("Lý do: Currently unavailable for the requested time."),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Phân công nhân viên", exact: true })
-    .click();
-  await page.locator('input[name="employee_id"][value="emp-zen"]').check();
-  await page.getByRole("button", { name: "Gửi đề nghị", exact: true }).click();
-  await page.getByRole("link", { name: "Mở bản xem thử nhân viên" }).click();
-  await page.getByRole("button", { name: "Accept order", exact: true }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Accept order", exact: true })
-    .click();
-  await expect(
-    page.getByText("Offer accepted. You’re ready to start."),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Start work", exact: true }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Start work", exact: true })
-    .click();
-  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "in progress",
-  );
-  await page.goto("/admin/orders/ASC-1049");
-  await expect(page.locator(".ap-page-header .ap-badge")).toHaveText(
-    "Đang thực hiện",
-  );
-  await expect(
-    page.getByText("Nhân viên đã nhận đơn", { exact: true }),
-  ).toBeVisible();
-});
 test("progress, pause and cancellation require deliberate confirmation", async ({
   page,
 }) => {
@@ -172,7 +111,7 @@ test("order action dropdown never navigates its row", async ({ page }) => {
   const row = page.getByRole("row").filter({ hasText: "ASC-1049" });
   await row.getByLabel("Mở thao tác").click();
   await row
-    .getByRole("button", { name: "Phân công nhân viên", exact: true })
+    .getByRole("button", { name: "Phân công nhân sự", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page).toHaveURL(/\/admin\/orders$/);
@@ -296,9 +235,6 @@ test("mobile inbox drills into chat and back without horizontal overflow", async
     "/admin/incoming-orders",
     "/admin/assignments",
     "/admin/orders/ASC-1042",
-    "/employee/orders",
-    "/employee/orders/available",
-    "/employee/orders/ASC-1043?employee=emp-zen",
   ]) {
     await page.goto(route);
     await expect(page.locator("h1")).toBeVisible();

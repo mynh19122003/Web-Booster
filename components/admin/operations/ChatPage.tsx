@@ -268,7 +268,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
           ) : (
             <EmptyState
               title="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
-              text="Câu hỏi của khách hàng, cập nhật của nhân viên và ghi chú nội bộ ở cùng một nơi."
+              text="Câu hỏi của khách hàng, cập nhật của nhân sự và ghi chú nội bộ ở cùng một nơi."
             />
           )}
         </section>

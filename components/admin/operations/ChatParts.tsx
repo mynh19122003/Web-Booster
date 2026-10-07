@@ -379,7 +379,7 @@ export function ChatContextPanel({
       <OrderProgressBar value={order.progress} />
       <dl className="op-facts">
         <div>
-          <dt>Nhân viên phụ trách</dt>
+          <dt>Nhân sự phụ trách</dt>
           <dd>{employee?.name ?? "Chưa phân công"}</dd>
         </div>
         <div>
@@ -406,7 +406,7 @@ export function ChatContextPanel({
           className="ap-button full"
           onClick={() => setPerson("employee")}
         >
-          Xem nhân viên{" "}
+          Xem nhân sự{" "}
         </button>
       )}
       {person && (
@@ -415,7 +415,7 @@ export function ChatContextPanel({
           description={
             person === "customer"
               ? "Hồ sơ khách hàng · Dữ liệu dùng thử"
-              : "Hồ sơ nhân viên · Dữ liệu dùng thử"
+              : "Hồ sơ nhân sự · Dữ liệu dùng thử"
           }
           submit="Đóng"
           onClose={() => setPerson(null)}
@@ -439,7 +439,7 @@ export function ChatContextPanel({
           ) : (
             <dl className="op-facts">
               <div>
-                <dt>Mã nhân viên</dt>
+                <dt>Mã nhân sự</dt>
                 <dd>{employee!.id}</dd>
               </div>
               <div>

@@ -14,22 +14,20 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import { adminAuthService } from "@/services/admin";
+import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Field } from "./Ui";
 function AuthFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="ap-auth">
       <aside className="ap-auth-story">
         <Link href="/" className="ap-brand">
-          <span className="ap-mark">A</span>
-          <span>
-            ASCEND<small>TIÊU CHUẨN CAO HƠN</small>
-          </span>
+          <AscendLogo size="lg" />
         </Link>
         <div className="ap-auth-art" aria-hidden="true">
           <div className="ap-orbit one" />
           <div className="ap-orbit two" />
           <div className="ap-orbit three" />
-          <span className="ap-art-a">A</span>
+          <AscendLogo variant="icon" size="xl" className="ap-art-logo" />
           <span className="ap-art-label">CHÍNH XÁC. CON NGƯỜI. TIẾN BỘ.</span>
         </div>
         <div className="ap-auth-copy">
@@ -95,6 +93,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
   }
   return (
     <AuthFrame>
+      <AscendLogo size="md" />
       <span className="ap-auth-icon">
         <ShieldCheck size={24} />
       </span>

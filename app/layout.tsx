@@ -32,7 +32,7 @@ function metadataBase(): Metadata {
       default: "ASCEND — Boost Your Potential",
       template: "%s | ASCEND",
     },
-    icons: { icon: "/icon.svg" },
+    icons: { icon: "/brand/app-icon.png" },
   };
 }
 export default function RootLayout({
@@ -55,7 +55,7 @@ export default function RootLayout({
               url: siteUrl,
               description:
                 "Independent gaming services for League of Legends, Valorant and Teamfight Tactics",
-              logo: `${siteUrl}/icon.svg`,
+              logo: `${siteUrl}/brand/app-icon.png`,
             }),
           }}
         />

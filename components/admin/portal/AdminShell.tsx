@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   Users,
   Mail,
-  ClipboardList,
   ShieldCheck,
   UserRound,
   ChevronLeft,
@@ -34,6 +33,7 @@ import {
 import { useAdminStore } from "@/lib/admin/store";
 import { adminNav } from "@/lib/admin/config";
 import { adminAuthService } from "@/services/admin";
+import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Avatar } from "./Ui";
 import { useOperations } from "@/lib/admin/operations-store";
 import { useOperationsHydration } from "@/lib/admin/use-operations";
@@ -45,7 +45,6 @@ const icons = {
   overview: LayoutDashboard,
   staff: Users,
   invitations: Mail,
-  applications: ClipboardList,
   security: ShieldCheck,
   profile: UserRound,
   orders: Package,
@@ -56,7 +55,7 @@ const icons = {
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, ready, applications } = useAdminStore();
+  const { user, ready } = useAdminStore();
   const operationsReady = useOperationsHydration();
   const {
     orders,
@@ -120,13 +119,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         )}
         <aside className="ap-sidebar">
           <Link href="/admin" className="ap-brand">
-            <span className="ap-mark">A</span>
-            <span>
-              ASCEND<small>TRANG QUẢN TRỊ</small>
-            </span>
+            <AscendLogo variant={collapsed ? "icon" : "horizontal"} size="md" />
           </Link>
           <div className="ap-workspace-label">
-            <span className="ap-workspace-square">A</span>
+            <AscendLogo variant="icon" size="sm" />
             <div>
               Không gian ASCEND<small>Vận hành và nhân sự</small>
             </div>
@@ -142,11 +138,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   : n.icon === "chat"
                     ? conversations
                         .filter((c) => !c.archived)
-                        .reduce((sum, c) => sum + c.unread, 0)
-                    : n.icon === "applications"
-                      ? applications.filter((a) => a.status === "PENDING")
-                          .length
-                      : 0;
+                        .reduce((sum, c) => sum + c.unread, 0) : 0;
               return (
                 <div key={n.href}>
                   {n.group && n.group !== nav[index - 1]?.group && (
@@ -213,11 +205,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </div>
             <div className="ap-topbar-right">
               <Link
-                href={
-                  can("order.view")
-                    ? "/admin/orders"
-                    : "/admin/employee-applications"
-                }
+                href={can("order.view") ? "/admin/orders" : "/admin/profile"}
                 className="ap-top-search"
               >
                 <Search size={16} />
@@ -257,19 +245,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           </small>
                         </Link>
                       ))}
-                    <p>
-                      {
-                        applications.filter((a) => a.status === "PENDING")
-                          .length
-                      }{" "}
-                      hồ sơ đang chờ duyệt.{" "}
-                    </p>
-                    <Link
-                      href="/admin/employee-applications"
-                      onClick={() => setNotifications(false)}
-                    >
-                      Mở hồ sơ ứng tuyển →{" "}
-                    </Link>
                   </div>
                 )}
               </div>

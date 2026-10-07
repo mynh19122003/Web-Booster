@@ -51,8 +51,6 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
       "chat",
       "staff",
       "staff/invitations",
-      "employee-applications",
-      "employee-applications/app-1048",
       "security",
       "profile",
     ]) {
@@ -67,7 +65,7 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
     }
     await page.goto("/admin/orders/ASC-1049");
     await page
-      .getByRole("button", { name: "Phân công nhân viên", exact: true })
+      .getByRole("button", { name: "Phân công nhân sự", exact: true })
       .click();
     const radio = page.locator(".op-candidate input").first();
     await expect(radio).toHaveCSS("width", "15px");
@@ -112,10 +110,6 @@ test("all admin routes and key dialogs fit every requested viewport", async ({
       page.getByRole("dialog").getByText("Ngày gửi", { exact: true }),
     ).toBeInViewport();
     await checkDialog(page);
-    await page.goto("/admin/employee-applications/app-1048");
-    for (const name of ["Duyệt hồ sơ", "Từ chối"]) {
-      await page.getByRole("button", { name, exact: true }).click();
-      await checkDialog(page);
-    }
+
   }
 });

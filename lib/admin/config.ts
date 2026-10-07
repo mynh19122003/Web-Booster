@@ -4,23 +4,7 @@ export const permissionOptions: {
   label: string;
   description: string;
 }[] = [
-  {
-    value: "employee.application.view",
-    label: "Xem hồ sơ ứng tuyển",
-    description: "Xem hồ sơ ứng viên và lịch sử ứng tuyển.",
-  },
-  {
-    value: "employee.application.approve",
-    label: "Duyệt hồ sơ ứng tuyển",
-    description: "Duyệt ứng viên và tạo tài khoản nhân viên.",
-  },
-  {
-    value: "employee.application.reject",
-    label: "Từ chối hồ sơ ứng tuyển",
-    description: "Từ chối hồ sơ kèm lý do xét duyệt.",
-  },
-];
-permissionOptions.push(
+
   {
     value: "order.view",
     label: "Xem đơn hàng",
@@ -29,7 +13,7 @@ permissionOptions.push(
   {
     value: "order.assign",
     label: "Phân công đơn",
-    description: "Gửi đề nghị và phân công lại đơn cho nhân viên.",
+    description: "Gửi đề nghị và phân công lại đơn cho nhân sự.",
   },
   {
     value: "order.update",
@@ -51,7 +35,7 @@ permissionOptions.push(
     label: "Gửi tin nhắn",
     description: "Trả lời, thêm ghi chú nội bộ và lưu trữ trò chuyện.",
   },
-);
+];
 export const allPermissions = permissionOptions.map((p) => p.value);
 export const adminNav = [
   { href: "/admin", label: "Tổng quan", icon: "overview", group: "" },
@@ -88,13 +72,6 @@ export const adminNav = [
     label: "Lời mời",
     icon: "invitations",
     owner: true,
-    group: "NHÂN SỰ",
-  },
-  {
-    href: "/admin/employee-applications",
-    label: "Hồ sơ ứng tuyển",
-    icon: "applications",
-    permission: "employee.application.view" as Permission,
     group: "NHÂN SỰ",
   },
   {

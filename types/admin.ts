@@ -35,29 +35,6 @@ export interface StaffInvitation {
   expiresAt: string;
   token?: string;
 }
-export interface EmployeeApplication {
-  id: string;
-  fullName: string;
-  displayName: string;
-  email: string;
-  phone: string;
-  country: string;
-  timezone: string;
-  positionApplied: "BOOSTER" | "COACH";
-  riotId: string;
-  currentRank: string;
-  experience: string;
-  note: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  submittedAt: string;
-  reviewedAt?: string;
-  reviewedBy?: string;
-  rejectionReason?: string;
-  employeeType?: string;
-  department?: string;
-  maxActiveOrders?: number;
-  credentialsSent?: boolean;
-}
 export interface SecuritySession {
   id: string;
   userId: string;
@@ -79,19 +56,12 @@ export interface AuditActivity {
   at: string;
 }
 export interface DashboardStats {
-  pendingApplications: number;
   activeStaff: number;
   pendingInvitations: number;
-  activeEmployees: number;
 }
 export interface InviteStaffInput {
   email: string;
   fullName: string;
   displayName: string;
   permissions: Permission[];
-}
-export interface ApproveApplicationInput {
-  employeeType: "BOOSTER" | "COACH";
-  department: "BOOSTING" | "COACHING";
-  maxActiveOrders: number;
 }

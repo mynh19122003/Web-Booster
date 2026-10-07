@@ -2,10 +2,10 @@ import type {
   AdminUser,
   StaffMember,
   StaffInvitation,
-  EmployeeApplication,
   SecuritySession,
   AuditActivity,
 } from "@/types/admin";
+import { employees as assignmentStaff } from "./orders";
 import { allPermissions } from "@/lib/admin/config";
 export const currentAdminUser: AdminUser = {
   id: "owner",
@@ -61,6 +61,8 @@ export const staff: StaffMember[] = [
     ip: "198.51.100.46",
   },
 ];
+// Operational candidates are STAFF accounts in the same team directory.
+staff.push(...assignmentStaff.map(s => ({ id: s.id, fullName: s.name, displayName: s.name, email: s.name.toLowerCase()+"@ascend.demo", role: "STAFF" as const, permissions: allPermissions, status: "ACTIVE" as const, lastLogin: s.lastActivity, ip: "127.0.0.1" })));
 export const invitations: StaffInvitation[] = [
   {
     id: "inv-101",
@@ -114,96 +116,6 @@ export const invitations: StaffInvitation[] = [
     expiresAt: "2026-10-01T09:00:00Z",
   },
 ];
-const candidates = [
-  [
-    "app-1048",
-    "Daniel Nguyen",
-    "Nova",
-    "BOOSTER",
-    "Nova#VN2",
-    "Challenger",
-    "PENDING",
-  ],
-  [
-    "app-1047",
-    "Isabella Torres",
-    "Luna",
-    "COACH",
-    "Luna#EUW",
-    "Grandmaster",
-    "PENDING",
-  ],
-  [
-    "app-1046",
-    "Oliver Kim",
-    "Zero",
-    "BOOSTER",
-    "Zero#KR1",
-    "Master",
-    "PENDING",
-  ],
-  [
-    "app-1045",
-    "Emma Wilson",
-    "Ember",
-    "COACH",
-    "Ember#NA1",
-    "Challenger",
-    "APPROVED",
-  ],
-  [
-    "app-1044",
-    "Liam Davis",
-    "Ghost",
-    "BOOSTER",
-    "Ghost#NA2",
-    "Diamond",
-    "REJECTED",
-  ],
-  [
-    "app-1043",
-    "Minh Tran",
-    "Aether",
-    "BOOSTER",
-    "Aether#VN2",
-    "Grandmaster",
-    "APPROVED",
-  ],
-] as const;
-export const applications: EmployeeApplication[] = candidates.map((c, i) => ({
-  id: c[0],
-  fullName: c[1],
-  displayName: c[2],
-  email: `${c[2].toLowerCase()}@example.demo`,
-  phone: "+84 912 345 678",
-  country: "VN",
-  timezone: "Asia/Ho_Chi_Minh",
-  positionApplied: c[3],
-  riotId: c[4],
-  currentRank: c[5],
-  status: c[6],
-  submittedAt: `2026-10-0${5 - Math.floor(i / 2)}T0${9 - i}:15:00Z`,
-  experience:
-    "Three years of competitive play and over 200 successful coaching sessions. I specialize in macro strategy, champion fundamentals, and helping players develop lasting improvement habits.",
-  note: "Available on weekdays and weekends, 20–30 hours per week. Fluent in English and Vietnamese. Happy to complete a trial session.",
-  ...(c[6] !== "PENDING"
-    ? { reviewedBy: "Olivia Chen", reviewedAt: "2026-10-04T12:00:00Z" }
-    : {}),
-  ...(c[6] === "REJECTED"
-    ? {
-        rejectionReason:
-          "Current rank does not meet the requirements for this position.",
-      }
-    : {}),
-  ...(c[6] === "APPROVED"
-    ? {
-        credentialsSent: true,
-        employeeType: c[3],
-        department: c[3] === "COACH" ? "COACHING" : "BOOSTING",
-        maxActiveOrders: 3,
-      }
-    : {}),
-}));
 export const sessions: SecuritySession[] = [
   currentAdminUser,
   ...staff.slice(0, 3),
@@ -228,13 +140,7 @@ export const activities: AuditActivity[] = [
     actor: "Alex Morgan",
     at: "2026-10-05T08:20:00Z",
   },
-  {
-    id: "a2",
-    action: "EMPLOYEE_APPROVED",
-    description: "Approved Emma Wilson’s application",
-    actor: "Olivia Chen",
-    at: "2026-10-04T12:00:00Z",
-  },
+
   {
     id: "a3",
     action: "PASSWORD_CHANGED",

@@ -49,17 +49,6 @@ for (const width of [1366, 390])
       .first()
       .click();
     await closeAndCheck(page);
-    await page.goto("/admin/employee-applications/app-1048");
-    await page
-      .getByRole("button", { name: "Duyệt hồ sơ", exact: true })
-      .click();
-    await page
-      .getByRole("button", { name: "Duyệt và gửi thông tin đăng nhập" })
-      .click();
-    await page
-      .getByRole("button", { name: "Gửi lại thông tin đăng nhập", exact: true })
-      .click();
-    await closeAndCheck(page);
     await page.goto("/admin/orders/ASC-1042");
     for (const name of ["Phân công lại", "Tạm dừng", "Hủy đơn", "Hoàn thành"]) {
       await page.getByRole("button", { name, exact: true }).click();
@@ -77,7 +66,7 @@ for (const width of [1366, 390])
       .click();
     await closeAndCheck(page);
     await context
-      .getByRole("button", { name: "Xem nhân viên", exact: true })
+      .getByRole("button", { name: "Xem nhân sự", exact: true })
       .click();
     await closeAndCheck(page);
     await context.getByLabel("Đóng thông tin trò chuyện").click();

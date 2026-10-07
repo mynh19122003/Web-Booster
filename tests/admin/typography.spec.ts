@@ -83,7 +83,7 @@ test("Admin Vietnamese font, compact filters and readable chat at every viewport
     const probe = document.createElement("p");
     probe.id = "vietnamese-font-probe";
     probe.textContent =
-      "Đang thực hiện Nhân viên phụ trách Chờ xử lý Đã hoàn thành Tranh chấp Hồ sơ ứng tuyển Phân công nhân viên Quản trị viên Ghi chú nội bộ Thông tin đơn hàng Tỷ lệ thành công Thời gian hoàn thành trung bình";
+      "Đang thực hiện Nhân sự phụ trách Chờ xử lý Đã hoàn thành Tranh chấp Hồ sơ ứng tuyển Phân công nhân sự Quản trị viên Ghi chú nội bộ Thông tin đơn hàng Tỷ lệ thành công Thời gian hoàn thành trung bình";
     document.querySelector(".ap-root")!.append(probe);
     await document.fonts.ready;
   });
@@ -102,7 +102,5 @@ test("Admin Vietnamese font, compact filters and readable chat at every viewport
     expect(font.familyName).toMatch(/Be Vietnam Pro/i);
   }
   await cdp.detach();
-  await page.goto("/employee/orders");
-  await expect(page.locator(".ap-root")).toHaveCSS("font-family", /Sora/);
-  await expect(page.locator(".ap-root")).toHaveCSS("font-size", "13px");
+
 });

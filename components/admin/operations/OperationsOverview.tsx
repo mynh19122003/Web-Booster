@@ -142,11 +142,6 @@ export function OperationsOverview() {
             <ArrowUpRight size={16} />
           </Link>
         )}
-        {can("employee.application.view") && (
-          <Link href="/admin/employee-applications">
-            Xét duyệt hồ sơ ứng tuyển <ArrowUpRight size={16} />
-          </Link>
-        )}
       </div>
     </section>
   );

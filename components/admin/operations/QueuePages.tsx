@@ -48,7 +48,7 @@ export function IncomingOrdersPage() {
     {
       title: "Chờ phân công",
       status: "WAITING_ASSIGNMENT",
-      description: "Đã duyệt và sẵn sàng phân công nhân viên phù hợp.",
+      description: "Đã duyệt và sẵn sàng phân công nhân sự phù hợp.",
     },
   ];
   return (
@@ -73,7 +73,7 @@ export function IncomingOrdersPage() {
         <Clock3 size={18} />
         <span>
           Trải nghiệm tốt bắt đầu từ đây.{" "}
-          <small>Duyệt đơn mới và gửi đề nghị tới nhân viên sẵn sàng. </small>
+          <small>Duyệt đơn mới và gửi đề nghị tới nhân sự sẵn sàng. </small>
         </span>
         <span className="ap-demo-tag">HÀNG CHỜ DÙNG THỬ</span>
       </div>
@@ -163,15 +163,12 @@ export function AssignmentsPage() {
       <PageHeader
         eyebrow="NHÂN SỰ × TIẾN ĐỘ"
         title="Phân công"
-        description="Đúng nhân viên, đúng đơn hàng. Theo dõi rõ ràng."
+        description="Đúng nhân sự, đúng đơn hàng. Theo dõi rõ ràng."
       >
-        <Link className="ap-button" href="/employee/orders/available">
-          Xem thử nhân viên <ArrowRight size={16} />
-        </Link>
       </PageHeader>
       <div className="op-info-banner">
         <span className="op-step">1</span> Gửi đề nghị <ArrowRight size={16} />
-        <span className="op-step">2</span> Nhân viên nhận việc{" "}
+        <span className="op-step">2</span> Nhân sự nhận việc{" "}
         <ArrowRight size={16} />
         <span className="op-step">3</span> Bắt đầu thực hiện{" "}
       </div>
@@ -200,13 +197,8 @@ export function AssignmentsPage() {
                     )}
                     {offer ? (
                       <div className="op-offer-state">
-                        <strong>Đang chờ nhân viên phản hồi…</strong>
+                        <strong>Đang chờ nhân sự phản hồi…</strong>
                         <OfferCountdown expiresAt={offer.expiresAt} />
-                        <Link
-                          href={`/employee/orders/${o.id}?employee=${offer.employeeId}`}
-                        >
-                          Xem thử nhận / từ chối →{" "}
-                        </Link>
                       </div>
                     ) : (
                       <OrderProgressBar value={o.progress} />
@@ -242,7 +234,7 @@ export function AssignmentsPage() {
                   {employees.find((e) => e.id === a.employeeId)?.name}
                 </strong>
                 <StatusBadge status={a.status} />
-                <span>{a.reason ?? "Đã ghi nhận phản hồi nhân viên"}</span>
+                <span>{a.reason ?? "Đã ghi nhận phản hồi nhân sự"}</span>
                 <small>{dateTime(a.respondedAt ?? a.offeredAt)}</small>
               </div>
             ))}

@@ -5,7 +5,6 @@ import { allPermissions, strongPassword } from "@/lib/admin/config";
 import type {
   Permission,
   InviteStaffInput,
-  ApproveApplicationInput,
   DashboardStats,
 } from "@/types/admin";
 const wait = () => new Promise<void>((r) => setTimeout(r, 250));
@@ -65,7 +64,6 @@ export const adminAuthService = {
       ...(mode === "viewer"
         ? {
             permissions: [
-              allPermissions[0],
               "order.view",
               "chat.view",
             ] as Permission[],
@@ -278,78 +276,6 @@ export const staffService = {
     audit("SESSIONS_REVOKED", "Revoked all staff sessions");
   },
 };
-export const employeeApplicationService = {
-  async getEmployeeApplications() {
-    await wait();
-    requirePermission(allPermissions[0]);
-    return store.getState().applications;
-  },
-  async getEmployeeApplicationById(applicationId: string) {
-    requirePermission(allPermissions[0]);
-    return store.getState().applications.find((x) => x.id === applicationId);
-  },
-  async approveEmployeeApplication(
-    applicationId: string,
-    input: ApproveApplicationInput,
-  ) {
-    await wait();
-    requirePermission(allPermissions[1]);
-    const a = store.getState().applications.find((x) => x.id === applicationId);
-    if (a?.status !== "PENDING")
-      throw new Error("Only pending applications can be approved.");
-    store.setState((s) => ({
-      applications: s.applications.map((x) =>
-        x.id === applicationId
-          ? {
-              ...x,
-              ...input,
-              status: "APPROVED",
-              reviewedBy: s.user?.fullName,
-              reviewedAt: new Date().toISOString(),
-              credentialsSent: true,
-            }
-          : x,
-      ),
-    }));
-    audit(
-      "EMPLOYEE_APPROVED",
-      `Approved ${a.fullName} and sent credentials (demo)`,
-    );
-  },
-  async rejectEmployeeApplication(applicationId: string, reason: string) {
-    await wait();
-    requirePermission(allPermissions[2]);
-    const a = store.getState().applications.find((x) => x.id === applicationId);
-    if (a?.status !== "PENDING" || !reason.trim())
-      throw new Error(
-        "A pending application and rejection reason are required.",
-      );
-    store.setState((s) => ({
-      applications: s.applications.map((x) =>
-        x.id === applicationId
-          ? {
-              ...x,
-              status: "REJECTED",
-              rejectionReason: reason,
-              reviewedAt: new Date().toISOString(),
-              reviewedBy: s.user?.fullName,
-            }
-          : x,
-      ),
-    }));
-    audit("EMPLOYEE_REJECTED", `Reviewed and declined ${a.fullName}`);
-  },
-  async resendCredentials(applicationId: string) {
-    await wait();
-    requirePermission(allPermissions[1]);
-    if (
-      store.getState().applications.find((x) => x.id === applicationId)
-        ?.status !== "APPROVED"
-    )
-      throw new Error("Application must be approved.");
-    audit("CREDENTIALS_RESENT", "Resent employee credentials (demo)");
-  },
-};
 export const securityService = {
   async getSecuritySessions() {
     return store.getState().sessions;
@@ -380,12 +306,8 @@ export const securityService = {
 export function getDashboardStats(): DashboardStats {
   const s = store.getState();
   return {
-    pendingApplications: s.applications.filter((x) => x.status === "PENDING")
-      .length,
     activeStaff: s.staff.filter((x) => x.status === "ACTIVE").length,
     pendingInvitations: s.invitations.filter((x) => x.status === "PENDING")
-      .length,
-    activeEmployees: s.applications.filter((x) => x.status === "APPROVED")
       .length,
   };
 }

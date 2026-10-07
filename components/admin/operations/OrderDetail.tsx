@@ -223,10 +223,10 @@ export function OrderDetail({ id }: { id: string }) {
                 </p>
               </div>
               <div className="op-note employee">
-                <span>Ghi chú nhân viên</span>
+                <span>Ghi chú nhân sự</span>
                 <p>
                   {adminText(order.employeeNotes) ||
-                    "Chưa có ghi chú nhân viên."}
+                    "Chưa có ghi chú nhân sự."}
                 </p>
               </div>
             </div>
@@ -234,7 +234,7 @@ export function OrderDetail({ id }: { id: string }) {
         </div>
         <aside className="op-detail-aside">
           <section className="ap-panel ap-prose">
-            <h2>Nhân viên phụ trách</h2>
+            <h2>Nhân sự phụ trách</h2>
             {employee ? (
               <>
                 <div className="ap-person op-spaced">
@@ -267,17 +267,12 @@ export function OrderDetail({ id }: { id: string }) {
                   <div className="op-offer-state">
                     <strong>Đã gửi đề nghị · Đang chờ phản hồi</strong>
                     <OfferCountdown expiresAt={offer.expiresAt} />
-                    <Link
-                      href={`/employee/orders/${id}?employee=${employee.id}`}
-                    >
-                      Mở bản xem thử nhân viên →{" "}
-                    </Link>
                   </div>
                 )}
               </>
             ) : (
               <p>
-                Đơn đang chờ nhân viên phù hợp. Chọn Phân công nhân viên để gửi
+                Đơn đang chờ nhân sự phù hợp. Chọn Phân công nhân sự để gửi
                 đề nghị.{" "}
               </p>
             )}

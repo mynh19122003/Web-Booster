@@ -28,9 +28,6 @@ test("Vietnamese admin routes contain no leftover English interface labels", asy
       "chat?order=ASC-1042",
       "staff",
       "staff/invitations",
-      "employee-applications",
-      "employee-applications/app-1048",
-      "employee-applications/app-1045",
       "security",
       "profile",
       "accept-invitation?token=demo-invitation",
@@ -52,11 +49,6 @@ test("Vietnamese admin routes contain no leftover English interface labels", asy
       animations: "disabled",
     });
   }
-  await page.goto("/admin/employee-applications/app-1048");
-  await page.getByRole("button", { name: "Duyệt hồ sơ", exact: true }).click();
-  await expect(page.getByLabel("Loại nhân viên")).toHaveValue("BOOSTER");
-  await expect(page.getByLabel("Bộ phận")).toHaveValue("BOOSTING");
-  await page.keyboard.press("Escape");
   await page.goto("/admin");
   await page.getByLabel("Thông báo", { exact: true }).click();
   expect(
@@ -73,7 +65,7 @@ test("Vietnamese display mappings preserve raw API values and translate errors",
     ["APPROVED", "Đã duyệt"],
     ["WAITING_ASSIGNMENT", "Chờ phân công"],
     ["SUPER_ADMIN", "Quản trị viên cấp cao"],
-    ["BOOSTER", "Nhân viên cày hạng"],
+    ["BOOSTER", "Nhân sự cày hạng"],
   ]) {
     expect(adminText(raw)).toBe(label);
     expect(raw).toMatch(/^[A-Z_]+$/);

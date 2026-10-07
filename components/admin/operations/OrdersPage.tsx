@@ -61,7 +61,7 @@ export function OrderTable({ orders }: { orders: Order[] }) {
               "Trò chơi / Dịch vụ",
               "Hạng hiện tại",
               "Hạng mục tiêu",
-              "Nhân viên",
+              "Nhân sự",
               "Trạng thái",
               "Tiến độ",
               "Giá trị đơn",
@@ -233,7 +233,7 @@ export function OrdersPage() {
             <Search size={17} />
             <input
               aria-label="Tìm đơn hàng"
-              placeholder="Mã đơn, khách hàng, Riot ID hoặc nhân viên…"
+              placeholder="Mã đơn, khách hàng, Riot ID hoặc nhân sự…"
               value={filters.query}
               onChange={(e) => filter("query", e.target.value)}
             />
@@ -278,12 +278,12 @@ export function OrdersPage() {
                 ))}
               </select>
             </Field>
-            <Field label="Nhân viên">
+            <Field label="Nhân sự">
               <select
                 value={filters.employee}
                 onChange={(e) => filter("employee", e.target.value)}
               >
-                <option value="ALL">Tất cả nhân viên</option>
+                <option value="ALL">Tất cả nhân sự</option>
                 <option value="NONE">Chưa phân công</option>
                 {employees.map((e) => (
                   <option value={e.id} key={e.id}>

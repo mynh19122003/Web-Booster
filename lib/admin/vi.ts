@@ -70,7 +70,7 @@ const labels: Record<string, string> = {
   "Take a moment to review their experience.":
     "Hãy xem xét kinh nghiệm của ứng viên.",
   "Employee credentials have been sent.":
-    "Đã gửi thông tin đăng nhập cho nhân viên.",
+    "Đã gửi thông tin đăng nhập cho nhân sự.",
   "Simulated delivery in this demo.":
     "Việc gửi được mô phỏng trong bản dùng thử.",
   "First sign-in requires a password change within 24 hours.":
@@ -79,9 +79,9 @@ const labels: Record<string, string> = {
   "Resend credentials": "Gửi lại thông tin đăng nhập",
   "Great service starts with great people. Review every application thoughtfully.":
     "Dịch vụ tốt bắt đầu từ nhân sự tốt. Hãy xem xét kỹ từng hồ sơ.",
-  "Welcome a new employee": "Chào đón nhân viên mới",
+  "Welcome a new employee": "Chào đón nhân sự mới",
   "Reject application": "Từ chối hồ sơ",
-  "Resend employee credentials": "Gửi lại thông tin đăng nhập cho nhân viên",
+  "Resend employee credentials": "Gửi lại thông tin đăng nhập cho nhân sự",
   "Add a clear reason for your decision. This review cannot be undone.":
     "Nêu rõ lý do từ chối. Không thể hoàn tác quyết định này.",
   "A new temporary password replaces the old one and revokes existing sessions.":
@@ -90,8 +90,8 @@ const labels: Record<string, string> = {
   "Application rejected. Review saved.":
     "Đã từ chối hồ sơ và lưu kết quả xét duyệt.",
   "Employee credentials have been sent (demo).":
-    "Đã gửi thông tin đăng nhập cho nhân viên (dùng thử).",
-  "Employee type": "Loại nhân viên",
+    "Đã gửi thông tin đăng nhập cho nhân sự (dùng thử).",
+  "Employee type": "Loại nhân sự",
   Department: "Bộ phận",
   "Maximum active orders": "Số đơn tối đa đang thực hiện",
   "Rejection reason": "Lý do từ chối",
@@ -175,7 +175,7 @@ const labels: Record<string, string> = {
   "Pending invitations": "Lời mời đang chờ",
   "Waiting to join your team": "Đang chờ gia nhập đội ngũ",
   "Managed by super admin": "Do quản trị viên cấp cao quản lý",
-  "Active employees": "Nhân viên đang hoạt động",
+  "Active employees": "Nhân sự đang hoạt động",
   "Approved in this workspace": "Đã được duyệt trong hệ thống",
   "Recent applications": "Hồ sơ gần đây",
   "Your next great team member could be here.":
@@ -372,7 +372,7 @@ const labels: Record<string, string> = {
   "Select a conversation to start messaging.":
     "Chọn cuộc trò chuyện để bắt đầu nhắn tin.",
   "Customer questions, employee updates, and your team’s private notes — all in one place.":
-    "Câu hỏi của khách hàng, cập nhật của nhân viên và ghi chú nội bộ ở cùng một nơi.",
+    "Câu hỏi của khách hàng, cập nhật của nhân sự và ghi chú nội bộ ở cùng một nơi.",
   "Customer profile · Demo data": "Hồ sơ khách hàng · Dữ liệu dùng thử",
   "Reopen conversation?": "Mở lại cuộc trò chuyện?",
   "Archive conversation?": "Lưu trữ cuộc trò chuyện?",
@@ -384,7 +384,7 @@ const labels: Record<string, string> = {
   Archived: "Đã lưu trữ",
   Unread: "Chưa đọc",
   Customers: "Khách hàng",
-  Employees: "Nhân viên",
+  Employees: "Nhân sự",
   Orders: "Đơn hàng",
   Inbox: "Hộp thư",
   "People, connected.": "Kết nối mọi người.",
@@ -426,14 +426,14 @@ const labels: Record<string, string> = {
   "Order view permission is required for order details.":
     "Cần quyền xem đơn hàng để mở chi tiết.",
   "ORDER CONTEXT": "THÔNG TIN ĐƠN HÀNG",
-  "Assigned employee": "Nhân viên phụ trách",
+  "Assigned employee": "Nhân sự phụ trách",
   Unassigned: "Chưa phân công",
   Customer: "Khách hàng",
   "Order value": "Giá trị đơn",
   "Expected completion": "Dự kiến hoàn thành",
-  "View employee": "Xem nhân viên",
-  "Employee profile · Demo data": "Hồ sơ nhân viên · Dữ liệu dùng thử",
-  "Employee ID": "Mã nhân viên",
+  "View employee": "Xem nhân sự",
+  "Employee profile · Demo data": "Hồ sơ nhân sự · Dữ liệu dùng thử",
+  "Employee ID": "Mã nhân sự",
   Type: "Loại",
   Capability: "Khả năng xử lý hạng",
   "Success rate": "Tỷ lệ thành công",
@@ -485,15 +485,15 @@ const labels: Record<string, string> = {
   "Edit admin notes": "Sửa ghi chú quản trị",
   "Admin · Internal": "Quản trị · Nội bộ",
   "No admin notes yet.": "Chưa có ghi chú quản trị.",
-  "Employee notes": "Ghi chú nhân viên",
-  "No employee notes yet.": "Chưa có ghi chú nhân viên.",
+  "Employee notes": "Ghi chú nhân sự",
+  "No employee notes yet.": "Chưa có ghi chú nhân sự.",
   Workload: "Khối lượng công việc",
   Online: "Trực tuyến",
   Offline: "Ngoại tuyến",
   "Offer sent · Waiting for response": "Đã gửi đề nghị · Đang chờ phản hồi",
-  "Open employee preview →": "Mở bản xem thử nhân viên →",
+  "Open employee preview →": "Mở bản xem thử nhân sự →",
   "This order is waiting for a specialist. Use Assign employee to send an offer.":
-    "Đơn đang chờ nhân viên phù hợp. Chọn Phân công nhân viên để gửi đề nghị.",
+    "Đơn đang chờ nhân sự phù hợp. Chọn Phân công nhân sự để gửi đề nghị.",
   "Assignment history": "Lịch sử phân công",
   "Reason:": "Lý do:",
   "No offers have been sent yet.": "Chưa gửi đề nghị nào.",
@@ -517,7 +517,7 @@ const labels: Record<string, string> = {
   "Game / Service": "Trò chơi / Dịch vụ",
   "Current rank": "Hạng hiện tại",
   "Target rank": "Hạng mục tiêu",
-  Employee: "Nhân viên",
+  Employee: "Nhân sự",
   Progress: "Tiến độ",
   Amount: "Giá trị đơn",
   Created: "Ngày tạo",
@@ -533,11 +533,11 @@ const labels: Record<string, string> = {
   "Across this workspace": "Trong hệ thống",
   "Search orders": "Tìm đơn hàng",
   "Order ID, customer, Riot ID or employee…":
-    "Mã đơn, khách hàng, Riot ID hoặc nhân viên…",
+    "Mã đơn, khách hàng, Riot ID hoặc nhân sự…",
   "All games": "Tất cả trò chơi",
   Service: "Dịch vụ",
   "All services": "Tất cả dịch vụ",
-  "All employees": "Tất cả nhân viên",
+  "All employees": "Tất cả nhân sự",
   "From date": "Từ ngày",
   "To date": "Đến ngày",
   "Sort orders": "Sắp xếp đơn hàng",
@@ -566,15 +566,15 @@ const labels: Record<string, string> = {
   "At capacity": "Đã đủ số đơn",
   "Unavailable for this order": "Không phù hợp đơn này",
   "Confirm a new employee below. The previous assignment will end and a new 15-minute offer will be sent.":
-    "Chọn nhân viên mới bên dưới. Phân công cũ sẽ kết thúc và đề nghị mới có hiệu lực 15 phút sẽ được gửi.",
+    "Chọn nhân sự mới bên dưới. Phân công cũ sẽ kết thúc và đề nghị mới có hiệu lực 15 phút sẽ được gửi.",
   "Choose the right person. The employee must accept before work begins.":
-    "Chọn nhân viên phù hợp. Nhân viên phải nhận đề nghị trước khi bắt đầu.",
+    "Chọn nhân sự phù hợp. Nhân sự phải nhận đề nghị trước khi bắt đầu.",
   "Confirm reassignment": "Xác nhận phân công lại",
   "Send offer": "Gửi đề nghị",
-  "Choose an employee first.": "Vui lòng chọn nhân viên trước.",
+  "Choose an employee first.": "Vui lòng chọn nhân sự trước.",
   "Offer sent. Waiting for employee response.":
-    "Đã gửi đề nghị. Đang chờ nhân viên phản hồi.",
-  "Search employees": "Tìm nhân viên",
+    "Đã gửi đề nghị. Đang chờ nhân sự phản hồi.",
+  "Search employees": "Tìm nhân sự",
   "Search by name…": "Tìm theo tên…",
   "Rank capability": "Khả năng xử lý hạng",
   "All ranks": "Tất cả hạng",
@@ -582,11 +582,11 @@ const labels: Record<string, string> = {
   "Any availability": "Mọi tình trạng",
   "All workloads": "Tất cả khối lượng công việc",
   "Has capacity": "Còn khả năng nhận đơn",
-  "No matching employees": "Không tìm thấy nhân viên phù hợp",
+  "No matching employees": "Không tìm thấy nhân sự phù hợp",
   "Adjust the filters to see more candidates.":
-    "Điều chỉnh bộ lọc để xem thêm nhân viên.",
+    "Điều chỉnh bộ lọc để xem thêm nhân sự.",
   Reassign: "Phân công lại",
-  "Assign employee": "Phân công nhân viên",
+  "Assign employee": "Phân công nhân sự",
   "Open chat": "Mở trò chuyện",
   "Review order": "Xác nhận đơn",
   Pause: "Tạm dừng",
@@ -601,7 +601,7 @@ const labels: Record<string, string> = {
   "Work will pause until an admin resumes the order.":
     "Công việc sẽ tạm dừng cho tới khi quản trị viên tiếp tục đơn.",
   "Mark the target as reached and release this employee’s workload.":
-    "Xác nhận đã đạt mục tiêu và giải phóng khối lượng công việc của nhân viên.",
+    "Xác nhận đã đạt mục tiêu và giải phóng khối lượng công việc của nhân sự.",
   "Confirm the order details and move it to the assignment queue.":
     "Xác nhận thông tin đơn và chuyển sang hàng chờ phân công.",
   "Move this accepted assignment into active work.":
@@ -618,7 +618,7 @@ const labels: Record<string, string> = {
     "Đã xác nhận thanh toán. Hãy kiểm tra thông tin.",
   "Waiting assignment": "Chờ phân công",
   "Reviewed and ready for the right employee.":
-    "Đã duyệt và sẵn sàng phân công nhân viên phù hợp.",
+    "Đã duyệt và sẵn sàng phân công nhân sự phù hợp.",
   "THE ORDER INBOX": "HỘP THƯ ĐƠN HÀNG",
   "Incoming orders": "Đơn mới",
   "A clear queue. A great first impression.":
@@ -626,7 +626,7 @@ const labels: Record<string, string> = {
   waiting: "đang chờ",
   "Every great experience starts here.": "Trải nghiệm tốt bắt đầu từ đây.",
   "Review new orders and offer them to an available specialist.":
-    "Duyệt đơn mới và gửi đề nghị tới nhân viên sẵn sàng.",
+    "Duyệt đơn mới và gửi đề nghị tới nhân sự sẵn sàng.",
   "DEMO QUEUE": "HÀNG CHỜ DÙNG THỬ",
   "Preferred region": "Khu vực ưu tiên",
   Received: "Đã nhận",
@@ -640,19 +640,19 @@ const labels: Record<string, string> = {
   "PEOPLE × PROGRESS": "NHÂN SỰ × TIẾN ĐỘ",
   Assignments: "Phân công",
   "The right specialist. The right order. Full visibility.":
-    "Đúng nhân viên, đúng đơn hàng. Theo dõi rõ ràng.",
-  "Employee preview": "Xem thử nhân viên",
+    "Đúng nhân sự, đúng đơn hàng. Theo dõi rõ ràng.",
+  "Employee preview": "Xem thử nhân sự",
   Offer: "Gửi đề nghị",
-  "Employee accepts": "Nhân viên nhận việc",
+  "Employee accepts": "Nhân sự nhận việc",
   "Work begins": "Bắt đầu thực hiện",
-  "Waiting for employee response…": "Đang chờ nhân viên phản hồi…",
+  "Waiting for employee response…": "Đang chờ nhân sự phản hồi…",
   "Preview accept / decline →": "Xem thử nhận / từ chối →",
   "Clear for now": "Hiện chưa có đơn",
   "Orders appear here as they move forward.":
     "Đơn sẽ xuất hiện tại đây khi chuyển trạng thái.",
   "Recent assignment decisions": "Lịch sử phân công gần đây",
   "Offers are kept in the history": "Đề nghị được lưu trong lịch sử",
-  "Employee response recorded": "Đã ghi nhận phản hồi nhân viên",
+  "Employee response recorded": "Đã ghi nhận phản hồi nhân sự",
   "Admin Portal": "Trang quản trị",
   "Admin Workspace": "Không gian quản trị",
   "View applications": "Xem hồ sơ ứng tuyển",
@@ -660,7 +660,7 @@ const labels: Record<string, string> = {
     "Xem hồ sơ ứng viên và lịch sử ứng tuyển.",
   "Approve applications": "Duyệt hồ sơ ứng tuyển",
   "Approve candidates and provision employee accounts.":
-    "Duyệt ứng viên và tạo tài khoản nhân viên.",
+    "Duyệt ứng viên và tạo tài khoản nhân sự.",
   "Reject applications": "Từ chối hồ sơ ứng tuyển",
   "Decline applications with a review reason.":
     "Từ chối hồ sơ kèm lý do xét duyệt.",
@@ -668,7 +668,7 @@ const labels: Record<string, string> = {
   "Read order details and assignment activity.":
     "Xem chi tiết đơn và hoạt động phân công.",
   "Offer and reassign orders to employees.":
-    "Gửi đề nghị và phân công lại đơn cho nhân viên.",
+    "Gửi đề nghị và phân công lại đơn cho nhân sự.",
   "Update orders": "Cập nhật đơn hàng",
   "Review, pause, complete and update progress.":
     "Xác nhận, tạm dừng, hoàn thành và cập nhật tiến độ.",
@@ -707,10 +707,10 @@ const labels: Record<string, string> = {
   REVOKED: "Đã thu hồi",
   SUPER_ADMIN: "Quản trị viên cấp cao",
   STAFF: "Nhân sự quản trị",
-  EMPLOYEE: "Nhân viên",
+  EMPLOYEE: "Nhân sự",
   CUSTOMER: "Khách hàng",
   ADMIN: "Quản trị viên",
-  BOOSTER: "Nhân viên cày hạng",
+  BOOSTER: "Nhân sự cày hạng",
   COACH: "Huấn luyện viên",
   BOOSTING: "Cày hạng",
   COACHING: "Huấn luyện",
@@ -753,18 +753,18 @@ const labels: Record<string, string> = {
   "This order cannot be assigned in its current state.":
     "Không thể phân công đơn ở trạng thái hiện tại.",
   "Use reassign to replace the current employee.":
-    "Chọn Phân công lại để thay nhân viên phụ trách.",
+    "Chọn Phân công lại để thay nhân sự phụ trách.",
   "Choose an employee who supports this game and service.":
-    "Chọn nhân viên hỗ trợ trò chơi và dịch vụ này.",
+    "Chọn nhân sự hỗ trợ trò chơi và dịch vụ này.",
   "Choose a different employee for reassignment.":
-    "Chọn nhân viên khác để phân công lại.",
+    "Chọn nhân sự khác để phân công lại.",
   "This employee has reached their order limit.":
-    "Nhân viên đã đạt giới hạn số đơn.",
+    "Nhân sự đã đạt giới hạn số đơn.",
   "This order has already been reviewed.": "Đơn này đã được xác nhận.",
   "Only active work can be paused.":
     "Chỉ có thể tạm dừng công việc đang thực hiện.",
   "The employee must accept before work begins.":
-    "Nhân viên phải nhận đề nghị trước khi bắt đầu.",
+    "Nhân sự phải nhận đề nghị trước khi bắt đầu.",
   "This order is already closed.": "Đơn này đã đóng.",
   "Add a cancellation reason (5+ characters).":
     "Nhập lý do hủy đơn từ 5 ký tự.",
@@ -775,7 +775,7 @@ const labels: Record<string, string> = {
   "Progress must increase up to 99%; LP must be 0–100. Use Complete to finish.":
     "Tiến độ phải tăng và không vượt 99%; LP từ 0 đến 100. Chọn Hoàn thành để kết thúc.",
   "This offer is no longer available for this employee.":
-    "Đề nghị không còn dành cho nhân viên này.",
+    "Đề nghị không còn dành cho nhân sự này.",
   "Please add a decline reason (5+ characters).":
     "Nhập lý do từ chối từ 5 ký tự.",
   "The order has changed. Refresh the offers.":
@@ -787,14 +787,14 @@ const labels: Record<string, string> = {
     "Nhập tin nhắn không quá 4.000 ký tự.",
   "New order": "Đơn mới",
   "New message": "Tin nhắn mới",
-  "Employee accepted order": "Nhân viên đã nhận đơn",
-  "Employee declined order": "Nhân viên đã từ chối đơn",
+  "Employee accepted order": "Nhân sự đã nhận đơn",
+  "Employee declined order": "Nhân sự đã từ chối đơn",
   "Order completed": "Đơn đã hoàn thành",
   "Order created": "Đã tạo đơn",
   "Customer submitted their request.": "Khách hàng đã gửi yêu cầu.",
   "Payment confirmed": "Đã xác nhận thanh toán",
   "Demo payment received.": "Đã nhận thanh toán dùng thử.",
-  "Employee offer sent.": "Đã gửi đề nghị cho nhân viên.",
+  "Employee offer sent.": "Đã gửi đề nghị cho nhân sự.",
   "Assignment accepted and workload reserved.":
     "Đã nhận phân công và ghi nhận khối lượng công việc.",
   "Work started": "Đã bắt đầu thực hiện",
@@ -802,7 +802,7 @@ const labels: Record<string, string> = {
   "Rank updated": "Đã cập nhật hạng",
   "Offer sent": "Đã gửi đề nghị",
   "Review completed": "Đã xác nhận đơn",
-  "Ready for employee assignment": "Sẵn sàng phân công nhân viên",
+  "Ready for employee assignment": "Sẵn sàng phân công nhân sự",
   "Order paused": "Đơn đã tạm dừng",
   "Work paused by admin": "Quản trị viên đã tạm dừng công việc",
   "Order is now in progress": "Đơn đang được thực hiện",
@@ -812,7 +812,7 @@ const labels: Record<string, string> = {
   "Admin note updated": "Đã cập nhật ghi chú quản trị",
   "Internal order notes saved": "Đã lưu ghi chú nội bộ của đơn",
   "Returned to the assignment queue": "Đã chuyển về hàng chờ phân công",
-  "Employee started their session": "Nhân viên đã bắt đầu phiên làm việc",
+  "Employee started their session": "Nhân sự đã bắt đầu phiên làm việc",
   "Updated account password": "Đã đổi mật khẩu tài khoản",
   "Updated password and signed out of all sessions (demo)":
     "Đã đổi mật khẩu và đăng xuất tất cả phiên (dùng thử)",
@@ -823,7 +823,7 @@ const labels: Record<string, string> = {
   "Restored staff account access": "Đã khôi phục quyền truy cập nhân sự",
   "Revoked all staff sessions": "Đã thu hồi tất cả phiên nhân sự",
   "Resent employee credentials (demo)":
-    "Đã gửi lại thông tin đăng nhập nhân viên (dùng thử)",
+    "Đã gửi lại thông tin đăng nhập nhân sự (dùng thử)",
   "Please play after 18:00 in my timezone. Keep me updated after each session.":
     "Vui lòng chơi sau 18:00 theo múi giờ của tôi và cập nhật sau mỗi phiên.",
   "Customer requested a progress update. Keep communication clear.":
@@ -850,7 +850,7 @@ const labels: Record<string, string> = {
   status: "Trạng thái",
   game: "Trò chơi",
   service: "Dịch vụ",
-  employee: "Nhân viên",
+  employee: "Nhân sự",
   from: "Từ ngày",
   to: "Đến ngày",
 };
@@ -875,7 +875,7 @@ export function adminText(value: string): string {
     [/^(.+) is ready to start$/, "$1 đã sẵn sàng bắt đầu"],
     [
       /^(.+) · Waiting for employee response$/,
-      "$1 · Đang chờ nhân viên phản hồi",
+      "$1 · Đang chờ nhân sự phản hồi",
     ],
     [/^(\d+)% of the journey complete\.$/, "Đã hoàn thành $1% tiến độ."],
     [/^(\d+)% complete · (\d+) LP\. (.*)$/, "Hoàn thành $1% · $2 LP. $3"],

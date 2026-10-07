@@ -44,7 +44,7 @@ export interface Order {
   adminNotes: string;
   employeeNotes: string;
 }
-export interface EmployeeCandidate {
+export interface StaffCandidate {
   id: string;
   name: string;
   type: "BOOSTER" | "COACH";

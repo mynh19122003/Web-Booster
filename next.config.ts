@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
+import { realpathSync } from "node:fs";
+import path from "node:path";
+// Worktrees share dependencies with the repository root.
+const dependencyRoot = path.dirname(realpathSync(path.join(process.cwd(), "node_modules")));
 const config: NextConfig = {
+  turbopack: { root: dependencyRoot },
   async headers() {
     return [
       {

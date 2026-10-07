@@ -46,7 +46,7 @@ function event(
   order: Order,
   title: string,
   detail: string,
-  actor = useAdminStore.getState().user?.displayName ?? "Employee preview",
+  actor = useAdminStore.getState().user?.displayName ?? "Staff",
 ) {
   const s = store.getState();
   store.setState({
@@ -105,17 +105,18 @@ async function offer(orderId: string, employeeId: string, reassign: boolean) {
   )
     throw new Error("This order cannot be assigned in its current state.");
   if (o.employeeId && !reassign)
-    throw new Error("Use reassign to replace the current employee.");
+    throw new Error("Use reassign to replace the current staff.");
   if (
+    !useAdminStore.getState().staff.some(s => s.id === employeeId && s.status === "ACTIVE") ||
     !employee ||
     !employee.games.includes(o.game) ||
     employee.type !== (o.service === "Coaching" ? "COACH" : "BOOSTER")
   )
-    throw new Error("Choose an employee who supports this game and service.");
+    throw new Error("Choose an staff who supports this game and service.");
   if (employeeId === o.employeeId)
-    throw new Error("Choose a different employee for reassignment.");
+    throw new Error("Choose a different staff for reassignment.");
   if (workload(employeeId) >= employee.maxActiveOrders)
-    throw new Error("This employee has reached their order limit.");
+    throw new Error("This staff has reached their order limit.");
   resolveOffers(orderId, "REPLACED");
   const assignment: OrderAssignment = {
     id: uid(),
@@ -150,9 +151,9 @@ export const orderService = {
       .getState()
       .orders.filter((o) => incomingStatuses.includes(o.status));
   },
-  assignEmployee: (id: string, employeeId: string) =>
+  assignStaff: (id: string, employeeId: string) =>
     offer(id, employeeId, false),
-  reassignEmployee: (id: string, employeeId: string) =>
+  reassignStaff: (id: string, employeeId: string) =>
     offer(id, employeeId, true),
   async reviewOrder(id: string) {
     await wait();
@@ -161,7 +162,7 @@ export const orderService = {
     if (!incomingStatuses.includes(o.status))
       throw new Error("This order has already been reviewed.");
     update(id, { status: "WAITING_ASSIGNMENT" });
-    event(o, "Review completed", "Ready for employee assignment");
+    event(o, "Review completed", "Ready for staff assignment");
   },
   async pauseOrder(id: string) {
     await wait();
@@ -177,7 +178,7 @@ export const orderService = {
     requireAccess("order.update");
     const o = orderById(id);
     if (!["ACCEPTED", "PAUSED"].includes(o.status))
-      throw new Error("The employee must accept before work begins.");
+      throw new Error("The staff must accept before work begins.");
     update(id, { status: "IN_PROGRESS" });
     event(o, "Work started", "Order is now in progress");
   },
@@ -245,8 +246,8 @@ export const assignmentService = {
     requireAccess("order.view");
     return store.getState().assignments;
   },
-  createAssignment: orderService.assignEmployee,
-  async getAvailableEmployees() {
+  createAssignment: orderService.assignStaff,
+  async getAvailableStaff() {
     await wait();
     requireAccess("order.assign");
     return store.getState().employees;
@@ -273,61 +274,6 @@ export const assignmentService = {
         event(o, "Offer expired", "Returned to the assignment queue");
       }
     }
-  },
-};
-// Explicit employee preview identity, not real authentication or an authorization boundary.
-export const employeePreviewService = {
-  async getOrders() {
-    await wait();
-    const s = store.getState();
-    return s.orders.filter((o) => o.employeeId === s.previewEmployeeId);
-  },
-  async respond(assignmentId: string, accept: boolean, reason = "") {
-    await wait();
-    assignmentService.expireOffers();
-    const s = store.getState();
-    const a = s.assignments.find((x) => x.id === assignmentId);
-    if (!a || a.status !== "OFFERED" || a.employeeId !== s.previewEmployeeId)
-      throw new Error("This offer is no longer available for this employee.");
-    if (!accept && reason.trim().length < 5)
-      throw new Error("Please add a decline reason (5+ characters).");
-    const o = orderById(a.orderId);
-    if (o.status !== "OFFERED" || o.employeeId !== a.employeeId)
-      throw new Error("The order has changed. Refresh the offers.");
-    const name = s.employees.find((e) => e.id === a.employeeId)!.name;
-    store.setState({
-      assignments: s.assignments.map((x) =>
-        x.id === a.id
-          ? {
-              ...x,
-              status: accept ? "ACCEPTED" : "DECLINED",
-              respondedAt: timestamp(),
-              reason: accept ? undefined : reason.trim(),
-            }
-          : x,
-      ),
-    });
-    update(o.id, {
-      status: accept ? "ACCEPTED" : "WAITING_ASSIGNMENT",
-      employeeId: accept ? a.employeeId : undefined,
-    });
-    event(
-      o,
-      accept ? "Employee accepted order" : "Employee declined order",
-      accept ? `${name} is ready to start` : `${name}: ${reason.trim()}`,
-      name,
-    );
-  },
-  async start(id: string) {
-    await wait();
-    const o = orderById(id);
-    if (
-      o.employeeId !== store.getState().previewEmployeeId ||
-      o.status !== "ACCEPTED"
-    )
-      throw new Error("Accept your offer before starting.");
-    update(id, { status: "IN_PROGRESS" });
-    event(o, "Work started", "Employee started their session");
   },
 };
 export const chatService = {

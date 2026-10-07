@@ -1,20 +1,17 @@
 "use client";
 
-import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import {
   ArrowUpRight,
   CalendarDays,
-  ClipboardList,
   Users,
   Mail,
   ShieldCheck,
   Plus,
   ArrowRight,
-  CheckCircle2,
 } from "lucide-react";
 import { useAdminStore } from "@/lib/admin/store";
-import { can, getDashboardStats } from "@/services/admin";
+import { getDashboardStats } from "@/services/admin";
 import { OperationsOverview } from "../operations/OperationsOverview";
 import {
   PageHeader,
@@ -25,10 +22,9 @@ import {
   formatDate,
 } from "./Ui";
 export function Dashboard() {
-  const { user, applications, invitations, activities } = useAdminStore();
+  const { user, invitations, activities } = useAdminStore();
   const stats = getDashboardStats();
   const owner = user?.role === "SUPER_ADMIN";
-  const view = can("employee.application.view");
   return (
     <>
       <PageHeader
@@ -37,7 +33,7 @@ export function Dashboard() {
         description="Theo dõi hoạt động của đội ngũ hôm nay."
       >
         <span className="ap-date">
-          <CalendarDays size={16} /> 05 tháng 10 năm 2026{" "}
+          <CalendarDays size={16} /> {new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", day: "numeric", month: "long", year: "numeric" })}{" "}
         </span>
         {owner && (
           <Link
@@ -50,13 +46,7 @@ export function Dashboard() {
       </PageHeader>
       <OperationsOverview />
       <div className="ap-stats">
-        <AdminStatCard
-          label="Hồ sơ chờ duyệt"
-          value={view ? stats.pendingApplications : 0}
-          note={view ? "Sẵn sàng xét duyệt" : "Cần quyền xem"}
-          icon={<ClipboardList size={19} />}
-          index="01"
-        />
+
         <AdminStatCard
           label="Nhân sự đang hoạt động"
           value={owner ? stats.activeStaff : 1}
@@ -77,83 +67,9 @@ export function Dashboard() {
           icon={<Mail size={19} />}
           index="03"
         />
-        <AdminStatCard
-          label="Nhân viên đang hoạt động"
-          value={view ? stats.activeEmployees : 0}
-          note="Đã được duyệt trong hệ thống"
-          icon={<CheckCircle2 size={19} />}
-          index="04"
-        />
+
       </div>
       <div className="ap-dashboard-grid">
-        <section className="ap-panel ap-applications-panel">
-          <div className="ap-panel-heading">
-            <div>
-              <h2>
-                Hồ sơ gần đây{" "}
-                <span className="ap-count">
-                  {view ? applications.length : "—"}
-                </span>
-              </h2>
-              <p>Thành viên tiếp theo của đội ngũ có thể ở đây.</p>
-            </div>
-            {view && (
-              <Link href="/admin/employee-applications">
-                Xem tất cả <ArrowUpRight size={15} />
-              </Link>
-            )}
-          </div>
-          {view ? (
-            <div className="ap-table-wrap">
-              <table aria-label="Hồ sơ gần đây">
-                <thead>
-                  <tr>
-                    <th>Ứng viên</th>
-                    <th>Vị trí ứng tuyển</th>
-                    <th>Trạng thái</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.slice(0, 5).map((a) => (
-                    <tr key={a.id}>
-                      <td>
-                        <div className="ap-person">
-                          <Avatar name={a.fullName} />
-                          <div>
-                            <strong>{a.fullName}</strong>
-                            <small>{a.riotId}</small>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="ap-position">
-                          {adminText(a.positionApplied)}
-                        </span>
-                      </td>
-                      <td>
-                        <StatusBadge status={a.status} />
-                      </td>
-                      <td>
-                        <Link
-                          href={`/admin/employee-applications/${a.id}`}
-                          className="ap-icon-button"
-                          aria-label={`Xem hồ sơ ${a.fullName}`}
-                        >
-                          <ArrowUpRight size={18} />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="ap-panel-padding">
-              Quyền truy cập hồ sơ do quản trị viên cấp cao quản lý.{" "}
-            </p>
-          )}
-        </section>
         <section className="ap-panel ap-spotlight">
           <div className="ap-spotlight-icon">
             <ShieldCheck size={29} />
@@ -164,14 +80,14 @@ export function Dashboard() {
             từ những người phù hợp.{" "}
           </h2>
           <p>
-            Xét duyệt ứng viên, cấp quyền phù hợp và bảo vệ không gian làm
+            Phân công nhân sự, cấp quyền phù hợp và bảo vệ không gian làm
             việc.{" "}
           </p>
           <Link
-            href={view ? "/admin/employee-applications" : "/admin/profile"}
+            href={owner ? "/admin/staff" : "/admin/profile"}
             className="ap-button primary"
           >
-            {view ? "Xét duyệt hồ sơ" : "Xem hồ sơ cá nhân"}
+            {owner ? "Quản lý nhân sự" : "Xem hồ sơ cá nhân"}
             <ArrowRight size={16} />
           </Link>
           <div className="ap-spotlight-bottom">

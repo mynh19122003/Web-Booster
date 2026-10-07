@@ -39,7 +39,7 @@ test("review shows complete details, blocks repeated submit and updates only moc
   for (const width of [1366, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });
     await page
-      .getByRole("button", { name: "Phân công nhân viên", exact: true })
+      .getByRole("button", { name: "Phân công nhân sự", exact: true })
       .click();
     await page.screenshot({
       path: `test-results/assign-final-${width}.png`,

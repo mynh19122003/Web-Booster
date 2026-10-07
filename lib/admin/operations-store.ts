@@ -7,7 +7,7 @@ import { conversations } from "@/mock-data/conversations";
 import { messages } from "@/mock-data/messages";
 import type {
   Order,
-  EmployeeCandidate,
+  StaffCandidate,
   OrderAssignment,
   OrderProgressEvent,
   Conversation,
@@ -16,13 +16,12 @@ import type {
 } from "@/types/operations";
 interface OperationsState {
   orders: Order[];
-  employees: EmployeeCandidate[];
+  employees: StaffCandidate[];
   assignments: OrderAssignment[];
   events: OrderProgressEvent[];
   conversations: Conversation[];
   messages: ChatMessage[];
   notifications: OrderNotification[];
-  previewEmployeeId: string;
   ready: boolean;
   setReady: () => void;
 }
@@ -77,12 +76,11 @@ export const useOperations = create<OperationsState>()(
           scope: "order.view",
         },
       ],
-      previewEmployeeId: "emp-zen",
       ready: false,
       setReady: () => set({ ready: true }),
     }),
     {
-      name: "ascend-operations-demo-v1",
+      name: "ascend-operations-demo-v2",
       storage: createJSONStorage(() => sessionStorage),
       skipHydration: true,
       partialize: (s) => ({
@@ -93,7 +91,6 @@ export const useOperations = create<OperationsState>()(
         conversations: s.conversations,
         messages: s.messages,
         notifications: s.notifications,
-        previewEmployeeId: s.previewEmployeeId,
       }),
       onRehydrateStorage: () => (state) => state?.setReady(),
     },

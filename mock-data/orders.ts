@@ -1,13 +1,13 @@
 import type {
   Order,
-  EmployeeCandidate,
+  StaffCandidate,
   OrderStatus,
   Game,
 } from "@/types/operations";
 const now = Date.now();
 export const ago = (minutes: number) =>
   new Date(now - minutes * 60000).toISOString();
-export const employees: EmployeeCandidate[] = [
+export const employees: StaffCandidate[] = [
   {
     id: "emp-nova",
     name: "Nova",

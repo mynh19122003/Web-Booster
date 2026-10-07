@@ -15,7 +15,7 @@ import { useOperations } from "@/lib/admin/operations-store";
 import { useAdminStore } from "@/lib/admin/store";
 import { can } from "@/services/admin";
 import { orderService, workload } from "@/services/operations";
-import type { Order, EmployeeCandidate } from "@/types/operations";
+import type { Order, StaffCandidate } from "@/types/operations";
 import type { Permission } from "@/types/admin";
 import {
   Avatar,
@@ -121,13 +121,13 @@ export function OfferCountdown({ expiresAt }: { expiresAt: string }) {
     </span>
   );
 }
-export function EmployeeCandidateCard({
+export function StaffCandidateCard({
   employee,
   selected,
   disabled,
   onSelect,
 }: {
-  employee: EmployeeCandidate;
+  employee: StaffCandidate;
   selected: boolean;
   disabled: boolean;
   onSelect: () => void;
@@ -185,7 +185,7 @@ export function EmployeeCandidateCard({
     </label>
   );
 }
-export function AssignEmployeeModal({
+export function AssignStaffModal({
   order,
   onClose,
 }: {
@@ -215,21 +215,21 @@ export function AssignEmployeeModal({
       title={
         order.employeeId
           ? `Phân công lại #${order.id}`
-          : `Phân công nhân viên · #${order.id}`
+          : `Phân công nhân sự · #${order.id}`
       }
       description={
         order.employeeId
-          ? "Chọn nhân viên mới bên dưới. Phân công cũ sẽ kết thúc và đề nghị mới có hiệu lực 15 phút sẽ được gửi."
-          : "Chọn nhân viên phù hợp. Nhân viên phải nhận đề nghị trước khi bắt đầu."
+          ? "Chọn nhân sự mới bên dưới. Phân công cũ sẽ kết thúc và đề nghị mới có hiệu lực 15 phút sẽ được gửi."
+          : "Chọn nhân sự phù hợp. Nhân sự phải nhận đề nghị trước khi bắt đầu."
       }
       submit={order.employeeId ? "Xác nhận phân công lại" : "Gửi đề nghị"}
       onClose={onClose}
       onSubmit={async () => {
-        if (!selected) throw new Error("Vui lòng chọn nhân viên trước.");
+        if (!selected) throw new Error("Vui lòng chọn nhân sự trước.");
         await (order.employeeId
-          ? orderService.reassignEmployee(order.id, selected)
-          : orderService.assignEmployee(order.id, selected));
-        notice("Đã gửi đề nghị. Đang chờ nhân viên phản hồi.");
+          ? orderService.reassignStaff(order.id, selected)
+          : orderService.assignStaff(order.id, selected));
+        notice("Đã gửi đề nghị. Đang chờ nhân sự phản hồi.");
       }}
     >
       <div className="op-assignment-target">
@@ -242,7 +242,7 @@ export function AssignEmployeeModal({
         </span>
         <StatusBadge status={order.status} />
       </div>
-      <Field label="Tìm nhân viên">
+      <Field label="Tìm nhân sự">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -288,7 +288,7 @@ export function AssignEmployeeModal({
       </div>
       <div className="op-candidates">
         {candidates.map((e) => (
-          <EmployeeCandidateCard
+          <StaffCandidateCard
             key={e.id}
             employee={e}
             selected={selected === e.id}
@@ -303,8 +303,8 @@ export function AssignEmployeeModal({
         ))}
         {!candidates.length && (
           <EmptyState
-            title="Không tìm thấy nhân viên phù hợp"
-            text="Điều chỉnh bộ lọc để xem thêm nhân viên."
+            title="Không tìm thấy nhân sự phù hợp"
+            text="Điều chỉnh bộ lọc để xem thêm nhân sự."
           />
         )}
       </div>
@@ -337,7 +337,7 @@ export function OrderActions({
           className={!compact ? "ap-button primary" : ""}
           onClick={() => setAction("assign")}
         >
-          {order.employeeId ? "Phân công lại" : "Phân công nhân viên"}
+          {order.employeeId ? "Phân công lại" : "Phân công nhân sự"}
         </button>
       )}
       {chat && (
@@ -405,7 +405,7 @@ export function OrderActions({
     >
       {compact ? <ActionMenu>{controls}</ActionMenu> : controls}
       {action === "assign" && (
-        <AssignEmployeeModal order={order} onClose={() => setAction(null)} />
+        <AssignStaffModal order={order} onClose={() => setAction(null)} />
       )}
       {action && action !== "assign" && (
         <FormModal
@@ -416,7 +416,7 @@ export function OrderActions({
               : action === "pause"
                 ? "Công việc sẽ tạm dừng cho tới khi quản trị viên tiếp tục đơn."
                 : action === "complete"
-                  ? "Xác nhận đã đạt mục tiêu và giải phóng khối lượng công việc của nhân viên."
+                  ? "Xác nhận đã đạt mục tiêu và giải phóng khối lượng công việc của nhân sự."
                   : action === "review"
                     ? "Xác nhận thông tin đơn và chuyển sang hàng chờ phân công."
                     : "Chuyển phân công đã nhận sang trạng thái đang thực hiện."
