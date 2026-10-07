@@ -1,33 +1,36 @@
 "use client";
-import { unavailable } from "@/lib/api/errors";
-import { useOperations } from "@/lib/admin/operations-store";
-import type { OrderStatus } from "@/types/operations";
-export const incomingStatuses: OrderStatus[] = [
-  "PENDING",
-  "CONFIRMED",
-  "WAITING_ASSIGNMENT",
-];
-export const activeStatuses: OrderStatus[] = [
-  "OFFERED",
-  "ACCEPTED",
-  "IN_PROGRESS",
-  "PAUSED",
-  "DISPUTED",
-];
-export function workload(id: string) {
-  return useOperations
-    .getState()
-    .orders.filter(
-      (o) => o.employeeId === id && activeStatuses.includes(o.status),
-    ).length;
-}
-export const orderService = {
+import { dataSource, selectDataSource } from "@/lib/admin/data-source";
+import { unavailable, ApiFeatureUnavailableError } from "@/lib/api/errors";
+import {
+  mockOrderService,
+  mockAssignmentService,
+  mockChatService,
+} from "./mock/operations.service";
+import type { OrderService, AssignmentService, ChatService } from "./contracts";
+export {
+  incomingStatuses,
+  activeStatuses,
+  workload,
+} from "@/lib/admin/operations-model";
+const mockOrderAdapter = {
+  ...mockOrderService,
+  getOrderById: mockOrderService.getOrder,
+  assignStaff:
+    dataSource.assignments === "mock"
+      ? mockOrderService.assignStaff
+      : unavailable("assignments"),
+  reassignStaff:
+    dataSource.assignments === "mock"
+      ? mockOrderService.reassignStaff
+      : unavailable("assignments"),
+};
+const apiOrderAdapter = {
   getOrders: unavailable("orders"),
   getOrder: unavailable("orders"),
   getOrderById: unavailable("orders"),
   getIncomingOrders: unavailable("orders"),
-  assignStaff: unavailable("assignments"),
-  reassignStaff: unavailable("assignments"),
+  assignStaff: unavailable("orders"),
+  reassignStaff: unavailable("orders"),
   reviewOrder: unavailable("orders"),
   pauseOrder: unavailable("orders"),
   startOrder: unavailable("orders"),
@@ -36,13 +39,35 @@ export const orderService = {
   updateProgress: unavailable("orders"),
   saveNotes: unavailable("orders"),
 };
-export const assignmentService = {
+export const orderService = selectDataSource<typeof mockOrderAdapter>(
+  dataSource.orders,
+  mockOrderAdapter,
+  apiOrderAdapter,
+) satisfies OrderService;
+const mockAssignmentAdapter = {
+  ...mockAssignmentService,
+  assignStaff: mockOrderService.assignStaff,
+};
+const apiAssignmentAdapter = {
   getAssignments: unavailable("assignments"),
+  getAvailableStaff: unavailable("assignments"),
   assignStaff: unavailable("assignments"),
   createAssignment: unavailable("assignments"),
-  getAvailableStaff: unavailable("staff"),
+  expireOffers() {
+    throw new ApiFeatureUnavailableError("assignments");
+  },
 };
-export const chatService = {
+export const assignmentService = selectDataSource<typeof mockAssignmentAdapter>(
+  dataSource.assignments,
+  mockAssignmentAdapter,
+  apiAssignmentAdapter,
+) satisfies AssignmentService;
+const mockChatAdapter = {
+  ...mockChatService,
+  getMessages: mockChatService.getConversationMessages,
+};
+const apiChatAdapter = {
+  prepareAttachment: unavailable("chat"),
   getConversations: unavailable("chat"),
   getConversationMessages: unavailable("chat"),
   getMessages: unavailable("chat"),
@@ -51,3 +76,8 @@ export const chatService = {
   markAsRead: unavailable("chat"),
   archiveConversation: unavailable("chat"),
 };
+export const chatService = selectDataSource<typeof mockChatAdapter>(
+  dataSource.chat,
+  mockChatAdapter,
+  apiChatAdapter,
+) satisfies ChatService;

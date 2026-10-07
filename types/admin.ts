@@ -53,6 +53,7 @@ export interface AuditActivity {
   at: string;
 }
 export interface DashboardStats {
+  updatedAt?: string;
   activeStaff: number | null;
   pendingInvitations: number | null;
 }

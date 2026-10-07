@@ -28,7 +28,13 @@ export function SecurityPage() {
   const [target, setTarget] = useState<SecuritySession | null>(null);
   const owner = user?.role === "SUPER_ADMIN";
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const visible = sessions.filter((s) => owner || s.userId === user?.id);
   return (
     <>
@@ -58,7 +64,9 @@ export function SecurityPage() {
                 : "Các phiên đăng nhập gần đây của bạn."}
             </p>
           </div>
-          <span className="ap-count">— đang hoạt động</span>
+          <span className="ap-count">
+            {visible.filter((s) => s.status === "ACTIVE").length} đang hoạt động
+          </span>
         </div>
         <DataTable
           rows={visible}
@@ -131,7 +139,6 @@ export function SecurityPage() {
       </section>
       {target && (
         <FormModal
-          disabled
           title="Thu hồi phiên đăng nhập này?"
           description={`${target.user} · ${adminText(target.device)}`}
           submit="Thu hồi phiên đăng nhập"
@@ -157,7 +164,7 @@ export function ProfilePage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  if (!user) return <LoadingPanel />;
+  if (!user) return null;
   async function change(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -297,10 +304,7 @@ export function ProfilePage() {
           </section>
           <div className="ap-side-note">
             <LockKeyhole size={18} />
-            <p>
-              Mật khẩu được xác minh bởi máy chủ. Không chia sẻ mật khẩu của
-              bạn.{" "}
-            </p>
+            <p>Bảo vệ tài khoản và không chia sẻ mật khẩu của bạn. </p>
           </div>
         </aside>
       </div>

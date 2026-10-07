@@ -4,15 +4,19 @@ import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { ArrowUpRight, Package, MessageSquare } from "lucide-react";
 import { useOperations } from "@/lib/admin/operations-store";
-
+import { activeStatuses, incomingStatuses } from "@/services/operations";
 import { can } from "@/services/admin";
 import { StatusBadge } from "../portal/Ui";
 import { money, usePermission } from "./OrderUi";
 export function OperationsOverview() {
   const allowed = usePermission("order.view");
   const chat = usePermission("chat.view");
-  const { orders } = useOperations();
-
+  const { orders, conversations } = useOperations();
+  const today = new Date().toISOString().slice(0, 10);
+  const todaysOrders = orders.filter((o) => o.createdAt.startsWith(today));
+  const unread = conversations
+    .filter((c) => !c.archived)
+    .reduce((sum, c) => sum + c.unread, 0);
   if (!allowed && !chat) return null;
   return (
     <section className="op-overview">
@@ -31,22 +35,33 @@ export function OperationsOverview() {
             {[
               {
                 label: "Doanh thu hôm nay",
-                value: "—",
+                value: money(
+                  todaysOrders
+                    .filter(
+                      (o) =>
+                        !["PENDING", "CANCELLED", "REFUNDED"].includes(
+                          o.status,
+                        ),
+                    )
+                    .reduce((sum, o) => sum + o.amount, 0),
+                ),
                 note: "Giá trị đơn đã xác nhận",
               },
               {
                 label: "Đơn hàng hôm nay",
-                value: "—",
+                value: todaysOrders.length,
                 note: "Hành trình khách hàng mới",
               },
               {
                 label: "Đơn đang thực hiện",
-                value: "—",
+                value: orders.filter((o) => activeStatuses.includes(o.status))
+                  .length,
                 note: "Trong quy trình xử lý",
               },
               {
                 label: "Đơn chưa phân công",
-                value: "—",
+                value: orders.filter((o) => incomingStatuses.includes(o.status))
+                  .length,
                 note: "Sẵn sàng duyệt hoặc phân công",
               },
             ].map((stat) => (
@@ -66,9 +81,6 @@ export function OperationsOverview() {
                 </Link>
               </div>
               <div className="op-recent-orders">
-                {!orders.length && (
-                  <p className="ap-panel-padding">Chưa có đơn hàng.</p>
-                )}
                 {orders
                   .toSorted(
                     (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
@@ -93,11 +105,13 @@ export function OperationsOverview() {
               {["PENDING", "IN_PROGRESS", "COMPLETED"].map((status) => (
                 <div className="op-status-metric" key={status}>
                   <span>{adminText(status)}</span>
-                  <strong>—</strong>
+                  <strong>
+                    {orders.filter((o) => o.status === status).length}
+                  </strong>
                   <div>
                     <i
                       style={{
-                        width: "0%",
+                        width: `${(orders.filter((o) => o.status === status).length / Math.max(1, orders.length)) * 100}%`,
                       }}
                     />
                   </div>
@@ -123,7 +137,7 @@ export function OperationsOverview() {
             <MessageSquare size={16} />
             <span>
               Hoạt động trò chuyện{" "}
-              <small>Dữ liệu chưa khả dụng. · Mở trò chuyện</small>
+              <small>{unread} tin nhắn chưa đọc · Mở trò chuyện</small>
             </span>
             <ArrowUpRight size={16} />
           </Link>

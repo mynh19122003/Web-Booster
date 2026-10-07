@@ -26,7 +26,7 @@ import {
 } from "./Ui";
 export function StaffPage() {
   const { staff, user } = useAdminStore();
-  const load = useServiceLoad(staffService.getStaffList);
+  const load = useServiceLoad(staffService.getStaff);
   const notice = useNotice();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -36,7 +36,13 @@ export function StaffPage() {
   } | null>(null);
   if (user?.role !== "SUPER_ADMIN") return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const rows = staff.filter(
     (s) =>
       `${s.fullName} ${s.email}`.toLowerCase().includes(query.toLowerCase()) &&
@@ -59,11 +65,12 @@ export function StaffPage() {
       <div className="ap-inline-summary">
         <span>
           <Users size={17} />
-          <b>—</b> Thành viên đội ngũ{" "}
+          <b>{staff.length}</b> Thành viên đội ngũ{" "}
         </span>
         <span>
           <i className="ap-online" />
-          <b>—</b> Đang hoạt động{" "}
+          <b>{staff.filter((s) => s.status === "ACTIVE").length}</b> Đang hoạt
+          động{" "}
         </span>
         <span>
           <ShieldCheck size={17} /> Truy cập theo quyền hạn{" "}
@@ -78,7 +85,7 @@ export function StaffPage() {
           statuses={["ACTIVE", "SUSPENDED"]}
         />
         <DataTable
-          label="Nhân sự"
+          label="Nhân sự quản trị"
           rows={rows}
           columns={[
             {
@@ -143,7 +150,6 @@ export function StaffPage() {
       </section>
       {dialog && (
         <FormModal
-          disabled
           title={adminText(dialog.action)}
           description={`${dialog.member.fullName} · ${dialog.member.email}`}
           submit={
@@ -222,7 +228,13 @@ export function InvitationsPage({
   } | null>(null);
   if (user?.role !== "SUPER_ADMIN") return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const rows = invitations.filter(
     (i) =>
       `${i.email} ${i.fullName}`.toLowerCase().includes(query.toLowerCase()) &&
@@ -333,7 +345,6 @@ export function InvitationsPage({
       </section>
       {invite && (
         <FormModal
-          disabled
           title="Mời nhân sự mới"
           description="Thêm thành viên, nâng tiêu chuẩn. Chọn quyền truy cập bên dưới."
           submit="Gửi lời mời"
@@ -379,7 +390,6 @@ export function InvitationsPage({
       )}
       {dialog && (
         <FormModal
-          disabled
           title={adminText(dialog.action)}
           description={dialog.invitation.email}
           submit={

@@ -1,6 +1,6 @@
 "use client";
 
-import { adminError, adminText } from "@/lib/admin/vi";
+import { adminText } from "@/lib/admin/vi";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -32,11 +32,12 @@ import {
 } from "lucide-react";
 import { useAdminStore } from "@/lib/admin/store";
 import { adminNav } from "@/lib/admin/config";
+import { initializeAdminWorkspace } from "@/services/auth.service";
 import { adminAuthService } from "@/services/admin";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Avatar } from "./Ui";
 import { useOperations } from "@/lib/admin/operations-store";
-import { apiCapabilities } from "@/lib/api/endpoints";
+import { useOperationsHydration } from "@/lib/admin/use-operations";
 import { incomingStatuses } from "@/services/operations";
 import { can } from "@/services/admin";
 const Notice = createContext<(text: string) => void>(() => {});
@@ -56,6 +57,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, ready } = useAdminStore();
+  const operationsReady = useOperationsHydration();
   const {
     orders,
     conversations,
@@ -68,12 +70,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const publicPage =
     pathname === "/admin/login" || pathname === "/admin/accept-invitation";
   useEffect(() => {
-    if (publicPage) {
-      useAdminStore.getState().setReady();
-      return;
-    }
-    void adminAuthService.me().catch(() => {});
-  }, [publicPage]);
+    void initializeAdminWorkspace();
+  }, []);
   useEffect(() => {
     if (ready && !user && !publicPage) router.replace("/admin/login");
   }, [ready, user, publicPage, router]);
@@ -83,21 +81,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
       return () => clearTimeout(timeout);
     }
   }, [notice]);
-  const feature: keyof typeof apiCapabilities =
-    pathname.startsWith("/admin/orders") ||
-    pathname.startsWith("/admin/incoming-orders")
-      ? "orders"
-      : pathname.startsWith("/admin/staff")
-        ? "staff"
-        : pathname.startsWith("/admin/chat")
-          ? "chat"
-          : pathname.startsWith("/admin/assignments")
-            ? "assignments"
-            : pathname.startsWith("/admin/security")
-              ? "security"
-              : pathname === "/admin"
-                ? "dashboard"
-                : "auth";
   const active = [...adminNav]
     .reverse()
     .find(
@@ -105,7 +88,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         n.href === pathname ||
         (n.href !== "/admin" && pathname.startsWith(n.href + "/")),
     );
-  if (!publicPage && !ready)
+  if (!ready || !operationsReady)
     return (
       <div className="ap-loading" aria-label="Đang tải trang quản trị">
         <div className="ap-skeleton" />
@@ -179,7 +162,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             })}
           </nav>
           <div className="ap-sidebar-bottom">
-            <div className="ap-workspace-card">
+            <div className="ap-demo-card">
               <Zap size={18} />
               <strong>Nâng tầm vận hành.</strong>
               <p>
@@ -240,9 +223,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 {notifications && (
                   <div className="ap-notification-popover">
                     <strong>Thông báo quản trị</strong>
-                    {!operationNotifications.length && (
-                      <p>Chưa có thông báo. Dữ liệu chưa khả dụng.</p>
-                    )}
                     {operationNotifications
                       .filter((n) => can(n.scope))
                       .slice(0, 5)
@@ -282,12 +262,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   <Link href="/admin/profile">Hồ sơ cá nhân</Link>
                   <button
                     onClick={async () => {
-                      try {
-                        await adminAuthService.logout();
-                        router.push("/admin/login");
-                      } catch (error) {
-                        setNotice(adminError(error));
-                      }
+                      await adminAuthService.logout();
+                      router.push("/admin/login");
                     }}
                   >
                     <LogOut size={15} /> Đăng xuất{" "}
@@ -297,11 +273,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </div>
           </header>
           <div className="ap-content" key={pathname}>
-            {!apiCapabilities[feature] && (
-              <p className="ap-info-strip" role="status">
-                Dữ liệu chưa khả dụng.
-              </p>
-            )}
             {children}
           </div>
           <footer className="ap-workspace-footer">

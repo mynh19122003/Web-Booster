@@ -17,7 +17,11 @@ import type {
 } from "@/types/operations";
 
 export interface AuthService {
-  login(email: string, password: string): Promise<AdminUser>;
+  login(
+    email: string,
+    password: string,
+    role?: "owner" | "staff" | "viewer",
+  ): Promise<AdminUser>;
   me(): Promise<AdminUser | null>;
   logout(): Promise<void>;
   acceptInvitation(

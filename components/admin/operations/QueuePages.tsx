@@ -33,7 +33,13 @@ export function IncomingOrdersPage() {
   const load = useServiceLoad(orderService.getIncomingOrders);
   if (!allowed) return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const sections = [
     {
       title: "Đơn mới",
@@ -60,10 +66,9 @@ export function IncomingOrdersPage() {
       >
         <span className="ap-date">
           <Inbox size={16} />
-          {load.unavailable
-            ? "—"
-            : orders.filter((o) => incomingStatuses.includes(o.status))
-                .length}{" "}
+          {
+            orders.filter((o) => incomingStatuses.includes(o.status)).length
+          }{" "}
           đang chờ{" "}
         </span>
         <Link className="ap-button" href="/admin/orders">
@@ -85,9 +90,7 @@ export function IncomingOrdersPage() {
               <div className="op-lane-heading">
                 <h2>
                   {section.title}{" "}
-                  <span className="ap-count">
-                    {load.unavailable ? "—" : queue.length}
-                  </span>
+                  <span className="ap-count">{queue.length}</span>
                 </h2>
                 <p>{section.description}</p>
               </div>
@@ -129,8 +132,8 @@ export function IncomingOrdersPage() {
               {!queue.length && (
                 <div className="ap-panel">
                   <EmptyState
-                    title="Hiện chưa có dữ liệu đơn mới."
-                    text="Dữ liệu chưa khả dụng."
+                    title="Bạn đã xử lý hết."
+                    text="Hiện không có đơn mới chờ duyệt."
                   />
                 </div>
               )}
@@ -180,10 +183,7 @@ export function AssignmentsPage() {
             <section key={lane.title}>
               <div className="op-lane-heading">
                 <h2>
-                  {lane.title}{" "}
-                  <span className="ap-count">
-                    {load.unavailable ? "—" : items.length}
-                  </span>
+                  {lane.title} <span className="ap-count">{items.length}</span>
                 </h2>
               </div>
               {items.map((o) => {

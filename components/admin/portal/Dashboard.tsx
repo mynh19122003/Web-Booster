@@ -16,14 +16,27 @@ import {
 import { useAdminStore } from "@/lib/admin/store";
 import { getDashboardStats } from "@/services/admin";
 import { OperationsOverview } from "../operations/OperationsOverview";
-import { PageHeader, AdminStatCard, StatusBadge, ActivityTimeline } from "./Ui";
+import {
+  PageHeader,
+  AdminStatCard,
+  Avatar,
+  StatusBadge,
+  ActivityTimeline,
+  formatDate,
+} from "./Ui";
 export function Dashboard() {
-  const { user, invitations, activities } = useAdminStore();
+  const { user, staff, invitations, activities } = useAdminStore();
   const load = useServiceLoad(dashboardService.getDashboard);
   const stats = getDashboardStats();
   const owner = user?.role === "SUPER_ADMIN";
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   return (
     <>
       <PageHeader
@@ -53,7 +66,7 @@ export function Dashboard() {
       <div className="ap-stats">
         <AdminStatCard
           label="Nhân sự đang hoạt động"
-          value={stats.activeStaff}
+          value={owner ? stats.activeStaff : 1}
           note={
             owner ? "Duy trì hoạt động liên tục" : "Tài khoản nhân sự của bạn"
           }
@@ -62,7 +75,7 @@ export function Dashboard() {
         />
         <AdminStatCard
           label="Lời mời đang chờ"
-          value={stats.pendingInvitations}
+          value={owner ? stats.pendingInvitations : 0}
           note={
             owner
               ? "Đang chờ gia nhập đội ngũ"
@@ -94,6 +107,11 @@ export function Dashboard() {
             <ArrowRight size={16} />
           </Link>
           <div className="ap-spotlight-bottom">
+            <span className="ap-stack">
+              {staff.slice(0, 3).map((member) => (
+                <Avatar key={member.id} name={member.fullName} />
+              ))}
+            </span>
             <small>Một đội ngũ. Một tiêu chuẩn cao hơn.</small>
           </div>
         </section>
@@ -115,9 +133,6 @@ export function Dashboard() {
           </div>
           {owner ? (
             <div className="ap-invitation-list">
-              {!invitations.length && (
-                <p className="ap-panel-padding">Chưa có lời mời.</p>
-              )}
               {invitations.slice(0, 3).map((i) => (
                 <div key={i.id}>
                   <span className="ap-mail-icon">
@@ -181,7 +196,9 @@ export function Dashboard() {
           </span>
           <ArrowUpRight size={17} />
         </Link>
-        <span className="ap-updated">Dữ liệu chưa khả dụng.</span>
+        <span className="ap-updated">
+          Cập nhật gần nhất · {formatDate(load.data?.updatedAt ?? "")}
+        </span>
       </div>
     </>
   );

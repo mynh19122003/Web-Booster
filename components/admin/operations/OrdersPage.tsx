@@ -73,16 +73,6 @@ export function OrderTable({ orders }: { orders: Order[] }) {
           </tr>
         </thead>
         <tbody>
-          {!orders.length && (
-            <tr>
-              <td colSpan={11}>
-                <EmptyState
-                  title="Chưa có dữ liệu đơn hàng."
-                  text="Dữ liệu chưa khả dụng."
-                />
-              </td>
-            </tr>
-          )}
           {orders.map((o) => {
             const employee = employees.find((e) => e.id === o.employeeId);
             return (
@@ -155,7 +145,13 @@ export function OrdersPage() {
   }
   if (!allowed) return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const filtered = orders
     .filter((o) => {
       const employee =
@@ -230,7 +226,7 @@ export function OrdersPage() {
           <AdminStatCard
             key={s.label}
             label={s.label}
-            value={load.unavailable ? null : s.value}
+            value={s.value}
             icon={<s.icon size={18} />}
             note="Trong hệ thống"
             index={`0${i + 1}`}
@@ -357,19 +353,19 @@ export function OrdersPage() {
             </div>
           )}
         </div>
-        <OrderTable orders={visible} />
+        {visible.length ? (
+          <OrderTable orders={visible} />
+        ) : (
+          <EmptyState
+            title="Chưa có đơn hàng"
+            text="Không có đơn phù hợp bộ lọc. Hãy thử tìm kiếm khác."
+          />
+        )}
         <div className="ap-table-footer">
           <span>
-            {load.unavailable
-              ? "—"
-              : filtered.length
-                ? (currentPage - 1) * 6 + 1
-                : 0}
-            –
-            {load.unavailable
-              ? "—"
-              : Math.min(currentPage * 6, filtered.length)}{" "}
-            trên {load.unavailable ? "—" : filtered.length} đơn hàng{" "}
+            {filtered.length ? (currentPage - 1) * 6 + 1 : 0}–
+            {Math.min(currentPage * 6, filtered.length)} trên {filtered.length}{" "}
+            đơn hàng{" "}
           </span>
           <div className="op-pagination">
             <button
@@ -380,8 +376,7 @@ export function OrdersPage() {
               <ArrowLeft size={16} />
             </button>
             <span>
-              Trang {load.unavailable ? "—" : currentPage} trên{" "}
-              {load.unavailable ? "—" : totalPages}
+              Trang {currentPage} trên {totalPages}
             </span>
             <button
               aria-label="Trang sau"

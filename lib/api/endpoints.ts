@@ -30,13 +30,4 @@ export const adminEndpoints = {
   changePassword: "/auth/change-password",
   acceptInvitation: "/auth/accept-invitation",
 } as const;
-export const apiCapabilities = {
-  auth: true,
-  staff: false,
-  orders: false,
-  assignments: false,
-  chat: false,
-  dashboard: false,
-  security: false,
-  notifications: false,
-} as const;
+// Endpoint registry is preparation only; no Admin API adapter is connected.

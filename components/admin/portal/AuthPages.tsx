@@ -1,6 +1,5 @@
 "use client";
 
-import { useAdminStore } from "@/lib/admin/store";
 import { adminError } from "@/lib/admin/vi";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -68,8 +67,10 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
 }
 export function LoginPage({ changed = false }: { changed?: boolean }) {
   const router = useRouter();
-  const authError = useAdminStore((s) => s.authError);
-  const [email, setEmail] = useState("");
+  const [mode, setMode] = useState<"owner" | "staff" | "viewer">("owner");
+  const [email, setEmail] = useState(
+    () => adminAuthService.getLoginProfiles()[0]?.email ?? "",
+  );
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -80,7 +81,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
     setPending(true);
     setError("");
     try {
-      await adminAuthService.login(email, String(data.get("password")));
+      await adminAuthService.login(email, String(data.get("password")), mode);
       router.push("/admin");
     } catch (e) {
       setError(
@@ -103,18 +104,40 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
       <p className="ap-auth-description">
         Đăng nhập để quản lý đội ngũ và theo dõi hoạt động.{" "}
       </p>
-      {authError && (
-        <p className="ap-error" role="alert">
-          Chưa tải được thông tin tài khoản. {authError}
-        </p>
-      )}
       {changed && (
         <p className="ap-success">
           Đã cập nhật mật khẩu và thu hồi các phiên trước. Vui lòng đăng nhập
           lại.{" "}
         </p>
       )}
-
+      {adminAuthService.getLoginProfiles().length > 0 && (
+        <div className="ap-demo-switch">
+          <span>VAI TRÒ TRUY CẬP</span>
+          <div>
+            {(["owner", "staff", "viewer"] as const).map((m) => (
+              <button
+                type="button"
+                key={m}
+                className={mode === m ? "active" : ""}
+                onClick={() => {
+                  setMode(m);
+                  setEmail(
+                    adminAuthService
+                      .getLoginProfiles()
+                      .find((profile) => profile.role === m)?.email ?? "",
+                  );
+                }}
+              >
+                {m === "owner"
+                  ? "Quản trị viên cấp cao"
+                  : m === "staff"
+                    ? "Nhân sự quản trị"
+                    : "Nhân sự chỉ xem"}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <form onSubmit={login}>
         <Field label="Địa chỉ email">
           <input
@@ -133,7 +156,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
               name="password"
               minLength={8}
               required
-              placeholder="Nhập mật khẩu của bạn"
+              placeholder="Nhập mật khẩu, ít nhất 8 ký tự"
               autoComplete="current-password"
             />
             <button
@@ -146,7 +169,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
           </span>
         </Field>
         <div className="ap-login-help">
-          <span>Đăng nhập bằng tài khoản được cấp</span>
+          <span>Ghi nhớ phiên trong thẻ này</span>
           <button type="button" onClick={() => setHelp(!help)}>
             Quên mật khẩu?{" "}
           </button>
@@ -170,7 +193,7 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
 
       <div className="ap-auth-invitation">
         Bạn muốn gia nhập đội ngũ?{" "}
-        <Link href="/admin/accept-invitation">
+        <Link href={adminAuthService.getInvitationEntry()}>
           Chấp nhận lời mời <ArrowUpRight size={14} />
         </Link>
       </div>
@@ -211,8 +234,8 @@ export function AcceptInvitationPage({ token }: { token: string }) {
           <CheckCircle2 size={52} />
           <h2>Bạn đã gia nhập đội ngũ.</h2>
           <p>
-            Tài khoản đã sẵn sàng. Đăng nhập bằng thông tin tài khoản của
-            bạn.{" "}
+            Tài khoản đã sẵn sàng. Đăng nhập để truy cập không gian làm
+            việc.{" "}
           </p>
           <Link className="ap-button primary full" href="/admin/login">
             Tiếp tục đăng nhập <ArrowRight size={17} />

@@ -58,18 +58,17 @@ export function OrderDetail({ id }: { id: string }) {
   const notice = useNotice();
   if (!allowed) return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   const order = orders.find((o) => o.id === id);
   if (!order)
     return (
-      <ErrorPanel
-        error={
-          load.unavailable
-            ? "Không tìm thấy dữ liệu đơn hàng. Dữ liệu chưa khả dụng."
-            : "Không tìm thấy dữ liệu đơn hàng."
-        }
-        retry={load.retry}
-      />
+      <ErrorPanel error="Không tìm thấy đơn hàng này." retry={load.retry} />
     );
   const employee = employees.find((e) => e.id === order.employeeId);
   const history = assignments.filter((a) => a.orderId === id).toReversed();
@@ -345,7 +344,6 @@ export function OrderDetail({ id }: { id: string }) {
       </div>
       {dialog && (
         <FormModal
-          disabled
           title={
             dialog === "progress"
               ? "Cập nhật tiến độ hiện tại"

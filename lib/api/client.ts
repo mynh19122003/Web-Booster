@@ -11,6 +11,7 @@ export class ApiError extends Error {
 const messages: Record<number, string> = {
   401: "Phiên đăng nhập không hợp lệ hoặc đã hết hạn.",
   403: "Bạn không có quyền thực hiện thao tác này.",
+  409: "Dữ liệu đã thay đổi. Vui lòng tải lại trang.",
   404: "Không tìm thấy dữ liệu.",
   422: "Thông tin chưa hợp lệ. Vui lòng kiểm tra lại.",
   429: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",

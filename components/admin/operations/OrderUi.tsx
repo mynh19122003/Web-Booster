@@ -211,7 +211,6 @@ export function AssignStaffModal({
   );
   return (
     <FormModal
-      disabled
       className="op-assign-modal"
       title={
         order.employeeId
@@ -304,7 +303,7 @@ export function AssignStaffModal({
         ))}
         {!candidates.length && (
           <EmptyState
-            title="Không có dữ liệu nhân sự khả dụng."
+            title="Không tìm thấy nhân sự phù hợp"
             text="Điều chỉnh bộ lọc để xem thêm nhân sự."
           />
         )}
@@ -410,7 +409,6 @@ export function OrderActions({
       )}
       {action && action !== "assign" && (
         <FormModal
-          disabled
           title={`${labels[action]} #${order.id}?`}
           description={
             action === "cancel"

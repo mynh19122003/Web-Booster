@@ -1,3 +1,14 @@
-import { securityService as adapter } from "./admin";
+import { dataSource, selectDataSource } from "@/lib/admin/data-source";
+import { unavailable } from "@/lib/api/errors";
+import { mockSecurityService } from "./mock/admin.service";
 import type { SecurityService } from "./contracts";
-export const securityService = adapter satisfies SecurityService;
+const apiSecurityAdapter = {
+  getSecuritySessions: unavailable("security"),
+  getAuditActivities: unavailable("security"),
+  revokeSession: unavailable("security"),
+} satisfies SecurityService;
+export const securityService = selectDataSource<SecurityService>(
+  dataSource.security,
+  mockSecurityService,
+  apiSecurityAdapter,
+);

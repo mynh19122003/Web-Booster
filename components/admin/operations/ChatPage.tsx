@@ -33,9 +33,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   const send = usePermission("chat.send");
   const orderView = usePermission("order.view");
   const { conversations, messages, orders } = useOperations();
-  const [selected, setSelected] = useState(
-    () => conversations.find((c) => c.orderId === orderId)?.id ?? "",
-  );
+  const [selected, setSelected] = useState(orderId ? `chat-${orderId}` : "");
   const [channel, setChannel] = useState<"CUSTOMER" | "INTERNAL">("CUSTOMER");
   const [context, setContext] = useState(
     () =>
@@ -49,7 +47,8 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   const load = useServiceLoad(
     useCallback(async () => {
       await chatService.getConversations();
-    }, []),
+      if (orderId) await chatService.ensureOrderConversation(orderId);
+    }, [orderId]),
   );
   const messageLoad = useServiceLoad(
     useCallback(async () => {
@@ -80,7 +79,13 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
   }, [selected, channel, visible.length, messageLoad.loading]);
   if (!allowed) return <AccessDenied />;
   if (load.loading) return <LoadingPanel />;
-  if (load.error) return <ErrorPanel {...load} />;
+  if (load.error || load.unavailable)
+    return (
+      <ErrorPanel
+        error={load.error || "Dữ liệu chưa khả dụng."}
+        retry={load.retry}
+      />
+    );
   return (
     <>
       <PageHeader
@@ -90,7 +95,7 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       >
         <span className="ap-date">
           <MessageSquare size={16} />
-          {load.unavailable ? "—" : conversations
+          {conversations
             .filter((c) => !c.archived)
             .reduce((sum, c) => sum + c.unread, 0)}{" "}
           tin nhắn chưa đọc{" "}
@@ -244,13 +249,10 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
               />
             </>
           ) : (
-            <>
-              <EmptyState
-                title="Chưa có cuộc trò chuyện."
-                text="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
-              />
-              <ChatComposer channel={channel} />
-            </>
+            <EmptyState
+              title="Chọn cuộc trò chuyện để bắt đầu nhắn tin."
+              text="Câu hỏi của khách hàng, cập nhật của nhân sự và ghi chú nội bộ ở cùng một nơi."
+            />
           )}
         </section>
         {context && conversation && (
@@ -262,9 +264,8 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       </div>
       {customerOpen && order && orderView && (
         <FormModal
-          disabled
           title={order.customer.name}
-          description="Hồ sơ khách hàng · Dữ liệu từ máy chủ"
+          description="Hồ sơ khách hàng · Thông tin tài khoản"
           submit="Đóng"
           onClose={() => setCustomerOpen(false)}
           onSubmit={async () => {}}
@@ -287,7 +288,6 @@ export function ChatPage({ orderId = "" }: { orderId?: string }) {
       )}
       {archive && conversation && (
         <FormModal
-          disabled
           title={
             conversation.archived
               ? "Mở lại cuộc trò chuyện?"
