@@ -8,12 +8,7 @@ export const metadata = makeMetadata(
 export default function Page() {
   return (
     <>
-      <PageIntro
-        eyebrow="THE ASCEND ROSTER"
-        title="Talent meets ambition"
-        description="Meet our concept roster. These original profiles illustrate the future player selection experience."
-        path="/boosters"
-      />
+      <PageIntro pageKey="boosters" path="/boosters" />
     </>
   );
 }

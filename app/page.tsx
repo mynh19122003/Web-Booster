@@ -1,6 +1,6 @@
 import { Hero } from "@/components/home/Hero";
+import { HeroTrustRibbon } from "@/components/home/HeroTrustRibbon";
 import { GameServices } from "@/components/home/GameServices";
-import { ServiceConfigurator } from "@/components/home/ServiceConfigurator";
 import { OrderTracking } from "@/components/home/OrderTracking";
 import { FeatureShowcase } from "@/components/home/FeatureShowcase";
 import { TrophyBreak } from "@/components/home/TrophyBreak";
@@ -21,7 +21,6 @@ export default function Home() {
     <>
       <Hero />
       <GameServices />
-      <ServiceConfigurator />
       <OrderTracking />
       <FeatureShowcase />
       <TrophyBreak />

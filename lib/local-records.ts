@@ -20,6 +20,32 @@ export type Application = {
   status: ApplicationStatus;
 };
 export type ServiceRequest = {
+  lpGain?: string;
+  addOns?: string[];
+  pricingVersion?: string;
+  categoryName?: string;
+  quoteRequired?: boolean;
+  coachBooking?: {
+    coachId: string;
+    coachName: string;
+    coachSlug: string;
+    packageId?: string;
+    packageName?: string;
+    format: "hourly" | "duo";
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  };
+  accountPurchase?: {
+    accountId: string;
+    title: string;
+    game: string;
+    price: number;
+    server: string;
+    rank: string;
+    division?: string;
+    level: number;
+  };
   id: string;
   createdAt: string;
   name: string;
@@ -86,7 +112,14 @@ function validRequest(value: unknown) {
   return (
     object(value) &&
     common(value) &&
-    services.some((s) => s.slug === value.service) &&
+    (services.some((s) => s.slug === value.service) || value.service === "account-purchase") &&
+    (value.categoryName === undefined || typeof value.categoryName === "string") &&
+    (value.quoteRequired === undefined || typeof value.quoteRequired === "boolean") &&
+    (value.lpGain === undefined || typeof value.lpGain === "string") &&
+    (value.pricingVersion === undefined || typeof value.pricingVersion === "string") &&
+    (value.addOns === undefined || (Array.isArray(value.addOns) && value.addOns.length <= 20 && value.addOns.every(item => typeof item === "string"))) &&
+    (value.coachBooking === undefined || object(value.coachBooking)) &&
+    (value.accountPurchase === undefined || object(value.accountPurchase)) &&
     ["from", "to", "queue", "region", "role", "champions"].every(
       (k) => typeof value[k] === "string",
     ) &&
@@ -200,4 +233,7 @@ export function deleteRecord(kind: "applications" | "requests", id: string) {
       (r) => r.id !== id,
     ),
   );
+}
+export function getRequestById(id: string): ServiceRequest | undefined {
+  return readRequests().find((r) => r.id.toLowerCase() === id.toLowerCase());
 }

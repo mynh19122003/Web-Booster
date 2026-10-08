@@ -26,20 +26,38 @@ export function HeroScene({
   const path = usePathname();
   const sections = useRef<(HTMLElement | null)[]>([]);
   const bounds = useRef<{ top: number; height: number }[]>([]);
+  const anchorBounds = useRef<{ left: number; top: number; width: number; height: number } | null>(null);
+  const scrollY = useRef(0);
   useEffect(() => {
     sections.current = ["hero", "trophy", "final-cta"].map((id) =>
       document.getElementById(id),
     );
     const measure = () => {
+      scrollY.current = window.scrollY;
       bounds.current = sections.current.map((el) => {
         if (!el) return { top: Infinity, height: 0 };
         const rect = el.getBoundingClientRect();
         return { top: rect.top + window.scrollY, height: rect.height };
       });
+      const anchor = document.getElementById("hero-artifact-anchor");
+      if (anchor) {
+        const rect = anchor.getBoundingClientRect();
+        anchorBounds.current = {
+          left: rect.left,
+          top: rect.top + window.scrollY,
+          width: rect.width,
+          height: rect.height,
+        };
+      } else {
+        anchorBounds.current = null;
+      }
       invalidate();
     };
     const observer = new ResizeObserver(measure);
     observer.observe(document.body);
+    sections.current.forEach((el) => el && observer.observe(el));
+    const anchor = document.getElementById("hero-artifact-anchor");
+    if (anchor) observer.observe(anchor);
     measure();
     const move = (e: PointerEvent) => {
       pointer.current = {
@@ -49,18 +67,27 @@ export function HeroScene({
     };
     if (!mobile && !reduced)
       window.addEventListener("pointermove", move, { passive: true });
-    const onScroll = () => invalidate();
+    let scrollFrame = 0;
+    const onScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        scrollY.current = window.scrollY;
+        invalidate();
+      });
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     invalidate();
     return () => {
       observer.disconnect();
+      cancelAnimationFrame(scrollFrame);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("scroll", onScroll);
     };
   }, [path, mobile, reduced, invalidate]);
   useFrame(({ clock }) => {
     if (!root.current || !artifact.current) return;
-    const scroll = window.scrollY;
+    const scroll = scrollY.current;
     const index = bounds.current.findIndex(
       (r) => r.top - scroll < size.height && r.top + r.height - scroll > 0,
     );
@@ -73,9 +100,7 @@ export function HeroScene({
       top: bounds.current[index].top - scroll,
       height: bounds.current[index].height,
     };
-    const anchor = index === 0
-      ? document.getElementById("hero-artifact-anchor")?.getBoundingClientRect()
-      : undefined;
+    const anchor = index === 0 ? anchorBounds.current : undefined;
     const px = anchor ? anchor.left + anchor.width / 2 : mobile ? size.width * 0.55 : size.width * 0.745;
     const offset =
       index === 0
@@ -89,7 +114,7 @@ export function HeroScene({
           : mobile
             ? 460
             : rect.height * 0.5;
-    const py = anchor ? anchor.top + anchor.height / 2 : rect.top + offset;
+    const py = anchor ? anchor.top - scroll + anchor.height / 2 : rect.top + offset;
     root.current.position.set(
       (px / size.width - 0.5) * viewport.width,
       (0.5 - py / size.height) * viewport.height,

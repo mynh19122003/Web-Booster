@@ -11,5 +11,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
   const mode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
   const error = Array.isArray(params.error) ? params.error[0] : params.error;
-  return <AuthPanel initialMode={mode === "register" ? "register" : "login"} googleConfigured={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} error={error} />;
+  const next = Array.isArray(params.next) ? params.next[0] : params.next;
+  const returnTo = next?.startsWith("/") && !next.startsWith("//") && !next.includes("\\") ? next : "/";
+  return <AuthPanel initialMode={mode === "register" ? "register" : "login"} googleConfigured={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} error={error} returnTo={returnTo} />;
 }

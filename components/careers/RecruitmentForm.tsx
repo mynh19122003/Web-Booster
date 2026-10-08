@@ -1,11 +1,14 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { ArrowUpRight, CheckCircle2, RotateCcw } from "lucide-react";
 import { games } from "@/data/games";
 import { ranksFor } from "@/lib/service-options";
 import { addApplication } from "@/lib/local-records";
 import Link from "next/link";
+import { PhoneNumberField } from "@/components/ui/PhoneNumberField";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 const inputStyles =
   "w-full min-h-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-500 transition-all duration-200 hover:border-white/20 focus:border-[#FF9F3C] focus:ring-1 focus:ring-[#FF9F3C]/50 focus:outline-none";
@@ -13,13 +16,44 @@ const inputStyles =
 const labelStyles = "flex flex-col gap-2 text-xs font-semibold text-zinc-300";
 
 export function RecruitmentForm() {
+  const { language, t } = useLanguage();
+  const formId = useId();
   const [game, setGame] = useState(games[0].slug);
   const [savedId, setSavedId] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  function errorMessage(field: string) {
+    const messages: Record<string, [string, string]> = {
+      name: ["Enter your full name (at least 2 characters).", "Nhập họ tên (ít nhất 2 ký tự)."],
+      email: ["Enter a valid email address.", "Nhập địa chỉ email hợp lệ."],
+      rank: ["Choose your current rank.", "Chọn rank hiện tại của bạn."],
+      profile: ["Enter a complete link starting with https://.", "Nhập liên kết đầy đủ, bắt đầu bằng https://."],
+      consent: ["Please agree to the application review terms.", "Vui lòng đồng ý lưu thông tin để xét duyệt hồ sơ."],
+    };
+    const message = messages[field];
+    return message ? translateText(language, message[0], message[1]) : t("recruitmentInvalid");
+  }
+  function fieldError(field: string) {
+    return fieldErrors[field] && <span id={`${formId}-${field}-error`} className="recruitment-field-error">{fieldErrors[field]}</span>;
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+    const invalidFields: Record<string, string> = {};
+    form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea").forEach((field) => {
+      if (field.willValidate && !field.validity.valid && field.name !== "phone-national") invalidFields[field.name] = errorMessage(field.name);
+    });
+    const fullName = form.elements.namedItem("name") as HTMLInputElement;
+    if (fullName.value.trim().length < 2) invalidFields.name = errorMessage("name");
+    setFieldErrors(invalidFields);
+    if (!form.checkValidity() || Object.keys(invalidFields).length > 0) {
+      setError(translateText(language, "Please check the highlighted fields below.", "Vui lòng kiểm tra các trường được đánh dấu bên dưới."));
+      const firstInvalid = invalidFields.name ? fullName : form.querySelector<HTMLInputElement | HTMLSelectElement>(":invalid") ?? fullName;
+      firstInvalid.focus();
+      return;
+    }
     const values = new FormData(form);
     const name = String(values.get("name") || "").trim();
     const email = String(values.get("email") || "").trim();
@@ -34,9 +68,7 @@ export function RecruitmentForm() {
       !ranksFor(game).includes(rank) ||
       values.get("consent") !== "on"
     ) {
-      setError(
-        "Check your name, email and rank, confirm consent, and use a valid phone number if provided.",
-      );
+      setError(t("recruitmentInvalid"));
       return;
     }
     try {
@@ -60,9 +92,7 @@ export function RecruitmentForm() {
       setError("");
       form.reset();
     } catch {
-      setError(
-        "Your application could not be saved. Check browser storage and try again.",
-      );
+      setError(t("recruitmentStorageError"));
     }
   }
 
@@ -76,56 +106,67 @@ export function RecruitmentForm() {
           <CheckCircle2 size={32} />
         </div>
         <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          Application received
+          {t("recruitmentReceived")}
         </h3>
         <p className="text-sm text-zinc-300 max-w-md mb-6 leading-relaxed">
-          Application Reference:{" "}
+          {t("applicationReference")}{" "}
           <span className="font-mono text-[#FF9F3C] font-semibold">
             {savedId}
           </span>
-          . Our recruitment team reviews elite profiles within 24–48 hours.
+
         </p>
         <button
           type="button"
           className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#FF9F3C] hover:text-[#f8b15d] transition-colors py-2 px-4 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 cursor-pointer"
           onClick={() => setSavedId("")}
         >
-          <RotateCcw size={14} /> Submit another application
+          <RotateCcw size={14} /> {t("submitAnotherApplication")}
         </button>
       </div>
     );
 
   return (
-    <form className="space-y-6" onSubmit={submit}>
+    <form className="recruitment-form space-y-6" noValidate onInvalidCapture={(event) => event.preventDefault()} onSubmit={submit} onInput={(event) => {
+      const field = event.target as HTMLInputElement;
+      if (fieldErrors[field.name] && field.validity.valid && (field.name !== "name" || field.value.trim().length >= 2)) setFieldErrors((previous) => {
+        const next = { ...previous }; delete next[field.name]; return next;
+      });
+      if (error) setError("");
+    }}>
       <div>
         <h3 className="text-xl sm:text-2xl font-heading font-bold uppercase tracking-wider text-white mb-1.5">
-          Apply to join
+          {t("applyToJoin")}
         </h3>
         <p className="text-xs text-zinc-400">
-          Required fields are marked with an asterisk (*).
+          {t("requiredFields")}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         <label className={labelStyles}>
-          <span>Full name *</span>
+          <span>{t("fullNameRequired")}</span>
           <input
             name="name"
-            aria-label="Full name"
+            aria-invalid={Boolean(fieldErrors.name)}
+            aria-describedby={fieldErrors.name ? `${formId}-name-error` : undefined}
+            aria-label={t("fullName")}
             autoComplete="name"
-            placeholder="Your full name"
+            placeholder={t("yourFullName")}
             required
             minLength={2}
             maxLength={80}
             className={inputStyles}
           />
+          {fieldError("name")}
         </label>
 
         <label className={labelStyles}>
-          <span>Email *</span>
+          <span>{t("emailRequired")}</span>
           <input
             name="email"
-            aria-label="Email"
+            aria-invalid={Boolean(fieldErrors.email)}
+            aria-describedby={fieldErrors.email ? `${formId}-email-error` : undefined}
+            aria-label={t("emailAddress")}
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
@@ -133,13 +174,14 @@ export function RecruitmentForm() {
             maxLength={120}
             className={inputStyles}
           />
+          {fieldError("email")}
         </label>
 
         <label className={labelStyles}>
-          <span>Game *</span>
+          <span>{t("gameRequired")}</span>
           <select
             name="game"
-            aria-label="Game"
+            aria-label={t("games")}
             value={game}
             onChange={(e) => setGame(e.target.value)}
             className={`${inputStyles} cursor-pointer [&>option]:bg-[#121316]/95 backdrop-blur-2xl [&>option]:text-white`}
@@ -153,17 +195,19 @@ export function RecruitmentForm() {
         </label>
 
         <label className={labelStyles}>
-          <span>Current rank *</span>
+          <span>{t("currentRankRequired")}</span>
           <select
             name="rank"
-            aria-label="Current rank"
+            aria-invalid={Boolean(fieldErrors.rank)}
+            aria-describedby={fieldErrors.rank ? `${formId}-rank-error` : undefined}
+            aria-label={t("currentRankRequired")}
             key={game}
             required
             defaultValue=""
             className={`${inputStyles} cursor-pointer [&>option]:bg-[#121316]/95 backdrop-blur-2xl [&>option]:text-white`}
           >
             <option value="" disabled className="text-zinc-600">
-              Select your rank
+              {t("selectYourRank")}
             </option>
             {ranksFor(game).map((rank) => (
               <option key={rank} value={rank}>
@@ -171,73 +215,59 @@ export function RecruitmentForm() {
               </option>
             ))}
           </select>
+          {fieldError("rank")}
         </label>
 
         <label className={labelStyles}>
           <div className="flex items-center justify-between">
-            <span>Availability</span>
+            <span>{t("availability")}</span>
             <span className="text-[11px] font-normal text-zinc-500">
-              Optional
+              {t("optional")}
             </span>
           </div>
           <input
             name="availability"
-            aria-label="Availability"
-            placeholder="e.g. Weekday evenings, UTC+7"
+            aria-label={t("availability")}
+            placeholder={t("availabilityExample")}
             maxLength={160}
             className={inputStyles}
           />
         </label>
 
-        <label className={labelStyles}>
-          <div className="flex items-center justify-between">
-            <span>Phone number</span>
-            <span className="text-[11px] font-normal text-zinc-500">
-              Optional
-            </span>
-          </div>
-          <input
-            name="phone"
-            aria-label="Phone number"
-            type="tel"
-            autoComplete="tel"
-            placeholder="+84 ..."
-            pattern="[+0-9\s().\-]{7,25}"
-            minLength={7}
-            maxLength={25}
-            className={inputStyles}
-          />
-        </label>
+        <PhoneNumberField />
 
         <label className={`${labelStyles} sm:col-span-2`}>
           <div className="flex items-center justify-between">
-            <span>Player profile</span>
+            <span>{t("playerProfile")}</span>
             <span className="text-[11px] font-normal text-zinc-500">
-              Optional
+              {t("optional")}
             </span>
           </div>
           <input
             name="profile"
-            aria-label="Player profile"
+            aria-invalid={Boolean(fieldErrors.profile)}
+            aria-describedby={fieldErrors.profile ? `${formId}-profile-error` : undefined}
+            aria-label={t("playerProfile")}
             type="url"
             placeholder="https://tracker.gg/... or op.gg/..."
             maxLength={500}
             className={inputStyles}
           />
+          {fieldError("profile")}
         </label>
 
         <label className={`${labelStyles} sm:col-span-2`}>
           <div className="flex items-center justify-between">
-            <span>Experience</span>
+            <span>{t("experience")}</span>
             <span className="text-[11px] font-normal text-zinc-500">
-              Optional
+              {t("optional")}
             </span>
           </div>
           <textarea
             name="message"
-            aria-label="Experience"
+            aria-label={t("experience")}
             rows={3}
-            placeholder="Tell us about your competitive background, rank achievements, or coaching history"
+            placeholder={t("experienceHint")}
             maxLength={1200}
             className={`${inputStyles} min-h-[112px] resize-y`}
           />
@@ -248,28 +278,31 @@ export function RecruitmentForm() {
         <input
           type="checkbox"
           name="consent"
-          aria-label="I agree to save my details for application review"
+          aria-invalid={Boolean(fieldErrors.consent)}
+          aria-describedby={fieldErrors.consent ? `${formId}-consent-error` : undefined}
+          aria-label={t("recruitmentConsent")}
           required
-          className="w-4 h-4 min-w-[16px] min-h-[16px] flex-shrink-0 cursor-pointer appearance-none rounded border border-white/20 bg-black/40 checked:border-[#FF9F3C] checked:bg-[#FF9F3C] checked:bg-[url('data:image/svg+xml,%3Csvg_viewBox=%270_0_16_16%27_fill=%27none%27_xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath_d=%27m3_8_3_3_7-7%27_stroke=%27%23000%27_stroke-width=%272%27_stroke-linecap=%27round%27_stroke-linejoin=%27round%27/%3E%3C/svg%3E')] transition-all focus:ring-1 focus:ring-[#FF9F3C]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF9F3C]"
+          className="form-checkbox"
         />
         <span>
-          I agree to save my details for application review. * Read our{" "}
+          {t("recruitmentConsent")}{" "}
           <Link
             href="/legal/privacy"
             className="text-zinc-200 underline hover:text-[#FF9F3C] transition-colors"
           >
-            Privacy Policy
+            {t("privacyPolicy")}
           </Link>
           .
         </span>
       </label>
+      {fieldError("consent")}
 
       <div className="pt-2">
         <button
           type="submit"
-          className="h-[52px] px-8 rounded-xl flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-[#FF9F3C] via-[#F59E0B] to-[#D97706] text-black font-heading font-extrabold uppercase tracking-wider shadow-[0_0_25px_rgba(255,159,60,0.35)] hover:shadow-[0_0_35px_rgba(255,159,60,0.5)] hover:brightness-110 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+          className="recruitment-submit"
         >
-          <span>Submit application</span>
+          <span>{t("submitApplication")}</span>
           <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
         </button>
       </div>

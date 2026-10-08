@@ -1,3 +1,4 @@
+import { UiText } from "@/components/ui/UiText";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { metadata } from "@/lib/seo";
@@ -125,7 +126,7 @@ export default async function Page({ params }: PageProps<"/legal/[slug]">) {
         path={`/legal/${slug}`}
       />
       <article className="container prose section">
-        <p className="policy-updated">Demo policy · Last updated October 4, 2026</p>
+        <p className="policy-updated"><UiText english={"Demo policy · Last updated October 4, 2026"} /></p>
         {document.sections.map((section) => (
           <section key={section.title}>
             <h2>{section.title}</h2>

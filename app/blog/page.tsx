@@ -1,3 +1,4 @@
+import { UiText } from "@/components/ui/UiText";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { articles } from "@/data/articles";
@@ -11,12 +12,7 @@ export const metadata = makeMetadata(
 export default function Page() {
   return (
     <>
-      <PageIntro
-        eyebrow="INSIGHTS / THE PLAYBOOK"
-        title="Play with intention"
-        description="Small ideas for a better climb. Original articles on focus, practice, and teamplay."
-        path="/blog"
-      />
+      <PageIntro pageKey="blog" path="/blog" />
       <div className="container article-grid section">
         {articles.map((a, i) => (
           <Link className="article-card" href={`/blog/${a.slug}`} key={a.slug}>
@@ -24,10 +20,9 @@ export default function Page() {
               <span>0{i + 1}</span>
               <ArrowUpRight size={60} />
             </div>
-            <p className="eyebrow">{a.category} · 2 MIN READ</p>
+            <p className="eyebrow">{a.category}<UiText english={"· 2 MIN READ"} /></p>
             <h2>{a.title}</h2>
-            <span className="text-link">
-              Read the story <ArrowUpRight size={17} />
+            <span className="text-link"><UiText english={"Read the story"} /><ArrowUpRight size={17} />
             </span>
           </Link>
         ))}

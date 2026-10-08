@@ -1,28 +1,33 @@
+"use client";
+
+import { useLanguage } from "@/components/ui/LanguageProvider";
+
 export function HowItWorks() {
+  const { t } = useLanguage();
   return (
     <section id="how-it-works" className="section steps">
-      <div className="container">
-        <p className="eyebrow">LESS FRICTION. MORE PROGRESSION.</p>
+      <div className="site-container">
+        <p className="eyebrow">{t("stepsEyebrow")}</p>
         <h2>
-          Three steps. <span className="muted">One direction.</span>
+          {t("stepsLead")} <span className="muted">{t("stepsFinish")}</span>
         </h2>
         <div className="steps-grid">
           <div className="step-line" />
           {[
             [
               "01",
-              "Choose your arena",
-              "Find your game. Discover what’s possible.",
+              t("stepOne"),
+              t("stepOneDescription"),
             ],
             [
               "02",
-              "Make it personal",
-              "Choose your ranks, region, and the way you play.",
+              t("stepTwo"),
+              t("stepTwoDescription"),
             ],
             [
               "03",
-              "Enjoy the climb",
-              "Track match progress live while our elite pros secure your wins.",
+              t("stepThree"),
+              t("stepThreeDescription"),
             ],
           ].map(([n, title, text]) => (
             <article key={n}>

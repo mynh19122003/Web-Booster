@@ -39,9 +39,7 @@ export default function SocialImage() {
         <span>YOUR GAME.</span>
         <span style={{ color: "#ff984e" }}>YOUR RISE.</span>
       </div>
-      <div style={{ display: "flex", fontSize: 24, color: "#a6a6ae" }}>
-        A higher standard of play.
-      </div>
+      <div style={{ display: "flex", fontSize: 24, color: "#a6a6ae" }}>A higher standard of play.</div>
       <div
         style={{
           display: "flex",

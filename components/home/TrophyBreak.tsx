@@ -1,20 +1,25 @@
+"use client";
+
+import { useLanguage } from "@/components/ui/LanguageProvider";
+
 export function TrophyBreak() {
+  const { t } = useLanguage();
   return (
     <section className="trophy-break" id="trophy">
-      <div className="container">
-        <p className="eyebrow">EVERY GREAT CLIMB STARTS WITH BELIEF.</p>
+      <div className="site-container">
+        <p className="eyebrow">{t("trophyEyebrow")}</p>
         <h2>
-          BUILT TO
+          {t("trophyLead")}
           <br />
-          <span className="muted">GO BEYOND.</span>
+          <span className="muted">{t("trophyFinish")}</span>
         </h2>
         <p>
-          Piece by piece. Match by match.
+          {t("trophyDescription")}
           <br />
-          Become the player you know you can be.
+          {t("trophyDescriptionEnd")}
         </p>
         <span className="trophy-caption">
-          THE ASCEND ARTIFACT / ASSEMBLY SEQUENCE
+          {t("trophyCaption")}
         </span>
       </div>
     </section>

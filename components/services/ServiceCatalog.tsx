@@ -11,6 +11,9 @@ import {
 import { games } from "@/data/games";
 import { useStore } from "@/store/useStore";
 import { servicesFor } from "@/lib/service-options";
+import type { ServiceSlug } from "@/lib/service-options";
+import { serviceCopyFor } from "@/data/service-copy";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 const icons = {
   "rank-boost": Trophy,
   "duo-boost": Users,
@@ -18,6 +21,7 @@ const icons = {
   placements: Target,
 };
 export function ServiceCatalog() {
+  const { language, t } = useLanguage();
   const game = useStore((s) => s.game);
   const set = useStore((s) => s.set);
   const selected = games.find((g) => g.slug === game) ?? games[0];
@@ -27,13 +31,13 @@ export function ServiceCatalog() {
         <div
           className="catalog-tabs"
           role="group"
-          aria-label="Choose your game"
+          aria-label={t("chooseYourGame")}
         >
           {games.map((g) => (
             <button
               key={g.slug}
               aria-pressed={game === g.slug}
-              onClick={() => set({ game: g.slug })}
+              onClick={() => set({ game: g.slug, product: null, checkoutDetails: null, quoteOverride: null })}
             >
               {g.name}
             </button>
@@ -53,16 +57,17 @@ export function ServiceCatalog() {
         <div className="catalog-grid">
           {servicesFor(game).map((s) => {
             const Icon = icons[s.slug as keyof typeof icons];
+            const copy = serviceCopyFor(language, s.slug as ServiceSlug);
             return (
               <article className="catalog-item" key={s.slug}>
                 <Icon size={25} />
-                <h3>{s.name}</h3>
-                <p>{s.description}</p>
+                <h3>{copy.name}</h3>
+                <p>{copy.description}</p>
                 <Link
                   className="text-link"
                   href={`/services/${s.slug}?game=${game}#configure`}
                 >
-                  Configure service <ArrowUpRight size={17} />
+                  {t("configureService")} <ArrowUpRight size={17} />
                 </Link>
               </article>
             );

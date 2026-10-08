@@ -1,4 +1,6 @@
 "use client";
+import { UiText } from "@/components/ui/UiText";
+
 import { useEffect, useState } from "react";
 export function InitialLoader() {
   const [loading, setLoading] = useState(true);
@@ -13,8 +15,6 @@ export function InitialLoader() {
   }, []);
   return loading ? (
     <div className="scene-loader" role="status">
-      <span />
-      ASCEND / INITIALIZING
-    </div>
+      <span /><UiText english={"ASCEND / INITIALIZING"} /></div>
   ) : null;
 }

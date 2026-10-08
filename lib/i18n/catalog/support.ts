@@ -1,0 +1,38 @@
+export const supportMessages = {
+  en: {
+    supportDraftTitle: "Draft a support request.",
+    supportDraftDescription: "This form validates your request locally. No message is sent.",
+    yourEmail: "Your email",
+    howCanHelp: "How can we help?",
+    supportQuestionHint: "Tell us a little about your question…",
+    sendMessage: "Send message",
+    supportDraftSaved: "Your request was validated locally. No message was sent.",
+  },
+  vi: {
+    supportDraftTitle: "Soạn yêu cầu hỗ trợ.",
+    supportDraftDescription: "Biểu mẫu chỉ kiểm tra yêu cầu trên trình duyệt. Không có tin nhắn nào được gửi.",
+    yourEmail: "Email của bạn",
+    howCanHelp: "Chúng tôi có thể giúp gì?",
+    supportQuestionHint: "Mô tả ngắn câu hỏi của bạn…",
+    sendMessage: "Gửi tin nhắn",
+    supportDraftSaved: "Yêu cầu đã được kiểm tra trên trình duyệt. Không có tin nhắn nào được gửi.",
+  },
+  zh: {
+    supportDraftTitle: "拟写支持请求。",
+    supportDraftDescription: "此表单仅在浏览器中验证内容，不会发送消息。",
+    yourEmail: "你的邮箱",
+    howCanHelp: "需要什么帮助？",
+    supportQuestionHint: "简要描述你的问题…",
+    sendMessage: "发送消息",
+    supportDraftSaved: "请求已在本地验证，没有发送任何消息。",
+  },
+  ko: {
+    supportDraftTitle: "지원 요청 작성",
+    supportDraftDescription: "이 양식은 브라우저에서만 내용을 확인하며 메시지를 보내지 않습니다.",
+    yourEmail: "이메일",
+    howCanHelp: "어떤 도움이 필요하신가요?",
+    supportQuestionHint: "질문을 간단히 알려주세요…",
+    sendMessage: "메시지 보내기",
+    supportDraftSaved: "요청이 브라우저에서 확인되었습니다. 메시지는 전송되지 않았습니다.",
+  },
+} as const;

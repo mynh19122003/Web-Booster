@@ -9,8 +9,10 @@ import {
   Send,
   Check,
 } from "lucide-react";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 export function FeatureShowcase() {
+  const { t } = useLanguage();
   const [offline, setOffline] = useState(true);
   const [reward, setReward] = useState(0);
   const [chat, setChat] = useState(false);
@@ -24,18 +26,18 @@ export function FeatureShowcase() {
         aria-hidden="true"
       />
 
-      <div className="container relative z-10">
+      <div className="site-container relative z-10">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow text-[#FF9F3C]">WHY PLAYERS CHOOSE ASCEND</p>
+            <p className="eyebrow text-[#FF9F3C]">{t("featureEyebrow")}</p>
             <h2>
-              More than <span className="muted">a service.</span>
+              {t("featureLead")} <span className="muted">{t("featureFinish")}</span>
             </h2>
           </div>
           <p>
-            Enterprise security, verified elite players,
+            {t("featureDescription")}
             <br />
-            and dedicated support on every order.
+            {t("featureDescriptionEnd")}
           </p>
         </div>
 
@@ -47,15 +49,15 @@ export function FeatureShowcase() {
                 <Headphones size={20} />
               </div>
               <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                24/7 Live Support
+                {t("liveSupport")}
               </h3>
               <div className="space-y-2.5 mb-5 min-h-[110px] flex flex-col justify-center">
                 <div className="self-start max-w-[90%] rounded-xl rounded-tl-sm bg-white/[0.04] border border-white/5 p-3 text-xs text-zinc-300 leading-relaxed">
-                  Hey! Ready for your next level?
+                  {t("chatGreeting")}
                 </div>
                 {chat && (
                   <div className="self-end max-w-[90%] ml-auto rounded-xl rounded-tr-sm bg-[#FF9F3C]/10 border border-[#FF9F3C]/20 p-3 text-xs text-[#F5D7A1] leading-relaxed animate-fadeIn">
-                    Absolutely. Let’s make a plan.
+                    {t("chatReply")}
                   </div>
                 )}
               </div>
@@ -67,7 +69,7 @@ export function FeatureShowcase() {
                 onClick={() => setChat(!chat)}
                 className="w-full flex items-center justify-between bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2 text-xs text-zinc-300 hover:text-white transition-all group/btn cursor-pointer"
               >
-                <span>{chat ? "Reset chat" : "Test live chat"}</span>
+                <span>{chat ? t("resetChat") : t("testChat")}</span>
                 <Send
                   size={13}
                   className="text-zinc-500 group-hover/btn:text-[#FF9F3C] transition-colors"
@@ -83,7 +85,7 @@ export function FeatureShowcase() {
                 <EyeOff size={20} />
               </div>
               <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                Offline & VPN Privacy
+                {t("privacy")}
               </h3>
               <div className="min-h-[110px] flex flex-col justify-center gap-3 mb-5">
                 <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-white/5">
@@ -96,14 +98,14 @@ export function FeatureShowcase() {
                       }`}
                     />
                     <strong className="text-xs font-semibold text-white">
-                      {offline ? "Invisible mode" : "Visible mode"}
+                      {offline ? t("invisibleMode") : t("visibleMode")}
                     </strong>
                   </div>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={offline}
-                    aria-label="Invisible mode toggle"
+                    aria-label={t("invisibleMode")}
                     onClick={() => setOffline(!offline)}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                       offline ? "bg-[#FF9F3C]" : "bg-white/10"
@@ -117,7 +119,7 @@ export function FeatureShowcase() {
                   </button>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  Boosters play in offline presence mode so your friend list sees no activity.
+                  {t("privacyDescription")}
                 </p>
               </div>
             </div>
@@ -130,7 +132,7 @@ export function FeatureShowcase() {
                 <Activity size={20} />
               </div>
               <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                Live Match Tracking
+                {t("liveTracking")}
               </h3>
               <div className="min-h-[110px] flex flex-col justify-center mb-5">
                 <button
@@ -160,8 +162,8 @@ export function FeatureShowcase() {
                   </div>
                   <small className="text-[11px] text-zinc-400 group-hover/prog:text-zinc-200 transition-colors">
                     {progress === 100
-                      ? "Order complete · Reset"
-                      : "Simulate live game progress →"}
+                      ? t("completeReset")
+                      : t("simulateProgress")}
                   </small>
                 </button>
               </div>
@@ -175,7 +177,7 @@ export function FeatureShowcase() {
                 <Gift size={20} />
               </div>
               <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                Cashback & Rewards
+                {t("rewards")}
               </h3>
               <div className="min-h-[110px] flex flex-col justify-center mb-5">
                 <button
@@ -189,10 +191,10 @@ export function FeatureShowcase() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="inline-block px-2 py-0.5 rounded text-[10px] font-heading font-bold tracking-wider uppercase bg-[#FF9F3C]/10 text-[#FF9F3C] border border-[#FF9F3C]/30 mb-1">
-                      {["BRONZE", "GOLD", "ELITE"][reward]} CASHBACK
+                      {["BRONZE", "GOLD", "ELITE"][reward]} {t("cashback")}
                     </span>
                     <small className="block text-[11px] text-zinc-400 group-hover/rew:text-zinc-200 transition-colors">
-                      Tap to switch tier →
+                      {t("switchTier")}
                     </small>
                   </div>
                 </button>
