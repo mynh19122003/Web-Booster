@@ -1,4 +1,8 @@
 "use client";
+import { useLanguage } from "@/components/ui/LanguageProvider";
+import { intlLocales, translateText } from "@/lib/i18n";
+import { UiText } from "@/components/ui/UiText";
+
 import Link from "next/link";
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import {
@@ -58,10 +62,11 @@ function gameName(slug: string) {
 function serviceName(slug: string) {
   return services.find((s) => s.slug === slug)?.name || slug;
 }
-function date(value: string) {
-  return new Date(value).toLocaleDateString("en-GB");
+function date(value: string, locale = "en-GB") {
+  return new Date(value).toLocaleDateString(locale);
 }
 export function AdminDashboard() {
+  const { language } = useLanguage();
   const applications = useApplications();
   const requests = useRequests();
   const staff = useStaff();
@@ -139,8 +144,8 @@ export function AdminDashboard() {
         <Link href="/" className="admin-brand flex items-center gap-2">
           <AscendLogo variant="horizontal" size="sm" showTagline={false} />
         </Link>
-        <span className="admin-caption">WORKSPACE</span>
-        <nav aria-label="Admin navigation">
+        <span className="admin-caption"><UiText english={"WORKSPACE"} /></span>
+        <nav aria-label={translateText(language, "Admin navigation")}>
           {(
             [
               { id: "overview", label: "Overview", Icon: LayoutDashboard },
@@ -159,7 +164,7 @@ export function AdminDashboard() {
               onClick={() => navigate(id)}
             >
               <Icon size={18} />
-              {label}
+              <UiText english={label} />
               <span>
                 {id === "applications"
                   ? applications.length
@@ -170,13 +175,12 @@ export function AdminDashboard() {
             </button>
           ))}
         </nav>
-        <Link href="/" className="admin-back">
-          View website <ArrowUpRight size={16} />
+        <Link href="/" className="admin-back"><UiText english={"View website"} /><ArrowUpRight size={16} />
         </Link>
       </aside>
       <div className="admin-content">
         <header className="admin-topbar">
-          <span>Admin / {title}</span>
+          <span><UiText english={"Admin /"} /><UiText english={title} /></span>
           <div>
             <button className="admin-theme-toggle" type="button" onClick={toggleTheme} aria-label={darkMode ? "Use light mode" : "Use dark mode"} title={darkMode ? "Light mode" : "Dark mode"}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button>
           </div>
@@ -185,46 +189,44 @@ export function AdminDashboard() {
           <div className="admin-heading">
             <div>
               <h1>{title}</h1>
-              <p>Manage applications, requests and your team.</p>
+              <p><UiText english={"Manage applications, requests and your team."} /></p>
             </div>
             <button
               className="admin-button"
               onClick={exportData}
-              title="Export records as JSON"
+              title={translateText(language, "Export records as JSON")}
             >
-              <Download size={16} />
-              Export
-            </button>
+              <Download size={16} /><UiText english={"Export"} /></button>
           </div>
           {tab === "staff" ? (
             <section className="admin-staff-panel">
-              <div className="admin-section-heading"><div><h2>Team members</h2><p>Assign requests without sharing customer game credentials.</p></div></div>
-              <div className="staff-metrics"><div><span>Total staff</span><strong>{staff.length}</strong></div><div><span>Admins</span><strong>{staff.filter((member) => member.role === "admin").length}</strong></div><div><span>Employees</span><strong>{staff.filter((member) => member.role === "employee").length}</strong></div></div>
+              <div className="admin-section-heading"><div><h2><UiText english={"Team members"} /></h2><p><UiText english={"Assign requests without sharing customer game credentials."} /></p></div></div>
+              <div className="staff-metrics"><div><span><UiText english={"Total staff"} /></span><strong>{staff.length}</strong></div><div><span><UiText english={"Admins"} /></span><strong>{staff.filter((member) => member.role === "admin").length}</strong></div><div><span><UiText english={"Employees"} /></span><strong>{staff.filter((member) => member.role === "employee").length}</strong></div></div>
               <form className="staff-form" onSubmit={(event) => { event.preventDefault(); if (!staffName.trim() || !staffEmail.trim()) return; if (editingStaff) updateStaff(editingStaff, { name: staffName.trim(), email: staffEmail.trim(), role: staffRole }); else addStaff({ name: staffName.trim(), email: staffEmail.trim(), role: staffRole }); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); setEditingStaff(null); setNotice(editingStaff ? "Staff member updated." : "Staff member added."); }}>
-                <input aria-label="Staff name" value={staffName} onChange={(event) => setStaffName(event.target.value)} placeholder="Full name" required />
-                <input aria-label="Staff email" type="email" value={staffEmail} onChange={(event) => setStaffEmail(event.target.value)} placeholder="Email address" required />
-                <select aria-label="Staff role" value={staffRole} onChange={(event) => setStaffRole(event.target.value as StaffRole)}><option value="employee">Employee</option><option value="admin">Admin</option></select>
-                <button className="admin-button" type="submit">{editingStaff ? "Save changes" : <><Plus size={16} /> Add staff</>}</button>
+                <input aria-label={translateText(language, "Staff name")} value={staffName} onChange={(event) => setStaffName(event.target.value)} placeholder={translateText(language, "Full name")} required />
+                <input aria-label={translateText(language, "Staff email")} type="email" value={staffEmail} onChange={(event) => setStaffEmail(event.target.value)} placeholder={translateText(language, "Email address")} required />
+                <select aria-label={translateText(language, "Staff role")} value={staffRole} onChange={(event) => setStaffRole(event.target.value as StaffRole)}><option value="employee"><UiText english={"Employee"} /></option><option value="admin"><UiText english={"Admin"} /></option></select>
+                <button className="admin-button" type="submit">{editingStaff ? "Save changes" : <><Plus size={16} /><UiText english={"Add staff"} /></>}</button>
               </form>
-              <div className="staff-list">{staff.map((member) => <div className="staff-row" key={member.id}><span className="user-avatar">{member.name.charAt(0).toUpperCase()}</span><span><strong>{member.name}</strong><small>{member.email} · {member.role}</small></span><div className="staff-actions"><button type="button" aria-label={`Edit ${member.name}`} title="Edit staff member" onClick={() => { setEditingStaff(member.id); setStaffName(member.name); setStaffEmail(member.email); setStaffRole(member.role); }}><Pencil size={15} /></button><button type="button" aria-label={`Delete ${member.name}`} title="Delete staff member" disabled={member.id === "staff-admin"} onClick={() => { if (window.confirm(`Delete ${member.name}?`)) { deleteStaff(member.id); setNotice("Staff member deleted."); } }}><Trash2 size={15} /></button></div></div>)}</div>
-              {editingStaff && <button className="text-link" type="button" onClick={() => { setEditingStaff(null); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); }}>Cancel editing</button>}
+              <div className="staff-list">{staff.map((member) => <div className="staff-row" key={member.id}><span className="user-avatar">{member.name.charAt(0).toUpperCase()}</span><span><strong>{member.name}</strong><small>{member.email} · {member.role}</small></span><div className="staff-actions"><button type="button" aria-label={`Edit ${member.name}`} title={translateText(language, "Edit staff member")} onClick={() => { setEditingStaff(member.id); setStaffName(member.name); setStaffEmail(member.email); setStaffRole(member.role); }}><Pencil size={15} /></button><button type="button" aria-label={`Delete ${member.name}`} title={translateText(language, "Delete staff member")} disabled={member.id === "staff-admin"} onClick={() => { if (window.confirm(`Delete ${member.name}?`)) { deleteStaff(member.id); setNotice("Staff member deleted."); } }}><Trash2 size={15} /></button></div></div>)}</div>
+              {editingStaff && <button className="text-link" type="button" onClick={() => { setEditingStaff(null); setStaffName(""); setStaffEmail(""); setStaffRole("employee"); }}><UiText english={"Cancel editing"} /></button>}
             </section>
           ) : tab === "overview" ? (
             <>
               <div className="admin-metrics">
                 <div>
                   <ClipboardList size={21} />
-                  <span>Service requests</span>
+                  <span><UiText english={"Service requests"} /></span>
                   <strong>{requests.length}</strong>
                 </div>
                 <div>
                   <Users size={21} />
-                  <span>Applications</span>
+                  <span><UiText english={"Applications"} /></span>
                   <strong>{applications.length}</strong>
                 </div>
                 <div>
                   <CheckCircle2 size={21} />
-                  <span>Needs review</span>
+                  <span><UiText english={"Needs review"} /></span>
                   <strong>
                     {requests.filter((r) => r.status === "New").length +
                       applications.filter((a) => a.status === "New").length}
@@ -234,9 +236,8 @@ export function AdminDashboard() {
               <div className="admin-overview">
                 <section>
                   <div className="admin-section-heading">
-                    <h2>Recent service requests</h2>
-                    <button onClick={() => navigate("requests")}>
-                      View all <ArrowUpRight size={15} />
+                    <h2><UiText english={"Recent service requests"} /></h2>
+                    <button onClick={() => navigate("requests")}><UiText english={"View all"} /><ArrowUpRight size={15} />
                     </button>
                   </div>
                   {requests.length ? (
@@ -252,24 +253,22 @@ export function AdminDashboard() {
                             {gameName(r.game)} · {serviceName(r.service)}
                           </small>
                         </span>
-                        <span className="record-status">{r.status}</span>
+                        <span className="record-status"><UiText english={r.status} /></span>
                       </button>
                     ))
                   ) : (
                     <div className="admin-empty">
                       <ClipboardList size={30} />
-                      <h3>No service requests yet</h3>
-                      <Link href="/services">
-                        Browse services <ArrowUpRight size={15} />
+                      <h3><UiText english={"No service requests yet"} /></h3>
+                      <Link href="/services"><UiText english={"Browse services"} /><ArrowUpRight size={15} />
                       </Link>
                     </div>
                   )}
                 </section>
                 <section>
                   <div className="admin-section-heading">
-                    <h2>Recent applications</h2>
-                    <button onClick={() => navigate("applications")}>
-                      View all <ArrowUpRight size={15} />
+                    <h2><UiText english={"Recent applications"} /></h2>
+                    <button onClick={() => navigate("applications")}><UiText english={"View all"} /><ArrowUpRight size={15} />
                     </button>
                   </div>
                   {applications.length ? (
@@ -291,9 +290,8 @@ export function AdminDashboard() {
                   ) : (
                     <div className="admin-empty">
                       <Users size={30} />
-                      <h3>No applications yet</h3>
-                      <Link href="/careers">
-                        Open recruitment <ArrowUpRight size={15} />
+                      <h3><UiText english={"No applications yet"} /></h3>
+                      <Link href="/careers"><UiText english={"Open recruitment"} /><ArrowUpRight size={15} />
                       </Link>
                     </div>
                   )}
@@ -306,18 +304,18 @@ export function AdminDashboard() {
                 <label className="admin-search">
                   <Search size={17} />
                   <input
-                    aria-label="Search records"
+                    aria-label={translateText(language, "Search records")}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search name, email or reference"
+                    placeholder={translateText(language, "Search name, email or reference")}
                   />
                 </label>
                 <select
-                  aria-label="Filter by game"
+                  aria-label={translateText(language, "Filter by game")}
                   value={game}
                   onChange={(e) => setGame(e.target.value)}
                 >
-                  <option value="All">All games</option>
+                  <option value="All"><UiText english={"All games"} /></option>
                   {games.map((g) => (
                     <option key={g.slug} value={g.slug}>
                       {g.name}
@@ -325,32 +323,32 @@ export function AdminDashboard() {
                   ))}
                 </select>
                 <select
-                  aria-label="Filter by status"
+                  aria-label={translateText(language, "Filter by status")}
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
-                  <option value="All">All statuses</option>
+                  <option value="All"><UiText english={"All statuses"} /></option>
                   {statuses.map((s) => (
                     <option key={s}>{s}</option>
                   ))}
                 </select>
-                <span>{rows.length} records</span>
+                <span>{rows.length}<UiText english={"records"} /></span>
               </div>
               <div className="admin-table-wrap">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Applicant / customer</th>
-                      <th>Game</th>
+                      <th><UiText english={"Applicant / customer"} /></th>
+                      <th><UiText english={"Game"} /></th>
                       <th>
-                        {kind === "applications"
+                        <UiText english={kind === "applications"
                           ? "Rank"
-                          : "Service / estimate"}
+                          : "Service / estimate"} />
                       </th>
-                      <th>Received</th>
-                      {kind === "requests" && <th>Assigned to</th>}
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th><UiText english={"Received"} /></th>
+                      {kind === "requests" && <th><UiText english={"Assigned to"} /></th>}
+                      <th><UiText english={"Status"} /></th>
+                      <th><UiText english={"Actions"} /></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -372,8 +370,8 @@ export function AdminDashboard() {
                             </>
                           )}
                         </td>
-                        <td>{date(r.createdAt)}</td>
-                        {kind === "requests" && <td><select aria-label={`Assignee for ${r.name}`} value={"rank" in r ? "" : r.assignedTo ?? ""} onChange={(event) => assignRequest(r.id, event.target.value)}><option value="">Unassigned</option>{staff.filter((member) => member.active).map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></td>}
+                        <td>{date(r.createdAt, intlLocales[language])}</td>
+                        {kind === "requests" && <td><select aria-label={`Assignee for ${r.name}`} value={"rank" in r ? "" : r.assignedTo ?? ""} onChange={(event) => assignRequest(r.id, event.target.value)}><option value=""><UiText english={"Unassigned"} /></option>{staff.filter((member) => member.active).map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></td>}
                         <td>
                           <select
                             aria-label={`Status for ${r.name}`}
@@ -387,17 +385,17 @@ export function AdminDashboard() {
                         </td>
                         <td>
                           <div className="admin-row-actions">
-                            {kind === "requests" && <a className="admin-row-action-link" aria-label={`Open Riot login for ${r.name}`} title="Open official Riot login" href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={17} /></a>}
+                            {kind === "requests" && <a className="admin-row-action-link" aria-label={`Open Riot login for ${r.name}`} title={translateText(language, "Open official Riot login")} href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={17} /></a>}
                             <button
                               aria-label={`View ${r.name}`}
-                              title="View details"
+                              title={translateText(language, "View details")}
                               onClick={() => setDetail(r)}
                             >
                               <Eye size={17} />
                             </button>
                             <button
                               aria-label={`Delete ${r.name}`}
-                              title="Delete record"
+                              title={translateText(language, "Delete record")}
                               onClick={() => setPendingDelete(r)}
                             >
                               <Trash2 size={17} />
@@ -412,12 +410,12 @@ export function AdminDashboard() {
                   <div className="admin-empty">
                     <Search size={30} />
                     <h3>
-                      {all.length ? "No matching records" : "No records yet"}
+                      <UiText english={all.length ? "No matching records" : "No records yet"} />
                     </h3>
                     <p>
-                      {all.length
+                      <UiText english={all.length
                         ? "Try another search or filter."
-                        : "New submissions will appear here."}
+                        : "New submissions will appear here."} />
                     </p>
                   </div>
                 )}
@@ -429,10 +427,7 @@ export function AdminDashboard() {
               {notice}
             </p>
           )}
-            <p className="admin-local-footer">
-            Browser storage only · no shared database or authenticated admin
-            account
-          </p>
+            <p className="admin-local-footer"><UiText english={"Browser storage only · no shared database or authenticated admin\n            account"} /></p>
         </div>
       </div>
       {detail && (
@@ -449,7 +444,7 @@ export function AdminDashboard() {
           onClose={() => setPendingDelete(null)}
           labelledBy="delete-title"
         >
-          <h2 id="delete-title">Delete this record?</h2>
+          <h2 id="delete-title"><UiText english={"Delete this record?"} /></h2>
           <p>
             {pendingDelete.name} · {pendingDelete.id}
           </p>
@@ -457,9 +452,7 @@ export function AdminDashboard() {
             <button
               className="admin-button"
               onClick={() => setPendingDelete(null)}
-            >
-              Cancel
-            </button>
+            ><UiText english={"Cancel"} /></button>
             <button
               className="admin-button danger"
               onClick={() => {
@@ -475,9 +468,7 @@ export function AdminDashboard() {
                 }
               }}
             >
-              <Trash2 size={16} />
-              Delete
-            </button>
+              <Trash2 size={16} /><UiText english={"Delete"} /></button>
           </div>
         </AdminModal>
       )}
@@ -491,12 +482,13 @@ function RecordDetails({
   record: Application | ServiceRequest;
   onClose: () => void;
 }) {
+  const { language } = useLanguage();
   const money = useMoney();
   return (
     <>
       <button
         className="admin-modal-close"
-        aria-label="Close details"
+        aria-label={translateText(language, "Close details")}
         onClick={onClose}
       >
         <X size={19} />
@@ -504,30 +496,30 @@ function RecordDetails({
       <span className="admin-caption">{record.id}</span>
       <h2 id="record-title">{record.name}</h2>
       <dl className="admin-details">
-        <dt>Email</dt>
+        <dt><UiText english={"Email"} /></dt>
         <dd>
           <a href={`mailto:${record.email}`}>{record.email}</a>
         </dd>
-        <dt>Game</dt>
+        <dt><UiText english={"Game"} /></dt>
         <dd>{gameName(record.game)}</dd>
-        <dt>Received</dt>
-        <dd>{date(record.createdAt)}</dd>
-        <dt>Status</dt>
+        <dt><UiText english={"Received"} /></dt>
+        <dd>{date(record.createdAt, intlLocales[language])}</dd>
+        <dt><UiText english={"Status"} /></dt>
         <dd>{record.status}</dd>
         {"rank" in record ? (
           <>
-            <dt>Phone</dt>
+            <dt><UiText english={"Phone"} /></dt>
             <dd>{record.phone}</dd>
-            <dt>Rank</dt>
+            <dt><UiText english={"Rank"} /></dt>
             <dd>{record.rank}</dd>
-            <dt>Experience</dt>
+            <dt><UiText english={"Experience"} /></dt>
             <dd>{record.message || "Not provided"}</dd>
           </>
         ) : (
           <>
-            <dt>Service</dt>
+            <dt><UiText english={"Service"} /></dt>
             <dd>{record.categoryName ?? serviceName(record.service)}</dd>
-            <dt>Plan</dt>
+            <dt><UiText english={"Plan"} /></dt>
             <dd>
               {record.categoryName ? `${record.from} to ${record.to}` : record.service === "coaching"
                 ? `${record.units} coaching hours`
@@ -535,16 +527,16 @@ function RecordDetails({
                   ? `${record.units} placement matches`
                   : `${record.from} to ${record.to}`}
             </dd>
-            <dt>Estimate</dt>
+            <dt><UiText english={"Estimate"} /></dt>
             <dd>{record.quoteRequired ? "Quote pending confirmation" : money.format(record.priceUsd)}</dd>
-            <dt>Region / queue</dt>
+            <dt><UiText english={"Region / queue"} /></dt>
             <dd>
               {record.region} / {record.queue}
             </dd>
-            <dt>Preferences</dt>
+            <dt><UiText english={"Preferences"} /></dt>
             <dd>{record.champions || "None"}</dd>
-            <dt>Game access</dt>
-            <dd><a className="admin-game-login" href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={14} /> Open Riot login</a><small>Opens the official login page. Customer game passwords are never shown or stored.</small></dd>
+            <dt><UiText english={"Game access"} /></dt>
+            <dd><a className="admin-game-login" href="https://authenticate.riotgames.com/" target="_blank" rel="noreferrer"><ExternalLink size={14} /><UiText english={"Open Riot login"} /></a><small><UiText english={"Opens the official login page. Customer game passwords are never shown or stored."} /></small></dd>
           </>
         )}
       </dl>

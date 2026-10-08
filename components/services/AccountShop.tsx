@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { NumberInput } from "@/components/ui/NumberInput";
 
@@ -25,7 +26,7 @@ export function AccountShop({ game, smurfs = false }: { game: string; smurfs?: b
   const { language, t } = useLanguage();
   const lolChampions = useLolChampions(game === "league-of-legends");
   const { favorites, toggleFavorite } = useShopFavorites();
-  const text = (en: string, vi: string) => language === "vi" ? vi : en;
+  const text = (en: string, vi: string) => translateText(language, en, vi);
   const [search, setSearch] = useState("");
   const [server, setServer] = useState("all");
   const [ranks, setRanks] = useState<string[]>([]);
@@ -83,7 +84,7 @@ export function AccountShop({ game, smurfs = false }: { game: string; smurfs?: b
       </div></ShopDisclosure>
       <div className="shop-results">
         <label className="shop-search"><Search size={19} aria-hidden="true" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={text("Search champion, agent, skin or account…", "Tìm tướng, agent, skin hoặc tài khoản…")} aria-label={text("Search accounts", "Tìm tài khoản")} />{search && <button type="button" aria-label={text("Clear search", "Xóa tìm kiếm")} onClick={() => setSearch("")}><X size={16} /></button>}</label>
-        <div className="shop-quick-filters"><button type="button" aria-pressed={smurfOnly} onClick={() => setSmurfOnly(!smurfOnly)}>Smurfs</button>{gameRegions.slice(0, 5).map((r) => <button type="button" key={r.code} aria-pressed={server === r.code} onClick={() => setServer(server === r.code ? "all" : r.code)}>{r.code}</button>)}<button type="button" aria-pressed={championsMin === ownedThreshold} onClick={() => setChampionsMin(championsMin === ownedThreshold ? 0 : ownedThreshold)}>{ownedThreshold}+ {ownedLabel}</button><button type="button" aria-pressed={collection} onClick={() => setCollection(!collection)}>30+ {cosmeticLabel}</button><button type="button" aria-pressed={pointsMin === 1} onClick={() => setPointsMin(pointsMin === 1 ? 0 : 1)}>Has {game === "valorant" ? "VP" : "RP"}</button><button type="button" aria-pressed={max === "50"} onClick={() => setMax(max === "50" ? "" : "50")}>{text("Under $50", "Dưới $50")}</button></div>
+        <div className="shop-quick-filters"><button type="button" aria-pressed={smurfOnly} onClick={() => setSmurfOnly(!smurfOnly)}>{translateText(language, "Smurfs", "Tài khoản Smurf")}</button>{gameRegions.slice(0, 5).map((r) => <button type="button" key={r.code} aria-pressed={server === r.code} onClick={() => setServer(server === r.code ? "all" : r.code)}>{r.code}</button>)}<button type="button" aria-pressed={championsMin === ownedThreshold} onClick={() => setChampionsMin(championsMin === ownedThreshold ? 0 : ownedThreshold)}>{ownedThreshold}+ {ownedLabel}</button><button type="button" aria-pressed={collection} onClick={() => setCollection(!collection)}>30+ {cosmeticLabel}</button><button type="button" aria-pressed={pointsMin === 1} onClick={() => setPointsMin(pointsMin === 1 ? 0 : 1)}>{translateText(language, "Has", "Có")}{game === "valorant" ? "VP" : "RP"}</button><button type="button" aria-pressed={max === "50"} onClick={() => setMax(max === "50" ? "" : "50")}>{text("Under $50", "Dưới $50")}</button></div>
 
         {(server !== "all" || ranks.length > 0 || role !== "all" || championsMin > 0 || skinsMin > 0 || pointsMin > 0 || min || max || ownedItems.length > 0 || lowGain || (smurfOnly && !smurfs)) && (
           <div className="flex flex-wrap items-center gap-2 py-2">

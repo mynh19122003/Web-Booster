@@ -1,6 +1,9 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { NumberInput } from "@/components/ui/NumberInput";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/store/useCart";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -34,10 +37,10 @@ const categoryCopy: Record<string, { en: string; vi: string; unit: string; unitV
 
 export function CategoryConfigurator({ game, productId }: { game: string; productId: string }) {
   const s = useStore();
+  const router = useRouter();
   const { language, t } = useLanguage();
   const money = useMoney();
-  const vi = language === "vi";
-  const text = (en: string, vn: string) => vi ? vn : en;
+  const text = (en: string, vi: string) => translateText(language, en, vi);
   const config = gameConfigFor(game);
   const product = productsByGame[game]?.find((item) => item.id === productId);
   const title = t((categoryKeys[productId] ?? "categoryDivisions") as Parameters<typeof t>[0]);
@@ -72,7 +75,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
   const base = estimateQuote(0, 1, s.queue, "placements", quantity, game);
   const price = quoteRequired ? 0 : base.price * (express ? 1.2 : 1);
   const from = account ? mode : progression ? `${title}: ${start}` : ranked ? rank : title;
-  const unit = vi ? copy?.unitVi : quantity === 1 ? copy?.unit.replace(/finishes$/, "finish").replace(/matches$/, "match").replace(/s$/, "") : copy?.unit;
+  const unit = translateText(language, copy?.unit ?? "games", copy?.unitVi);
   const to = account ? `${rank} · ${budget}` : progression ? `${title}: ${goal}${detail ? ` · ${detail}` : ""}` : `${quantity} ${unit}${productId === "games" ? ` · ${mode}` : ""}${detail ? ` · ${detail}` : ""}`;
   const options = productId === "games" ? ["Ranked duo", "High-rank duo", "Casual duo"] : account ? ["Ranked profile", "Fresh / Unranked"] : [];
   const optionName = (option: string) => ({ "Ranked duo": text("Ranked duo", "Chơi đôi xếp hạng"), "High-rank duo": text("High-rank duo", "Chơi đôi rank cao"), "Casual duo": text("Casual duo", "Chơi đôi thường"), "Ranked profile": text("Ranked profile", "Tài khoản có rank"), "Fresh / Unranked": text("Fresh / Unranked", "Tài khoản chưa rank") }[option] ?? option);
@@ -82,7 +85,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
   const unavailablePrice = !quoteRequired && money.amount(price) === null;
   const reviewLabel = quoteRequired ? text("Review request", "Xem yêu cầu") : t("reviewPlan");
 
-  function review() {
+  function review(addOnly = false) {
     if (!valid) {
       setAttempted(true);
       goalRef.current?.focus();
@@ -101,10 +104,17 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
       units: progression ? goal - start : quantity,
       quoteOverride: price,
       quoteAddOns: express ? ["Express priority"] : [],
-      modal: "checkout",
+      modal: null,
+      coachBooking: null,
+      accountPurchase: null,
       checkoutDetails: { name: title, from, to, quoteRequired },
       champions: productId === "mastery" ? detail.trim() : (extraNotes || s.champions),
     });
+    const params = new URLSearchParams({ type:"boost", game, service:s.service, name:title, from, to, region:s.region, queue:s.queue, role:s.role, units:String(progression ? goal - start : quantity), amount:String(price), base:String(price), quote:String(quoteRequired), champions:extraNotes, category:productId });
+    if (express) params.append("option", "Express priority");
+    const href = `/checkout?${params}`;
+    if (!quoteRequired) useCart.getState().add(href, addOnly);
+    if (!addOnly) router.push(href);
   }
 
   return (
@@ -114,7 +124,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
           <span className="category-icon"><Icon size={24} aria-hidden="true" /></span>
           <div><p>{config.name}</p><h3>{title}</h3></div>
         </header>
-        <p className="category-description">{account ? text("Set your preferred account profile, server and budget. We will confirm matching availability before you purchase.", "Chọn hồ sơ tài khoản, máy chủ và ngân sách. Tài khoản phù hợp sẽ được xác nhận trước khi mua.") : vi ? copy?.vi : copy?.en}</p>
+        <p className="category-description">{account ? text("Set your preferred account profile, server and budget. We will confirm matching availability before you purchase.", "Chọn hồ sơ tài khoản, máy chủ và ngân sách. Tài khoản phù hợp sẽ được xác nhận trước khi mua.") : translateText(language, copy?.en ?? "", copy?.vi)}</p>
 
         {options.length > 0 && <div className="category-packages" role="group" aria-label={text("Choose a plan", "Chọn gói")}>
           {options.map((option) => <button key={option} type="button" aria-pressed={mode === option} onClick={() => setMode(option)}>
@@ -145,15 +155,13 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
                   className={`px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${tftWinType === "top4" ? "border-amber-400/80 bg-amber-500/20 text-white" : "border-white/10 bg-black/30 text-zinc-400 hover:text-white"}`}
                   onClick={() => setTftWinType("top4")}
                 >
-                  Top 4 Finish (Standard)
-                </button>
+                  {translateText(language, "Top 4 Finish (Standard)", "Top 4 (Tiêu chuẩn)")}</button>
                 <button
                   type="button"
                   className={`px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${tftWinType === "first" ? "border-amber-400/80 bg-amber-500/20 text-white" : "border-white/10 bg-black/30 text-zinc-400 hover:text-white"}`}
                   onClick={() => setTftWinType("first")}
                 >
-                  1st Place Only (First Pick)
-                </button>
+                  {translateText(language, "1st Place Only (First Pick)", "Chỉ hạng nhất")}</button>
               </div>
             </div>
           )}
@@ -178,7 +186,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
             </>
           )}
           {["wins", "ranked-wins"].includes(productId) && <label className="category-field">{game === "valorant" ? "RR / win" : "LP / win"}
-            <select value={detail} onChange={(event) => setDetail(event.target.value)}><option value="">{text("Choose expected gain", "Chọn điểm nhận mỗi trận")}</option>{[14, 17, 19, 22, 25, 28, 30, 33].map((points) => <option key={points}>{points} {game === "valorant" ? "RR" : "LP"} / win</option>)}</select>
+            <select value={detail} onChange={(event) => setDetail(event.target.value)}><option value="">{text("Choose expected gain", "Chọn điểm nhận mỗi trận")}</option>{[14, 17, 19, 22, 25, 28, 30, 33].map((points) => <option key={points}>{points} {game === "valorant" ? "RR" : "LP"} {translateText(language, "/ win", "/ trận thắng")}</option>)}</select>
           </label>}
           {["mastery", "challenges", "clash"].includes(productId) && <label className="category-field category-field-wide">{productId === "mastery" ? text("Champion", "Tướng") : productId === "clash" ? text("Team / tournament", "Đội / giải đấu") : text("Challenge / target", "Thử thách / mục tiêu")} *
             <input ref={goalRef} list={productId === "mastery" ? "lol-champions-list" : undefined} value={detail} onChange={(event) => setDetail(event.target.value)} placeholder={productId === "mastery" ? "e.g. Ahri, Zed..." : text("Enter your goal", "Nhập mục tiêu của bạn")} maxLength={150} required aria-invalid={attempted && !valid} aria-describedby={`goal-help-${productId}`} />
@@ -200,7 +208,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
           <label className="category-field">{text("Current level", "Cấp hiện tại")}<NumberInput type="number" min={0} max={max - 1} value={start} onChange={(event) => { const value = Math.max(0, Math.min(max - 1, Math.floor(Number(event.target.value) || 0))); setStart(value); setGoal(Math.max(goal, value + 1)); }} /></label>
           <label className="category-field">{text("Target level", "Cấp mục tiêu")}<NumberInput type="number" min={start + 1} max={max} value={goal} onChange={(event) => setGoal(Math.max(start + 1, Math.min(max, Math.floor(Number(event.target.value) || start + 1))))} /></label>
         </div> : !account && <div className="category-quantity">
-          <label htmlFor={`quantity-${productId}`}>{text("Number of", "Số lượng")} {vi ? copy?.unitVi : copy?.unit}</label>
+          <label htmlFor={`quantity-${productId}`}>{text("Number of", "Số lượng")} {unit}</label>
           <div className="category-stepper"><button type="button" aria-label={text("Decrease quantity", "Giảm số lượng")} disabled={quantity <= 1} onClick={() => setQuantity(quantity - 1)}><Minus size={18} /></button>
             <NumberInput id={`quantity-${productId}`} type="number" min={1} max={max} value={quantity} onChange={(event) => setQuantity(Math.max(1, Math.min(max, Math.floor(Number(event.target.value) || 1))))} />
             <button type="button" aria-label={text("Increase quantity", "Tăng số lượng")} disabled={quantity >= max} onClick={() => setQuantity(quantity + 1)}><Plus size={18} /></button>
@@ -221,15 +229,16 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         <p className="category-game-name">{config.name}</p><h3>{title}</h3>
         <dl><div><dt>{account ? text("Profile", "Hồ sơ") : progression ? text("Progress", "Tiến độ") : t("currentRank")}</dt><dd>{from}</dd></div><div><dt>{text("Your goal", "Mục tiêu")}</dt><dd>{to}</dd></div><div><dt>{t("region")}</dt><dd>{s.region}</dd></div>{!account && <div><dt>{t("queue")}</dt><dd>{s.queue}</dd></div>}</dl>
         <div className="category-price" aria-live="polite">{quoteRequired ? <><strong>{text("Custom quote", "Báo giá riêng")}</strong><p>{text("Price confirmed after reviewing your preferences.", "Giá được xác nhận theo yêu cầu của bạn.")}</p></> : <><strong>{money.format(price)}</strong><span>{money.currency} · {t("estimatedQuote")}</span></>}</div>
-        {!account && <button type="button" className="category-extra" aria-pressed={express} onClick={() => setExpress(!express)}><span><strong>Express priority</strong><small>{quoteRequired ? text("Include in quote", "Thêm vào yêu cầu báo giá") : "+20%"}</small></span><span className="category-check">{express && <Check size={16} />}</span></button>}
-        {!quoteRequired && <p className="category-delivery">{t("estimatedDelivery")} <strong>{base.minHours}–{base.maxHours} hours</strong></p>}
-        <button type="button" className="order-start-boost category-review" disabled={unavailablePrice} onClick={review}>{reviewLabel}<ArrowRight size={18} aria-hidden="true" /></button>
+        {!account && <button type="button" className="category-extra" aria-pressed={express} onClick={() => setExpress(!express)}><span><strong>{translateText(language, "Express priority", "Ưu tiên xử lý")}</strong><small>{quoteRequired ? text("Include in quote", "Thêm vào yêu cầu báo giá") : "+20%"}</small></span><span className="category-check">{express && <Check size={16} />}</span></button>}
+        {!quoteRequired && <p className="category-delivery">{t("estimatedDelivery")} <strong>{base.minHours}–{base.maxHours} {translateText(language, "hours", "giờ")}</strong></p>}
+        {!quoteRequired && <button type="button" className="add-to-cart-button" disabled={unavailablePrice} onClick={() => review(true)}>{text("Add to cart", "Thêm vào giỏ hàng")} ＋</button>}
+        <button type="button" className="order-start-boost category-review" disabled={unavailablePrice} onClick={() => review()}>{quoteRequired ? reviewLabel : text("Continue to checkout", "Tiếp tục thanh toán")}<ArrowRight size={18} aria-hidden="true" /></button>
         {unavailablePrice && <p className="category-validation" role="status">{text("Currency rate unavailable. Choose USD to continue.", "Chưa có tỷ giá. Chọn USD để tiếp tục.")}</p>}
         <p className="category-summary-note"><ShieldCheck size={15} aria-hidden="true" />{text("Review your details before submitting", "Kiểm tra thông tin trước khi gửi")}</p>
       </aside>
       {inView && !s.modal && createPortal(<div className="category-mobile-review">
         <div><strong>{quoteRequired ? text("Custom quote", "Báo giá riêng") : money.format(price)}</strong><small>{title} · {account ? rank : progression ? `${start} → ${goal}` : `${quantity} ${unit}`}</small></div>
-        <button type="button" className="mobile-start-boost" disabled={unavailablePrice} onClick={review}>{reviewLabel}<ArrowRight size={16} aria-hidden="true" /></button>
+        <button type="button" className="mobile-start-boost" disabled={unavailablePrice} onClick={() => review()}>{quoteRequired ? reviewLabel : text("Continue to checkout", "Tiếp tục thanh toán")}<ArrowRight size={16} aria-hidden="true" /></button>
       </div>, document.body)}
     </div>
   );

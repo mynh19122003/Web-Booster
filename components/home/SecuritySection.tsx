@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import {
   ShieldCheck,
@@ -10,7 +11,7 @@ import {
 import { useLanguage } from "@/components/ui/LanguageProvider";
 
 export function SecuritySection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <section className="section security-section">
       <div className="site-container split-section">
@@ -21,17 +22,13 @@ export function SecuritySection() {
             <ShieldCheck size={75} strokeWidth={1} />
           </div>
           <span className="security-node node-1">
-            <LockKeyhole /> ENCRYPTED
-          </span>
+            <LockKeyhole /> {translateText(language, "ENCRYPTED", "Mã hóa")}</span>
           <span className="security-node node-2">
-            <Fingerprint /> VERIFIED
-          </span>
+            <Fingerprint /> {translateText(language, "VERIFIED", "Đã xác minh")}</span>
           <span className="security-node node-3">
-            <EyeOff /> PRIVATE
-          </span>
+            <EyeOff /> {translateText(language, "PRIVATE", "Riêng tư")}</span>
           <span className="security-node node-4">
-            <ShieldCheck /> PROTECTED
-          </span>
+            <ShieldCheck /> {translateText(language, "PROTECTED", "Được bảo vệ")}</span>
         </div>
         <div data-reveal>
           <p className="eyebrow">{t("securityEyebrow")}</p>

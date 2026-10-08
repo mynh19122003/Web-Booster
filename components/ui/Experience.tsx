@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { useLanguage } from "./LanguageProvider";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 export function Experience({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const [entryPath] = useState(path);
   const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const { language } = useLanguage();
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
@@ -37,16 +36,18 @@ export function Experience({ children }: { children: React.ReactNode }) {
     });
     return () => media.revert();
   }, [path]);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(frame);
+  }, [language]);
   return (
     <div ref={ref}>
-      <motion.div
+      <div
         key={path}
-        initial={reduced || path === entryPath ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.45 }}
+        className="route-content"
       >
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -6,21 +6,21 @@ import "./glass.css";
 const rajdhani = Rajdhani({
   subsets: ["latin"],
   weight: ["600", "700"],
-  variable: "--font-heading",
+  variable: "--font-ascend-heading",
   display: "swap",
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
+  subsets: ["latin", "latin-ext", "vietnamese", "cyrillic-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ascend-body",
   display: "swap",
 });
 
 const interPrice = Inter({
   subsets: ["latin"],
   weight: ["600"],
-  variable: "--font-price",
+  variable: "--font-ascend-price",
   display: "swap",
   preload: false,
 });

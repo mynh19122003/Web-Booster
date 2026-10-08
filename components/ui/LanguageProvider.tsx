@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
-import { intlLocales, isLanguageCode, translate, type LanguageCode, type MessageKey } from "@/lib/i18n";
+import { intlLocales, isLanguageCode, translate, translateText, type LanguageCode, type MessageKey } from "@/lib/i18n";
 
 const LanguageContext = createContext<LanguageCode>("en");
 
@@ -36,6 +36,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = intlLocales[language];
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+    document.documentElement.dataset.language = language;
   }, [language]);
 
   return <LanguageContext.Provider value={language}>{children}</LanguageContext.Provider>;
@@ -43,5 +44,5 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const language = useContext(LanguageContext);
-  return { language, t: (key: MessageKey, params?: Record<string, string | number>) => translate(language, key, params) };
+  return { language, t: (key: MessageKey, params?: Record<string, string | number>) => translate(language, key, params), text: (english: string, vietnamese?: string, params?: Record<string, string | number>) => translateText(language, english, vietnamese, params) };
 }

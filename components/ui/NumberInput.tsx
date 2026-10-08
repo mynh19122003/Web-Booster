@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { useId, useState, type ComponentPropsWithoutRef } from "react";
 import { useLanguage } from "./LanguageProvider";
@@ -8,7 +9,7 @@ export function NumberInput({ onChange, onKeyDown, onPaste, min = 0, ...props }:
   const { language } = useLanguage();
   const [negative, setNegative] = useState(false);
   const errorId = useId();
-  const message = language === "vi" ? "Không được nhập số âm. Vui lòng nhập số từ 0 trở lên." : "Negative numbers are not allowed. Enter a value of 0 or greater.";
+  const message = translateText(language, "Negative numbers are not allowed. Enter a value of 0 or greater.", "Không được nhập số âm. Vui lòng nhập số từ 0 trở lên.");
   return <>
     <input {...props} type="number" min={Math.max(0, Number(min))} inputMode={props.inputMode ?? "decimal"}
       aria-invalid={negative || props["aria-invalid"]}

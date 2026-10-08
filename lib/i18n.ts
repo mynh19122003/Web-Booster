@@ -29,6 +29,9 @@ import { huMessages } from "./i18n/catalog/locales/hu";
 import { hrMessages } from "./i18n/catalog/locales/hr";
 import { arMessages } from "./i18n/catalog/locales/ar";
 import { trMessages } from "./i18n/catalog/locales/tr";
+import { uiPhrases } from "./i18n/ui-phrases";
+import { commercePhrases } from "./i18n/commerce-phrases";
+import { generatedUiPhrases } from "./i18n/generated-ui-phrases";
 
 export const languages = [
   { code: "en", short: "EN", name: "English", country: "United Kingdom", flagCode: "gb" },
@@ -124,4 +127,38 @@ export function translate(
   return params
     ? template.replace(/\{(\w+)\}/g, (match, name: string) => String(params[name] ?? match))
     : template;
+}
+
+const normalizedPhrase = (text: string) => text.trim().toLocaleLowerCase("en").replace(/\s+/g, " ");
+const phraseKeys = new Map(Object.entries(supportedMessages.en).map(([key, value]) => [normalizedPhrase(value), key as MessageKey]));
+const phraseAliases: Record<string, string> = {
+  "your cart": "Cart", "send demo message": "Send", "chat with a booster": "Booster chat",
+  "conversation list": "Conversations", "game": "games", "view account details": "View details",
+  "open account details": "View details", "account purchase": "Buy Account Now", "show more matches": "Show more",
+  "search conversations": "Search", "search accounts": "Search", "search languages": "Search",
+};
+const phraseMessageAliases: Record<string, MessageKey> = {
+  "roles": "coachRoleFilter",
+  "browse coaches": "coachBackToList", "queue": "queue", "role": "role",
+  "24/7 support": "liveSupport", "terms of service": "terms", "privacy policy": "privacyPolicy",
+  "all": "coachAny",
+  "sort": "coachSortFilter", "optional": "optional",
+  "server": "server", "region": "region", "current rank": "currentRank", "order summary": "orderSummary",
+  "resume": "resumeSimulation", "resume demo": "resumeSimulation", "pause": "pauseSimulation", "pause demo": "pauseSimulation",
+  "your booster": "assignedPro", "win rate": "winRate",
+};
+export function translateText(language: LanguageCode, english: string, vietnamese?: string, params?: Record<string, string | number>): string {
+  const phrase = normalizedPhrase(english);
+  const key = phraseKeys.get(phrase) ?? phraseMessageAliases[phrase];
+  const direct = uiPhrases[language]?.[normalizedPhrase(phraseAliases[phrase] ?? english)] ?? commercePhrases[language]?.[phrase];
+  const template = language === "vi" && vietnamese ? vietnamese : direct ?? generatedUiPhrases[language]?.[phrase] ?? (key ? translate(language, key) : english);
+  const spaced = english.endsWith(" ") && !template.endsWith(" ") ? `${template} ` : template;
+  return params ? spaced.replace(/\{(\w+)\}/g, (match, name: string) => String(params[name] ?? match)) : spaced;
+}
+
+export function hasPhraseTranslation(language: LanguageCode, english: string, vietnamese?: string): boolean {
+  if (language === "en" || (language === "vi" && Boolean(vietnamese))) return true;
+  const phrase = normalizedPhrase(english);
+  const key = phraseKeys.get(phrase) ?? phraseMessageAliases[phrase];
+  return Boolean(uiPhrases[language]?.[normalizedPhrase(phraseAliases[phrase] ?? english)] || commercePhrases[language]?.[phrase] || generatedUiPhrases[language]?.[phrase] || (key && messages[language][key]));
 }

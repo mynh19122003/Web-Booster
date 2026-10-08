@@ -1,8 +1,11 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { NumberInput } from "@/components/ui/NumberInput";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/store/useCart";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -74,6 +77,7 @@ const roleIcons: Record<string, Record<string, string>> = {
 };
 
 export function ServiceConfigurator() {
+  const router = useRouter();
   const { language, t } = useLanguage();
   const s = useStore();
   const sectionRef = useRef<HTMLElement>(null);
@@ -123,7 +127,6 @@ export function ServiceConfigurator() {
   const hasCategoryForm = Boolean(categoryProduct && !["divisions", "ranks", "double-up", "coaching"].includes(categoryProduct));
 
   const selectionKey = `${s.game}:${service.slug}`;
-  const extras = extraSelection.key === selectionKey ? extraSelection.ids : [];
 
   const extrasForGame: Record<string, { id: string; title: string; detail: string; price: string; icon: typeof Zap }[]> = {
     "league-of-legends": [
@@ -156,6 +159,10 @@ export function ServiceConfigurator() {
     ],
   };
   const gameExtras = extrasForGame[s.game] ?? extrasForGame["league-of-legends"];
+  const extras = extraSelection.key === selectionKey ? extraSelection.ids
+    : extraSelection.key === "" && s.quoteOverride !== null
+      ? gameExtras.filter(extra => s.quoteAddOns.includes(extra.title)).map(extra => extra.id)
+      : [];
   const extraFees = extras.reduce((fees, id) => {
     const extra = gameExtras.find((item) => item.id === id);
     if (!extra || extra.price === "FREE" || extra.price === "RECOMMENDED") return fees;
@@ -164,12 +171,24 @@ export function ServiceConfigurator() {
     return fees;
   }, {percent:0, flat:0});
   const adjustedPrice = quoteRequired ? 0 : Number((price * (1 + extraFees.percent / 100) + extraFees.flat).toFixed(2));
-  const pendingQuote = language === "vi" ? "Yêu cầu báo giá" : "Request a quote";
+  const pendingQuote = translateText(language, "Request a quote", "Yêu cầu báo giá");
 
-  function reviewPlan() {
-    s.set({ current, target, currentLp, targetLp, service: service.slug, queue, modal: "checkout", quoteOverride: adjustedPrice,
+  function reviewPlan(addOnly = false) {
+    s.set({ current, target, currentLp, targetLp, service: service.slug, queue, modal: null, coachBooking: null, accountPurchase: null, quoteOverride: adjustedPrice,
       quoteAddOns: extras.map(id => gameExtras.find(extra => extra.id === id)?.title ?? id),
       checkoutDetails: quoteRequired ? {name:serviceCopyFor(language, service.slug as ServiceSlug).name, from:rankDescription(s.game,current,currentLp), to:rankDescription(s.game,target,targetLp), quoteRequired:true} : null });
+    const params = new URLSearchParams({
+      type: "boost", game: s.game, service: service.slug, name: serviceCopyFor(language, service.slug as ServiceSlug).name,
+      from: rankDescription(s.game, current, currentLp), to: rankDescription(s.game, target, targetLp),
+      region: s.region, queue, role: s.role, champions: s.champions,
+      lpGain: s.lpGain, units: String(s.units), amount: String(adjustedPrice),
+      base: String(price), delivery: `${minHours}–${maxHours}`,
+      quote: String(quoteRequired),
+    });
+    extras.forEach(id => params.append("option", gameExtras.find(extra => extra.id === id)?.title ?? id));
+    const href = `/checkout?${params.toString()}`;
+    if (!quoteRequired) useCart.getState().add(href, addOnly);
+    if (!addOnly) router.push(href);
   }
 
   return (
@@ -282,7 +301,7 @@ export function ServiceConfigurator() {
                     />
 
                     {/* Centered Forward Transition Arrow */}
-                    <div className="flex items-center justify-center -my-2 md:my-0 select-none">
+                    <div className="flex items-center justify-center -my-2 md:my-0 md:h-[330px] self-start select-none">
                       <div className="w-11 h-11 rounded-full bg-white/[0.03] backdrop-blur-md border border-white/[0.08] shadow-[0_0_20px_rgba(255,159,60,0.15)] flex items-center justify-center text-[#FF9F3C] shrink-0 rotate-90 md:rotate-0 transition-transform">
                         <ArrowRight size={20} />
                       </div>
@@ -304,8 +323,8 @@ export function ServiceConfigurator() {
 
                 {!unitService && s.game === "league-of-legends" && !isApexRank(s.game,current) && (
                   <div className="rank-gain-field">
-                    <span>{language === "vi" ? "LP nhận mỗi trận thắng" : "Expected LP per win"}</span>
-                    <RankGainPicker value={s.lpGain} onChange={(lpGain) => s.set({ lpGain })} label={language === "vi" ? "LP nhận mỗi trận thắng" : "Expected LP per win"} />
+                    <span>{translateText(language, "Expected LP per win", "LP nhận mỗi trận thắng")}</span>
+                    <RankGainPicker value={s.lpGain} onChange={(lpGain) => s.set({ lpGain })} label={translateText(language, "Expected LP per win", "LP nhận mỗi trận thắng")} />
                   </div>
                 )}
 
@@ -449,7 +468,7 @@ export function ServiceConfigurator() {
             </div>
 
             {/* 4. RIGHT-SIDE ORDER SUMMARY */}
-            <div className="journey-summary lg:col-span-5 xl:col-span-4 bg-white/[0.025] backdrop-blur-xl border border-white/[0.07] rounded-xl p-6 sm:p-7 flex flex-col justify-between shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_10px_30px_rgba(0,0,0,0.4)]">
+            <div className="journey-summary order-panel lg:col-span-5 xl:col-span-4 lg:col-start-8 xl:col-start-9 lg:row-start-1 lg:row-span-2 bg-white/[0.025] backdrop-blur-xl border border-white/[0.07] rounded-xl p-6 sm:p-7 flex flex-col justify-between shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_10px_30px_rgba(0,0,0,0.4)]">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <span className="text-sm font-sans font-semibold tracking-wide text-zinc-300 uppercase">
@@ -471,34 +490,28 @@ export function ServiceConfigurator() {
                     {s.region} · {queue}
                     {gameConfig.roles ? ` · ${s.role}` : ""}
                   </span>
-                  {!unitService && s.game === "valorant" && <span className="rank-pricing-policy">PC · 22 RR / {language === "vi" ? "trận thắng" : "win"}</span>}
+                  {!unitService && s.game === "valorant" && <span className="rank-pricing-policy">PC · 22 RR / {translateText(language, "win", "trận thắng")}</span>}
                 </p>
 
                 <div className="order-summary-price" aria-live="polite" aria-atomic="true">
                   {quoteRequired ? <strong className="quote-pending">{pendingQuote}</strong> : <ShopPrice usd={adjustedPrice} />}
                 </div>
-                {!quoteRequired && !unitService && (
-                  <p className="rank-pricing-policy">
-                    {s.region === "NA" ? (language === "vi" ? "Giảm 15% cho server NA" : "15% off on NA") :
-                      s.region === "KR" ? (language === "vi" ? "Server KR +20% · Các chặng Bạch Kim trở xuống −10%" : "KR +20% · Platinum and lower segments −10%") :
-                      (language === "vi" ? "Giảm 10% các chặng Bạch Kim trở xuống" : "10% off Platinum and lower segments")}
-                  </p>
-                )}
-
                 <section className="order-options" aria-labelledby={optionId + "-heading"}>
-                  <h3 id={optionId + "-heading"}>{language === "vi" ? "Tùy chọn đơn hàng" : "Order options"}</h3>
+                  <h3 id={optionId + "-heading"}>{translateText(language, "Order options", "Tùy chọn đơn hàng")}</h3>
                   <div className="order-options-list">
                     {gameExtras.map((extra) => {
                       const Icon = extra.icon;
                       const enabled = extras.includes(extra.id);
                       const copy = extraCopy[extra.title];
-                      const title = language === "vi" ? copy?.vi ?? extra.title : extra.title;
-                      const detail = language === "vi" ? extra.detail : copy?.enDetail ?? extra.detail;
+                      const title = translateText(language, extra.title, copy?.vi);
                       const recommended = extra.price === "RECOMMENDED";
-                      const fee = extra.price === "FREE" || recommended ? (language === "vi" ? "Miễn phí" : "Free") : extra.price.startsWith("+$") ? "+" + money.format(Number(extra.price.slice(2))) : extra.price;
+                      const fee = extra.price === "FREE" || recommended
+                        ? (translateText(language, "Free", "Miễn phí"))
+                        : extra.price.startsWith("+$")
+                          ? "+" + money.format(Number(extra.price.slice(2)))
+                          : extra.price;
                       return (
                         <button key={extra.id} type="button" role="switch" aria-checked={enabled} aria-label={title}
-                          aria-describedby={optionId + "-" + extra.id + "-detail " + optionId + "-" + extra.id + "-fee"}
                           onClick={() => setExtraSelection((selection) => {
                             const selected = selection.key === selectionKey ? selection.ids : [];
                             return {
@@ -507,11 +520,10 @@ export function ServiceConfigurator() {
                             };
                           })}
                           className="order-option-row">
-                          <Icon size={17} className="order-option-icon" aria-hidden="true" />
+                          <Icon size={16} className="order-option-icon" aria-hidden="true" />
                           <span className="order-option-copy">
                             <span className="order-option-heading">{title}</span>
-                            <span className="order-option-detail" id={optionId + "-" + extra.id + "-detail"}>{detail}</span>
-                            <span className="order-option-meta"><span className="order-option-fee" id={optionId + "-" + extra.id + "-fee"}>{fee}</span>{recommended && <span className="order-option-recommended">{language === "vi" ? "Gợi ý" : "Recommended"}</span>}</span>
+                            <span className="order-option-fee" id={optionId + "-" + extra.id + "-fee"}>{fee}</span>
                           </span>
                           <span aria-hidden="true" className="order-option-switch"><span>{enabled && <Check size={11} strokeWidth={3} />}</span></span>
                         </button>
@@ -525,7 +537,7 @@ export function ServiceConfigurator() {
                   <div className="flex items-center justify-between text-zinc-400">
                     <span>{t("estimatedDelivery")}</span>
                     <strong className="text-white font-medium tabular-nums">
-                      {quoteRequired ? (language === "vi" ? "Cần xác nhận" : "To be confirmed") : `${minHours}–${maxHours} ${language === "vi" ? "giờ" : "hours"}`}
+                      {quoteRequired ? (translateText(language, "To be confirmed", "Cần xác nhận")) : `${minHours}–${maxHours} ${translateText(language, "hours", "giờ")}`}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between text-zinc-400">
@@ -539,13 +551,14 @@ export function ServiceConfigurator() {
 
               {/* CTA Button and Security Notice */}
               <div className="mt-8">
+                {!quoteRequired && <button type="button" className="add-to-cart-button" disabled={money.amount(adjustedPrice) === null} onClick={() => reviewPlan(true)}>{translateText(language, "Add to cart", "Thêm vào giỏ hàng")} ＋</button>}
                 <button
                   type="button"
                   className="order-start-boost w-full px-6 font-sans font-bold flex items-center justify-center gap-2 cursor-pointer"
                   disabled={!quoteRequired && money.amount(adjustedPrice) === null}
-                  onClick={reviewPlan}
+                  onClick={() => reviewPlan()}
                 >
-                  <span>{quoteRequired ? pendingQuote : t("reviewPlan")}</span>
+                  <span>{quoteRequired ? pendingQuote : translateText(language, "Continue to checkout", "Tiếp tục thanh toán")}</span>
                   <ArrowRight size={17} aria-hidden="true" />
                 </button>
                 <small className="flex items-center justify-center gap-1.5 text-xs leading-relaxed text-zinc-400 text-center mt-3.5">
@@ -553,6 +566,7 @@ export function ServiceConfigurator() {
                 </small>
               </div>
             </div>
+
           </div>
           )}
           </div>
@@ -577,9 +591,9 @@ export function ServiceConfigurator() {
             type="button"
             className="mobile-start-boost px-4 font-semibold flex items-center gap-1.5"
             disabled={!quoteRequired && money.amount(adjustedPrice) === null}
-            onClick={reviewPlan}
+            onClick={() => reviewPlan()}
           >
-            {quoteRequired ? pendingQuote : t("reviewPlan")} <ArrowRight size={15} aria-hidden="true" />
+            {quoteRequired ? pendingQuote : translateText(language, "Continue to checkout", "Tiếp tục thanh toán")} <ArrowRight size={15} aria-hidden="true" />
           </button>
         </div>
       )}

@@ -1,6 +1,13 @@
 "use client";
 import { create } from "zustand";
 export type CoachBooking = {
+  sessionFormat?: "live" | "vod";
+  date?: string;
+  time?: string;
+  timeZone?: string;
+  goals?: string;
+  replayUrl?: string;
+  discount?: number;
   coachId: string;
   coachName: string;
   coachSlug: string;

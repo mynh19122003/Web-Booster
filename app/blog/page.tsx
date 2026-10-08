@@ -1,3 +1,4 @@
+import { UiText } from "@/components/ui/UiText";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { articles } from "@/data/articles";
@@ -19,10 +20,9 @@ export default function Page() {
               <span>0{i + 1}</span>
               <ArrowUpRight size={60} />
             </div>
-            <p className="eyebrow">{a.category} · 2 MIN READ</p>
+            <p className="eyebrow">{a.category}<UiText english={"· 2 MIN READ"} /></p>
             <h2>{a.title}</h2>
-            <span className="text-link">
-              Read the story <ArrowUpRight size={17} />
+            <span className="text-link"><UiText english={"Read the story"} /><ArrowUpRight size={17} />
             </span>
           </Link>
         ))}

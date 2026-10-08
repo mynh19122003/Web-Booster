@@ -1,0 +1,97 @@
+{
+  "phraseCount": 580,
+  "locales": [
+    {
+      "language": "de",
+      "missing": []
+    },
+    {
+      "language": "fr",
+      "missing": []
+    },
+    {
+      "language": "es",
+      "missing": []
+    },
+    {
+      "language": "pt",
+      "missing": []
+    },
+    {
+      "language": "it",
+      "missing": []
+    },
+    {
+      "language": "nl",
+      "missing": []
+    },
+    {
+      "language": "ja",
+      "missing": []
+    },
+    {
+      "language": "ru",
+      "missing": []
+    },
+    {
+      "language": "pl",
+      "missing": []
+    },
+    {
+      "language": "sv",
+      "missing": []
+    },
+    {
+      "language": "ro",
+      "missing": []
+    },
+    {
+      "language": "cs",
+      "missing": []
+    },
+    {
+      "language": "no",
+      "missing": []
+    },
+    {
+      "language": "da",
+      "missing": []
+    },
+    {
+      "language": "fi",
+      "missing": []
+    },
+    {
+      "language": "bg",
+      "missing": []
+    },
+    {
+      "language": "hu",
+      "missing": []
+    },
+    {
+      "language": "hr",
+      "missing": []
+    },
+    {
+      "language": "ar",
+      "missing": []
+    },
+    {
+      "language": "tr",
+      "missing": []
+    },
+    {
+      "language": "zh",
+      "missing": []
+    },
+    {
+      "language": "vi",
+      "missing": []
+    },
+    {
+      "language": "ko",
+      "missing": []
+    }
+  ]
+}

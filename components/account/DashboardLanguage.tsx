@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
@@ -20,10 +21,10 @@ export function DashboardLanguage() {
       <LanguageFlag code={current.flagCode} /><span><small>{t("language")}</small><strong>{current.name}</strong></span><ChevronDown size={17} style={{ transform: open ? "rotate(180deg)" : undefined }} />
     </button>
     {open && <div id="dashboard-languages" className="dashboard-locale-options">
-      <input autoFocus type="search" value={query} onChange={(event) => setQuery(event.target.value)} aria-label={language === "vi" ? "Tìm ngôn ngữ" : "Search languages"} placeholder={language === "vi" ? "Tìm ngôn ngữ…" : "Search languages…"} />
+      <input autoFocus type="search" value={query} onChange={(event) => setQuery(event.target.value)} aria-label={translateText(language, "Search languages", "Tìm ngôn ngữ")} placeholder={translateText(language, "Search languages…", "Tìm ngôn ngữ…")} />
       <div className="dashboard-locale-list" role="group" aria-label={t("language")}>
         {filtered.map((item) => <button type="button" key={item.code} aria-pressed={language === item.code} onClick={() => { setLanguage(item.code); setOpen(false); trigger.current?.focus(); }}><LanguageFlag code={item.flagCode} /><span><strong>{item.name}</strong><small>{item.country}</small></span>{item.code === language && <Check size={16} />}</button>)}
-        {filtered.length === 0 && <p>{language === "vi" ? "Không tìm thấy ngôn ngữ." : "No languages found."}</p>}
+        {filtered.length === 0 && <p>{translateText(language, "No languages found.", "Không tìm thấy ngôn ngữ.")}</p>}
       </div>
     </div>}
   </div>;

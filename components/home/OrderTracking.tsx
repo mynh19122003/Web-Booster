@@ -1,4 +1,7 @@
 "use client";
+import { UiText } from "@/components/ui/UiText";
+
+import { translateText } from "@/lib/i18n";
 import { ArrowUpRight, Radio, TrendingUp, Pause, Play } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -86,9 +89,9 @@ export function OrderTracking() {
         <div className="dashboard" data-reveal>
           <div className="dashboard-head">
             <span>
-              <span className="status-dot" /> {activeRequest ? (language === "vi" ? `Đơn hàng: ${activeRequest.status}` : `Order: ${activeRequest.status}`) : (complete ? t("orderComplete") : t("orderLive"))}
+              <span className="status-dot" /> {activeRequest ? (translateText(language, "Order: {value0}", "Đơn hàng: {value0}", {value0: activeRequest.status})) : (complete ? t("orderComplete") : t("orderLive"))}
             </span>
-            <span className="demo-head-actions"><span className="demo-tag">{activeRequest ? `#${activeRequest.id}` : t("orderNumber", { id: "AS-5821" })}</span><button type="button" className="tracking-demo-toggle" onClick={() => setPaused((value) => !value)} aria-label={paused ? (language === "vi" ? "Tiếp tục mô phỏng" : "Resume demo") : (language === "vi" ? "Tạm dừng mô phỏng" : "Pause demo")} aria-pressed={paused}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? (language === "vi" ? "Tiếp tục" : "Resume") : (language === "vi" ? "Tạm dừng" : "Pause")}</button></span>
+            <span className="demo-head-actions"><span className="demo-tag">{activeRequest ? `#${activeRequest.id}` : t("orderNumber", { id: "AS-5821" })}</span><button type="button" className="tracking-demo-toggle" onClick={() => setPaused((value) => !value)} aria-label={paused ? (translateText(language, "Resume demo", "Tiếp tục mô phỏng")) : (translateText(language, "Pause demo", "Tạm dừng mô phỏng"))} aria-pressed={paused}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? (translateText(language, "Resume", "Tiếp tục")) : (translateText(language, "Pause", "Tạm dừng"))}</button></span>
           </div>
           {activeRequest && (
             <div className="p-3 my-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-zinc-300 flex items-center justify-between">
@@ -133,8 +136,8 @@ export function OrderTracking() {
               <span className={lp > 0 ? "win" : "loss"}>
                 {game === "teamfight-tactics" ? "#" + (lp > 0 ? 1 + Math.abs(id) % 4 : 5 + Math.abs(id) % 4) : lp > 0 ? "W" : "L"}
               </span>
-              <strong>{game === "teamfight-tactics" ? (language === "vi" ? "Hạng " : "Place ") + (lp > 0 ? 1 + Math.abs(id) % 4 : 5 + Math.abs(id) % 4) : lp > 0 ? t("victory") : t("defeat")}</strong>
-              <small>{minutes} min · {game === "valorant" ? t("competitiveQueue") : game === "teamfight-tactics" ? (language === "vi" ? "Xếp hạng TFT" : "Ranked TFT") : t("rankedSoloQueue")}</small>
+              <strong>{game === "teamfight-tactics" ? (translateText(language, "Place ", "Hạng ")) + (lp > 0 ? 1 + Math.abs(id) % 4 : 5 + Math.abs(id) % 4) : lp > 0 ? t("victory") : t("defeat")}</strong>
+              <small>{minutes}<UiText english={"min ·"} />{game === "valorant" ? t("competitiveQueue") : game === "teamfight-tactics" ? (translateText(language, "Ranked TFT", "Xếp hạng TFT")) : t("rankedSoloQueue")}</small>
               <span className={lp > 0 ? "green" : "muted"}>
                 {lp > 0 ? "+" : ""}
                 {lp} {pointsLabel}

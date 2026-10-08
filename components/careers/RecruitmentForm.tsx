@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import { useId, useState, type FormEvent } from "react";
 import { ArrowUpRight, CheckCircle2, RotateCcw } from "lucide-react";
@@ -31,7 +32,7 @@ export function RecruitmentForm() {
       consent: ["Please agree to the application review terms.", "Vui lòng đồng ý lưu thông tin để xét duyệt hồ sơ."],
     };
     const message = messages[field];
-    return message ? message[language === "vi" ? 1 : 0] : t("recruitmentInvalid");
+    return message ? translateText(language, message[0], message[1]) : t("recruitmentInvalid");
   }
   function fieldError(field: string) {
     return fieldErrors[field] && <span id={`${formId}-${field}-error`} className="recruitment-field-error">{fieldErrors[field]}</span>;
@@ -48,7 +49,7 @@ export function RecruitmentForm() {
     if (fullName.value.trim().length < 2) invalidFields.name = errorMessage("name");
     setFieldErrors(invalidFields);
     if (!form.checkValidity() || Object.keys(invalidFields).length > 0) {
-      setError(language === "vi" ? "Vui lòng kiểm tra các trường được đánh dấu bên dưới." : "Please check the highlighted fields below.");
+      setError(translateText(language, "Please check the highlighted fields below.", "Vui lòng kiểm tra các trường được đánh dấu bên dưới."));
       const firstInvalid = invalidFields.name ? fullName : form.querySelector<HTMLInputElement | HTMLSelectElement>(":invalid") ?? fullName;
       firstInvalid.focus();
       return;

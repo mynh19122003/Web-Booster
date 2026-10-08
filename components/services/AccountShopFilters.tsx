@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import Image from "next/image";
 import { useId, useState } from "react";
@@ -25,7 +26,7 @@ type Props = {
 
 export function AccountShopFilters({ game, catalog, champions, filters: f, change }: Props) {
   const { language } = useLanguage();
-  const text = (en: string, vi: string) => language === "vi" ? vi : en;
+  const text = (en: string, vi: string) => translateText(language, en, vi);
   const groupId = useId();
   const [itemQuery, setItemQuery] = useState("");
   const [list, setList] = useState({ query: "", limit: 40 });

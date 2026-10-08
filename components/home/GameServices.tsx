@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -252,7 +253,7 @@ export function GameServices() {
                   <ArrowUpRight size={21} />
                 </Link>
               </div>
-              {opening === g.slug && <span className="game-opening" role="status"><LoaderCircle size={16} aria-hidden="true" />{language === "vi" ? "Đang mở…" : "Opening…"}</span>}
+              {opening === g.slug && <span className="game-opening" role="status"><LoaderCircle size={16} aria-hidden="true" />{translateText(language, "Opening…", "Đang mở…")}</span>}
               <div className="service-chips">
                 {g.services.slice(0, 3).map((s) => (
                   <Link
@@ -269,10 +270,9 @@ export function GameServices() {
         </div>
         <div className="service-foot">
           <span>
-            <span className="status-dot !bg-[#FF9F3C] !shadow-[0_0_8px_#FF9F3C]" /> YOUR NEXT CHAPTER IS ONE CLICK AWAY
-          </span>
+            <span className="status-dot !bg-[#FF9F3C] !shadow-[0_0_8px_#FF9F3C]" /> {translateText(language, "YOUR NEXT CHAPTER IS ONE CLICK AWAY", "Hành trình tiếp theo chỉ cách một lần nhấn")}</span>
           <Link href="/services" className="hover:text-[#FF9F3C] transition-colors">
-            Discover all services <ArrowUpRight size={15} />
+            {translateText(language, "Discover all services", "Khám phá tất cả dịch vụ")}<ArrowUpRight size={15} />
           </Link>
         </div>
       </div>

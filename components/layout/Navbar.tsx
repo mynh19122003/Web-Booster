@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +19,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { DashboardMenu } from "@/components/account/DashboardMenu";
+import { CartIcon } from "@/components/account/Cart";
 import { DashboardLanguage } from "@/components/account/DashboardLanguage";
 import { games } from "@/data/games";
 import { CurrencySwitch } from "@/components/ui/Currency";
@@ -56,7 +58,8 @@ export function Navbar() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/auth/me", { cache: "no-store" })
+    const loadUser = () => {
+      fetch("/api/auth/me", { cache: "no-store" })
       .then((response) => response.json())
       .then((result) => {
         if (active) setUser(result.user ?? null);
@@ -64,8 +67,12 @@ export function Navbar() {
       .catch(() => {
         if (active) setUser(null);
       });
+    };
+    loadUser();
+    window.addEventListener("ascend-profile-updated", loadUser);
     return () => {
       active = false;
+      window.removeEventListener("ascend-profile-updated", loadUser);
     };
   }, [pathname]);
 
@@ -165,7 +172,7 @@ export function Navbar() {
         <Link
           href="/"
           className="flex h-9 items-center text-white group transition-transform hover:scale-[1.02] shrink-0 justify-self-start"
-          aria-label="Ascend home"
+          aria-label={translateText(languageCode, "Ascend home")}
         >
           <span className="hidden sm:block"><AscendLogo variant="horizontal" size="md" /></span>
           <span className="sm:hidden"><AscendLogo variant="icon" size="md" /></span>
@@ -174,7 +181,7 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <nav
           className="hidden xl:flex h-9 items-center justify-self-center gap-6 text-xs font-semibold tracking-wider text-zinc-300 uppercase whitespace-nowrap"
-          aria-label="Main navigation"
+          aria-label={translateText(languageCode, "Main navigation")}
         >
           <Link
             href="/services"
@@ -247,6 +254,7 @@ export function Navbar() {
 
         {/* Action buttons */}
         <div className="flex h-9 items-center gap-2 sm:gap-4 justify-self-end shrink-0">
+          <CartIcon />
           <button
             ref={searchButtonRef}
             className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all shrink-0"
@@ -342,7 +350,7 @@ export function Navbar() {
           ) : (
             <Link
               className="h-9 flex items-center gap-2 px-3 rounded-full bg-[#FF9F3C]/10 hover:bg-[#FF9F3C]/20 border border-[#FF9F3C]/30 text-xs font-semibold text-[#FF9F3C] transition-all hover:shadow-[0_0_15px_rgba(255,159,60,0.2)]"
-              aria-label="Sign in or create an account"
+              aria-label={translateText(languageCode, "Sign in or create an account")}
               href="/login"
             >
               <UserRound size={15} />
@@ -354,7 +362,7 @@ export function Navbar() {
           <button
             ref={mobileButtonRef}
             className="xl:hidden w-9 h-9 flex items-center justify-center rounded-full text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
-            aria-label="Toggle navigation"
+            aria-label={translateText(languageCode, "Toggle navigation")}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
           >
@@ -419,7 +427,7 @@ export function Navbar() {
                 </button>
               </div>
 
-              <Link href="/account" onClick={() => setUserMenu(false)} className="profile-drawer-profile">
+              <Link href="/profile" onClick={() => setUserMenu(false)} className="profile-drawer-profile">
                 <span className="profile-drawer-avatar" aria-hidden="true">
                   {user.name.trim().charAt(0).toUpperCase()}
                 </span>
@@ -506,8 +514,7 @@ export function Navbar() {
           </div>
 
           <p className="text-xs font-bold tracking-widest text-[#FF9F3C] uppercase mb-4">
-            YOUR GAME. YOUR NEXT LEVEL.
-          </p>
+            {translateText(languageCode, "YOUR GAME. YOUR NEXT LEVEL.", "Trò chơi của bạn. Cấp độ tiếp theo.")}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
             {games.map((g) => (
@@ -589,8 +596,7 @@ export function Navbar() {
               g.name.toLowerCase().includes(query.toLowerCase()),
             ) && (
               <p className="text-zinc-500 text-sm py-4 text-center">
-                No games found. Try another title.
-              </p>
+                {translateText(languageCode, "No games found. Try another title.", "Không tìm thấy trò chơi. Hãy thử tên khác.")}</p>
             )}
           </div>
         </div>

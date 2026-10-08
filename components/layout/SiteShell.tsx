@@ -11,6 +11,7 @@ import { CurrencyProvider } from "@/components/ui/Currency";
 import { LanguageProvider } from "@/components/ui/LanguageProvider";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { Suspense } from "react";
+import { ChatLauncher } from "@/components/account/BoosterChat";
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
@@ -21,7 +22,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <LanguageProvider>
         <SkipLink />
         <CurrencyProvider />
-        <main id="main">{children}</main>
+        <Experience><main id="main">{children}</main></Experience>
       </LanguageProvider>
     );
   return (
@@ -36,6 +37,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <main id="main">{children}</main>
       </Experience>
       <Footer />
+      {path !== "/messages" && <ChatLauncher />}
       <Suspense fallback={null}>
         <Dialogs />
       </Suspense>

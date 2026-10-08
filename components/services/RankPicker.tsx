@@ -1,4 +1,5 @@
 "use client";
+import { translateText } from "@/lib/i18n";
 
 import Image from "next/image";
 import { Check, ChevronDown, X } from "lucide-react";
@@ -103,9 +104,9 @@ export function RankPicker({
   };
 
   return (
-    <fieldset className="border-0 m-0 p-0 min-w-0 w-full h-full">
+    <fieldset className="border-0 m-0 p-0 min-w-0 w-full self-start">
       {/* Hero Glassmorphic Card - Symmetrical with fixed min-height & balanced vertical rhythm */}
-      <div className="journey-rank-card relative group/card h-full min-h-[330px] bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_12px_36px_rgba(0,0,0,0.5)] rounded-2xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 hover:border-white/15">
+      <div className="journey-rank-card relative group/card min-h-[330px] bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_12px_36px_rgba(0,0,0,0.5)] rounded-2xl p-6 flex flex-col items-center justify-between text-center transition-all duration-300 hover:border-white/15">
         {/* Card Header Label */}
         <span className="text-sm font-sans font-semibold tracking-wide uppercase text-zinc-300 select-none">
           {label}
@@ -189,7 +190,7 @@ export function RankPicker({
                   </div>
                 ))}
               </div>
-              <p className="apex-lp-note">{language === "vi" ? "Đơn giá cơ bản. Giá cuối áp dụng điều chỉnh server." : "Base rates. Server adjustments apply to the final price."}</p>
+              <p className="apex-lp-note">{translateText(language, "Base rates. Server adjustments apply to the final price.", "Đơn giá cơ bản. Giá cuối áp dụng điều chỉnh server.")}</p>
             </div>
           )}
         </div>

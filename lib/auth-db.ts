@@ -111,3 +111,28 @@ export function getUserForSession(token: string): AuthUser | null {
 export function deleteSession(token: string) {
   database().prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash(token));
 }
+
+export type UserProfile = { name: string; email: string; phone: string; country: string; discord: string };
+function profileDatabase() {
+  const db = database();
+  db.exec(`CREATE TABLE IF NOT EXISTS user_profiles (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    phone TEXT NOT NULL DEFAULT '', country TEXT NOT NULL DEFAULT '', discord TEXT NOT NULL DEFAULT ''
+  )`);
+  return db;
+}
+export function getUserProfile(user: AuthUser): UserProfile {
+  const details = profileDatabase().prepare("SELECT phone, country, discord FROM user_profiles WHERE user_id = ?").get(user.id) as Pick<UserProfile, "phone" | "country" | "discord"> | undefined;
+  return { name: user.name, email: user.email, phone: "", country: "", discord: "", ...details };
+}
+export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email">): UserProfile {
+  const db = profileDatabase();
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare("UPDATE users SET name = ? WHERE id = ?").run(profile.name, user.id);
+    db.prepare(`INSERT INTO user_profiles (user_id, phone, country, discord) VALUES (?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET phone = excluded.phone, country = excluded.country, discord = excluded.discord`).run(user.id, profile.phone, profile.country, profile.discord);
+    db.exec("COMMIT");
+  } catch (error) { db.exec("ROLLBACK"); throw error; }
+  return { ...profile, email: user.email };
+}
