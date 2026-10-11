@@ -1,4 +1,5 @@
 "use client";
+import { GameIdentity } from "@/components/ui/GameIdentity";
 import { translateText } from "@/lib/i18n";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -243,7 +244,7 @@ export function Dialogs() {
           <h2>{saved ? t("requestSaved") : t("reviewPlanTitle")}</h2>
           <p>{quoteRequired ? t("checkoutDescription") : translateText(language, "Review your selected plan, then continue to payment and billing details.", "Kiểm tra gói đã chọn, sau đó tiếp tục đến thông tin thanh toán.")}</p>
           <div className="order-recap">
-            <strong>{games.find((g) => g.slug === s.game)?.name}</strong>
+            <GameIdentity game={s.game} />
             {s.coachBooking && (
               <span className="font-semibold text-emerald-400">
                 {translateText(language, "Coach", "Huấn luyện viên")}: {s.coachBooking.coachName} ({s.coachBooking.packageName})

@@ -2,6 +2,7 @@ import { apexConfig, rankProgress } from "@/lib/apex-ranks";
 import { rankLevelsFor } from "@/lib/service-options";
 import { APEX_PRICE_BANDS, DEFAULT_LP_GAIN, LP_GAIN_OPTIONS, rankPriceFactor } from "@/lib/rank-pricing";
 import priceData from "@/data/pricing/rank-prices.json";
+import { projectPackages, categoryQuote } from "@/lib/project-pricing";
 
 type RateTables = Record<string, Record<string, Record<string, (number | null)[]>>>;
 const rateTables: RateTables = priceData.games;
@@ -23,11 +24,14 @@ export function estimateQuote(
   lpGain = DEFAULT_LP_GAIN,
 ): Quote {
   const quantity = Math.max(1, Math.min(10, Math.floor(Number.isFinite(units) ? units : 1)));
-  if (service === "coaching" || service === "placements") {
+  if (service === "placements") {
+    return {...categoryQuote({game,product:"placements",region,queue,rank:rankLevelsFor(game)[current]?.label??"",quantity,start:0,goal:0,detail:"",winType:"top4",clashTier:"",clashBoosters:0}),lines:[]};
+  }
+  if (service === "coaching") {
     const hours = service === "coaching" ? quantity : quantity * 2;
     return {
       price: Number(
-        (quantity * (service === "coaching" ? 24 : 8.5)).toFixed(2),
+        (quantity * 24).toFixed(2),
       ),
       minHours: hours,
       maxHours: hours * 2,
@@ -41,22 +45,29 @@ export function estimateQuote(
   const deliverySteps = Number.isFinite(steps) ? Math.max(0, steps) : 1;
   const time = {minHours:Math.max(1, Math.ceil(deliverySteps)), maxHours:Math.max(2, Math.ceil(deliverySteps*2))};
   const unavailable = (): Quote => ({price:0, ...time, quoteRequired:true, lines:[]});
-  if (!Number.isInteger(current) || !Number.isInteger(target) || !ranks[current] || !ranks[target] || !Number.isFinite(steps) || steps <= 0 || !rateTables[game]?.[region]) return unavailable();
+  if (!Number.isInteger(current) || !Number.isInteger(target) || !ranks[current] || !ranks[target] || !Number.isFinite(steps) || steps <= 0 || !region) return unavailable();
   // Source snapshots cover standard solo ranked queues and PC Valorant.
   if ((game === "league-of-legends" && queue !== "Solo") ||
-      (game === "teamfight-tactics" && queue !== "Ranked") ||
+      (game === "teamfight-tactics" && !["Ranked","Double Up"].includes(queue)) ||
       (game === "valorant" && queue !== "Competitive") || service !== "rank-boost") return unavailable();
   const gain = game === "league-of-legends" ? lpGain : game === "valorant" ? "22 RR" : "default";
   if (game === "league-of-legends" && !LP_GAIN_OPTIONS.some(option => option.value === gain)) return unavailable();
-  const rates = rateTables[game]?.[region]?.[gain];
+  // All servers use NA as the base; older NA gain snapshots supplement the workbook.
+  const rates = rateTables[game]?.NA?.[gain];
+  const product = game === "valorant" ? "ranks" : queue === "Double Up" ? "double-up" : "divisions";
   const lines: QuoteLine[] = [];
   const firstApex = ranks.findIndex(rank => rank.tier === (game === "valorant" ? "Immortal" : "Master"));
   const regularEnd = apex ? Math.min(target, firstApex) : target;
   for (let rank = current; rank < regularEnd; rank++) {
-    const baseUsd = rates?.[rank];
+    const source = projectPackages.find(p => p.game === game && p.product === product && p.kind === "Từng bậc rank" && p.currentTier === ranks[rank].tier && String(p.currentDivision) === (game === "valorant" ? ["I","II","III"][Number(ranks[rank].division)-1] : ranks[rank].division));
+    const useWorkbook = game !== "league-of-legends" || gain === "19-22 LP";
+    const baseUsd = useWorkbook && source ? source.naUsd : queue === "Double Up" ? null : rates?.[rank];
     if (baseUsd == null || baseUsd <= 0) return unavailable();
     const tier = ranks[rank].tier;
-    lines.push({tier, points:game === "valorant" && rank >= firstApex ? 0 : 100, baseUsd, priceUsd:baseUsd * rankPriceFactor(region, tier)});
+    // The Double Up transition already includes 50 LP; an arbitrary apex
+    // destination needs its own quote to avoid counting that LP twice.
+    if(queue === "Double Up" && rank+1 === firstApex)return unavailable();
+    lines.push({tier, points:game === "valorant" && rank >= firstApex ? 0 : 100, baseUsd, priceUsd:baseUsd * rankPriceFactor(region)});
   }
   if (apex && target >= firstApex) {
     const from = current >= firstApex ? currentLp : 0;
@@ -65,7 +76,7 @@ export function estimateQuote(
       const points = Math.max(0, Math.min(targetLp, band.to) - Math.max(from, band.from));
       if (!points) continue;
       const baseUsd = points * band.usdPerLp;
-      lines.push({tier:band.tier, points, baseUsd, priceUsd:baseUsd * rankPriceFactor(region, band.tier)});
+      lines.push({tier:band.tier, points, baseUsd, priceUsd:baseUsd * rankPriceFactor(region)});
     }
   }
   // Radiant also requires a regional leaderboard position; confirm it manually.

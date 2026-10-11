@@ -26,6 +26,17 @@ export async function PATCH(request: Request) {
   if (phone && (!/^\+?[\d\s().-]{6,30}$/.test(phone) || phone.replace(/\D/g, "").length < 6 || phone.replace(/\D/g, "").length > 15)) return authError("invalid-phone", 400);
   if (country && !/^[A-Z]{2}$/.test(country)) return authError("invalid-country", 400);
   if (discord.length > 80) return authError("invalid-discord", 400);
-  try { return NextResponse.json({ profile: updateUserProfile(user, { name, phone, country, discord }) }); }
-  catch { return authError("save-failed", 500); }
+  let password: { currentPassword: string; newPassword: string; sessionToken: string } | undefined;
+  if (body.password !== undefined) {
+    if (!body.password || typeof body.password !== "object" || Array.isArray(body.password)) return authError("invalid-password", 400);
+    const { currentPassword, newPassword } = body.password as Record<string, unknown>;
+    if (typeof currentPassword !== "string" || !currentPassword || currentPassword.length > 128 || typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 128) return authError("invalid-password", 400);
+    if (currentPassword === newPassword) return authError("same-password", 400);
+    password = { currentPassword, newPassword, sessionToken: (await cookies()).get(SESSION_COOKIE)!.value };
+  }
+  try { return NextResponse.json({ profile: updateUserProfile(user, { name, phone, country, discord }, password) }); }
+  catch (error) {
+    if (error instanceof Error && ["external-account", "incorrect-password"].includes(error.message)) return authError(error.message, 400);
+    return authError("save-failed", 500);
+  }
 }

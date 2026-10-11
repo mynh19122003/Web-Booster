@@ -8,8 +8,13 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "employee:grant": "node scripts/grant-employee.mjs",
+    "coach:access": "node scripts/coach-access.mjs",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
+    "test:auth-riot": "node --test tests/auth-riot.test.mjs",
+    "test:pricing": "node --test tests/duo-pricing.test.mjs",
+    "riot:sync": "node scripts/sync-riot-catalog.mjs",
     "audit:lighthouse": "node scripts/lighthouse.mjs"
   },
   "dependencies": {
@@ -23,6 +28,7 @@
     "payment-icons": "^1.2.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-easy-crop": "^6.2.4",
     "react-icons": "^5.7.0",
     "simple-icons": "^16.34.0",
     "svg-path-bbox": "^2.1.0",

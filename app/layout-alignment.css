@@ -1,0 +1,30 @@
+/* Shared public page bounds, including navigation and footer. */
+:root {
+  --site-layout-width: 1450px;
+  --site-layout-gutter: 16px;
+}
+@media (min-width: 640px) {
+  :root { --site-layout-gutter: 24px; }
+}
+@media (min-width: 768px) {
+  :root { --site-layout-gutter: 32px; }
+}
+.container,
+.site-container,
+.wallet-page,
+.wallet-checkout-page,
+.profile-settings-page,
+.booster-messages-page,
+.account-detail-wrap,
+.br-account-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--site-layout-width);
+  margin-inline: auto;
+  padding-inline: var(--site-layout-gutter);
+}
+/* Account detail pages already provide their own inner wrapper. */
+.account-detail,
+.br-account-page { padding-inline: 0; }
+/* Reading content stays comfortable inside the aligned page bounds. */
+.container.prose > * { max-width: 800px; }

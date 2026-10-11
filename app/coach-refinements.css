@@ -1,0 +1,116 @@
+.coach-profile-checklist { border: 0; padding: 0; margin: 0; min-width: 0; }
+.coach-profile-checklist legend { margin-bottom: 10px; font-size: 13px; color: #d4d4d4; }
+.coach-profile-checklist > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.coach-profile-checklist label, .coach-profile-editor .coach-profile-form .coach-profile-checklist label, .coach-setup-fields .coach-profile-checklist label { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #ffffff26; border-radius: 999px; color: #d4d4d4; background: #19191d; cursor: pointer; font-size: 13px; }
+.coach-language-badge { display: inline-flex; align-items: center; gap: 6px; }
+.coach-profile-checklist label[data-selected="true"], .coach-profile-editor .coach-profile-form .coach-profile-checklist label[data-selected="true"], .coach-setup-fields .coach-profile-checklist label[data-selected="true"] { border-color: #ff9f3c; background: #ff9f3c26; color: #ff9f3c; }
+.coach-profile-checklist label input, .coaching-format-cards label input { position: absolute; width: 1px; height: 1px; min-height: 0; opacity: 0; padding: 0; border: 0; }
+.coach-profile-checklist label:has(input:focus-visible), .coaching-format-cards label:has(input:focus-visible) { outline: 2px solid #ff9f3c; outline-offset: 3px; }
+.coaching-format-cards { grid-column: 1/-1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; border: 0; padding: 0; margin: 18px 0 0; min-width: 0; }
+.coaching-format-cards legend { margin-bottom: 12px; font-size: 13px; color: #a3a3a3; }
+.coaching-format-cards label { position: relative; display: flex; align-items: center; gap: 12px; padding: 18px 14px; border: 1px solid #ffffff26; border-radius: 12px; cursor: pointer; background: #19191d; min-width: 0; }
+.coaching-format-cards label > svg { flex-shrink: 0; color: #a3a3a3; }
+.coaching-format-cards label span { display: grid; gap: 5px; min-width: 0; }
+.coaching-format-cards label strong { font-size: 14px; }
+.coaching-format-cards label small { color: #a3a3a3; font-size: 11px; line-height: 1.6; }
+.coaching-format-cards label[data-selected="true"] { border-color: #ff9f3c; background: #ff9f3c15; }
+.coaching-format-cards label[data-selected="true"] > svg { color: #ff9f3c; }
+.coaching-format-cards .format-selected-check { margin-inline-start: auto; visibility: hidden; }
+.coaching-format-cards label[data-selected="true"] .format-selected-check { visibility: visible; }
+.champion-stats-list { display: grid; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
+.champion-stats-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) minmax(84px, 110px); align-items: center; gap: 14px; padding: 12px; border: 1px solid #ffffff12; border-radius: 10px; background: #19191d; transition: background-color .2s, border-color .2s; }
+.champion-stats-row:hover { background: #171717e6; border-color: #ffffff26; }
+.champion-stats-row > img, .champion-stats-row > .account-image-empty { border-radius: 8px; }
+.champion-stats-identity { display: grid; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
+.champion-stats-row strong { font-size: 14px; }
+.champion-stats-row small { font-size: 11px; color: #a3a3a3; }
+.champion-win-rate { display: grid; gap: 8px; min-width: 0; text-align: end; font-family: var(--font-ascend-price), sans-serif; font-variant-numeric: tabular-nums; font-weight: 700; }
+.champion-win-rate[data-tier="high"] { color: #34d399; }
+.champion-win-rate[data-tier="medium"] { color: #ff9f3c; }
+.champion-win-rate[data-tier="low"] { color: #f43f5e; }
+.champion-win-rate small { font-weight: 400; }
+.champion-win-rate-track { height: 6px; overflow: hidden; border-radius: 999px; background: #ffffff12; }
+.champion-win-rate-fill { display: block; height: 100%; border-radius: inherit; background: currentColor; transform-origin: left; }
+.champion-stats-note { color: #a3a3a3; font-size: 12px; line-height: 1.8; margin: 18px 0 0; }
+.champion-stats-skeleton { display: grid; gap: 10px; margin-top: 20px; }
+.champion-stats-skeleton > div { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 10px; background: #ffffff06; }
+.champion-stats-skeleton i, .champion-stats-skeleton span { display: block; background: #ffffff12; border-radius: 8px; animation: champion-loading 1.5s ease-in-out infinite alternate; }
+.champion-stats-skeleton i { width: 48px; height: 48px; }
+.champion-stats-skeleton span { width: 60%; height: 28px; }
+@keyframes champion-loading { to { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .champion-stats-skeleton i, .champion-stats-skeleton span { animation: none; } }
+.support-inbox-direct { display: flex; }
+.support-inbox-direct .support-inbox-sidebar { display: none; }
+.support-inbox-direct .support-inbox-thread { display: flex !important; width: 100%; }
+.booster-chat-presence { display: flex; align-items: center; gap: 7px; }
+.booster-chat-presence i { display: block; width: 7px; height: 7px; border-radius: 50%; background: #737373; }
+.booster-chat-presence[data-online="true"] i { background: #34d399; box-shadow: 0 0 8px #34d39966; }
+.wallet-pay-now:disabled { cursor: not-allowed; }
+@media (min-width: 1101px) { .support-inbox-employee .employee-order-panel { width: 41.6667%; } }
+@media (max-width: 500px) { .coaching-format-cards label { flex-wrap: wrap; gap: 8px; padding: 12px; } .coaching-format-cards label span { width: 100%; order: 2; } }
+
+/* Keep authentication visible from the first paint; avoid nested GPU blur layers. */
+body .auth-page { min-height: 100svh; background: #0f0f12; }
+body .auth-page .auth-layout { background: #151518; backdrop-filter: none; -webkit-backdrop-filter: none; }
+body .auth-page :is(.auth-aside, .auth-content) { backdrop-filter: none; -webkit-backdrop-filter: none; }
+body .auth-page .auth-aside { background: radial-gradient(ellipse at 70% 70%, #ff984e16, transparent 52%), #17171d; }
+body .auth-page .auth-content { background: #111114; }
+html[data-theme="light"] body .auth-page { background: #f4f5f7; }
+html[data-theme="light"] body .auth-page :is(.auth-layout, .auth-content) { background: #fffdfa; }
+html[data-theme="light"] body .auth-page .auth-aside { background: #f1f0ed; }
+@media (max-width: 767px) { body .auth-page { padding-top: 80px; } }
+
+/* Keep the edit identity and all profile actions on the same center axis. */
+.riot-connection .coach-header-row { gap: 20px; }
+.riot-connection .coach-header-left { min-width: 0; }
+.coach-header-avatar { flex-shrink: 0; }
+.coach-header-identity { min-width: 0; }
+.coach-header-identity .coach-game-pill { display: inline-flex; max-width: 100%; overflow-wrap: anywhere; }
+.coach-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; margin-inline-start: auto; min-width: 0; }
+.coach-header-actions .coach-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; text-decoration: none; }
+.coach-header-actions .coach-availability-switch { min-height: 44px; }
+.coach-header-actions .coach-btn-secondary:disabled { opacity: .6; cursor: wait; }
+.riot-connection .riot-sync-button, .riot-connection .riot-connection-actions .coach-match-more { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.riot-connection .riot-connection-actions .coach-match-more { min-height: 44px; border: 1px solid #ff9f3c2e; border-radius: 10px; }
+.riot-connection .riot-connection-actions .coach-match-more:focus-visible { outline: 2px solid #ff9f3c; outline-offset: 3px; }
+.riot-connection .riot-connection-actions .coach-match-more:hover:not(:disabled) { border-color: #ff9f3c66; color: #ff9f3c; }
+.riot-connection .riot-connection-actions .coach-match-more:active:not(:disabled) { transform: translateY(0); background: #ff9f3c26; }
+.riot-connection .riot-connection-actions .coach-match-more:disabled { transform: none; }
+
+/* Badges and their hover borders need visible space inside the hero. */
+.coach-profile-page .coach-profile-hero { overflow: visible; }
+.coach-profile-page .coach-profile-hero::after { border-radius: inherit; }
+.coach-attributes { margin-top: 0; padding-top: 24px; overflow: visible; }
+.coach-attribute-group, .coach-attribute-badges { overflow: visible; }
+.coach-attribute-badge { max-width: 100%; transition: border-color .2s, color .2s, background-color .2s; }
+.coach-attribute-badge:hover { border-color: #ff9f3c66; color: #fff; background: #ff9f3c0a; }
+.coach-language-badge { min-width: 0; }
+.coach-language-badge > span { overflow-wrap: anywhere; }
+.coach-language-flag { display: block; flex-shrink: 0; }
+
+/* Reserve space for the featured badge and hover elevation above the grid. */
+.coach-profile-page .coach-offer-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 16px 0 6px; overflow: visible; }
+.coach-duo-package { display: flex; min-width: 0; position: relative; }
+.coach-duo-package:hover, .coach-duo-package:focus-within { z-index: 1; }
+.coach-profile-page .coach-duo-package .coach-offer-card { width: 100%; height: 100%; min-height: 212px; padding-bottom: 30px; background: #1f1f23; transition: border-color .2s, background-color .2s, box-shadow .2s; }
+.coach-profile-page .coach-duo-package .coach-offer-card:hover, .coach-profile-page .coach-duo-package .coach-offer-card:focus-visible { border-color: #ff9f3c66; background: #252023; box-shadow: 0 8px 24px rgba(255,159,60,.18); }
+.coach-profile-page .coach-duo-package .coach-offer-card.is-selected { border-color: #ff9f3c; background: #ff9f3c12; box-shadow: 0 8px 24px rgba(255,159,60,.18); }
+.coach-offer-card:focus-visible { outline: 2px solid #ff9f3c; outline-offset: 4px; }
+.coach-offer-selection { position: absolute; bottom: 9px; right: 9px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #ff9f3c; color: #0f0f10; opacity: 0; transition: opacity .2s; }
+.coach-offer-card.is-selected .coach-offer-selection { opacity: 1; }
+.coach-offer-price { font-family: var(--font-ascend-price), sans-serif; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1279px) { .coach-profile-page .coach-offer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .coach-header-actions { width: 100%; justify-content: flex-start; margin-inline-start: 0; }
+  .coach-profile-page .coach-offer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; }
+  .champion-stats-row { grid-template-columns: 40px minmax(0, 1fr) 84px; gap: 10px; padding: 10px; }
+  .champion-stats-row > img { width: 40px; height: 40px; }
+  .champion-win-rate small { display: block; }
+}
+@media (max-width: 359px) { .coach-profile-page .coach-offer-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) {
+  .coach-attribute-badge, .champion-stats-row, .coach-offer-selection, .coach-profile-page .coach-duo-package .coach-offer-card, .coach-header-actions .coach-switch-track i { transition: none; }
+  .coach-duo-package { transform: none !important; }
+  .riot-connection .animate-spin { animation: none; }
+}

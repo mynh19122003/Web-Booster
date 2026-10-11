@@ -9,6 +9,7 @@ const callingCodes: Record<string, string> = {
 };
 
 export const phoneCountries = Object.entries(callingCodes).map(([code, dial]) => ({ code, dial }));
+export const headerPhoneCountries = phoneCountries.filter(country => languages.some(language => language.flagCode === country.code));
 export function phoneCountryForLanguage(language: string) {
   return languages.find((item) => item.code === language)?.flagCode ?? "gb";
 }

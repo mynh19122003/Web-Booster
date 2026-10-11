@@ -4,11 +4,12 @@ import { NumberInput } from "@/components/ui/NumberInput";
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Heart, Search, ShieldCheck, Star, X } from "lucide-react";
-import { coachGameLogoPath, coachRankCardIconPath, coaches } from "@/data/coaches";
+import { coachGameLogoPath, coachRankCardIconPath, type Coach } from "@/data/coaches";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { useMoney } from "@/components/ui/Currency";
+import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
 
 const games = [
   { slug: "all", label: "filterAllGames" },
@@ -17,11 +18,35 @@ const games = [
   { slug: "teamfight-tactics", label: "Teamfight Tactics" },
 ] as const;
 
-export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
+export function CoachDirectory({ gameSlug, initialCoaches }: { gameSlug?: string; initialCoaches?: Coach[] }) {
   const { t } = useLanguage();
   const money = useMoney();
   const [search, setSearch] = useState("");
   const [selectedGame, setSelectedGame] = useState(gameSlug ?? "all");
+  const [coachList, setCoachList] = useState<Coach[]>(initialCoaches ?? []);
+
+  useEffect(() => {
+    const abort = new AbortController();
+    let pending = false;
+    async function refresh() {
+      if (document.hidden || pending) return;
+      pending = true;
+      try {
+        const response = await fetch("/api/coaches", { cache: "no-store", signal: abort.signal });
+        if (response.ok) {
+          const data = await response.json();
+          if (!abort.signal.aborted && Array.isArray(data.coaches)) setCoachList(data.coaches);
+        }
+      } catch {} finally { pending = false; }
+    }
+    void refresh();
+    const timer = setInterval(refresh, 15000);
+    const unsubscribe = subscribeCoachProfileUpdates(() => { void refresh(); });
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { unsubscribe(); abort.abort(); clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+  }, [initialCoaches]);
+
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [hundredReviewsOnly, setHundredReviewsOnly] = useState(false);
   const [mvpOnly, setMvpOnly] = useState(false);
@@ -38,7 +63,7 @@ export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
   const [sessionFormat, setSessionFormat] = useState("all");
   const [sortBy, setSortBy] = useState("top");
 
-  const gameCoaches = useMemo(() => selectedGame === "all" ? coaches : coaches.filter((coach) => coach.game === selectedGame), [selectedGame]);
+  const gameCoaches = useMemo(() => selectedGame === "all" ? coachList : coachList.filter((coach) => coach.game === selectedGame), [selectedGame, coachList]);
   const languages = useMemo(() => [...new Set(gameCoaches.flatMap((coach) => coach.languages))].sort(), [gameCoaches]);
   const roles = useMemo(() => [...new Set(gameCoaches.flatMap((coach) => coach.roles))].sort(), [gameCoaches]);
   const ranks = useMemo(() => [...new Set(gameCoaches.map((coach) => coach.peakRank))].sort().map((rank) => ({ rank, count: gameCoaches.filter((coach) => coach.peakRank === rank).length })), [gameCoaches]);
@@ -52,7 +77,7 @@ export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
     setServer("all");
   }
 
-  const filtered = useMemo(() => coaches.filter((coach) => {
+  const filtered = useMemo(() => coachList.filter((coach) => {
     const searchText = (coach.name + " " + coach.gameName + " " + coach.roles.join(" ") + " " + coach.languages.join(" ")).toLowerCase();
     const inPriceBand = priceBand === "all" ||
       (priceBand === "under20" && coach.hourlyRate < 20) ||
@@ -80,7 +105,7 @@ export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
     if (sortBy === "priceLow") return a.hourlyRate - b.hourlyRate;
     if (sortBy === "priceHigh") return b.hourlyRate - a.hourlyRate;
     return 0;
-  }), [favorites, favoritesOnly, hundredReviewsOnly, language, maxRate, minRate, mvpOnly, onlineOnly, peakRanks, priceBand, role, search, selectedGame, server, sessionFormat, sortBy, topRatedOnly]);
+  }), [coachList, favorites, favoritesOnly, hundredReviewsOnly, language, maxRate, minRate, mvpOnly, onlineOnly, peakRanks, priceBand, role, search, selectedGame, server, sessionFormat, sortBy, topRatedOnly]);
 
   function toggleFavorite(slug: string) {
     setFavorites((current) => current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug]);
@@ -163,7 +188,7 @@ export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
               <Link className="coach-card-main" href={"/coaches/" + coach.slug + "?game=" + coach.game} aria-label={t("viewCoachProfile") + ": " + coach.name}>
                 <div className="coach-card-cover">
                   <span className="coach-card-game"><Image src={coachGameLogoPath(coach.game)} alt="" width={26} height={26} />{coach.gameName}</span>
-                  <Image className="coach-card-avatar" src={"/images/coaches/" + coach.slug + ".svg"} alt="" width={92} height={92} />
+                  <Image className="coach-card-avatar" src={coach.avatar || ("/images/coaches/" + coach.slug + ".svg")} alt="" width={92} height={92} unoptimized={Boolean(coach.avatar?.startsWith("data:"))} />
                   <span className={"coach-presence " + (coach.online ? "is-online" : "is-offline")}><i className={coach.online ? "is-online" : ""} />{coach.online ? t("coachOnline") : t("coachOffline")}</span>
                 </div>
                 <div className="coach-card-content">
@@ -171,7 +196,7 @@ export function CoachDirectory({ gameSlug }: { gameSlug?: string }) {
                     <div><h3>{coach.name}</h3><span className="coach-verified"><ShieldCheck size={14} />{t("verifiedCoach")}</span>{coach.isMvp && <span className="coach-mvp-badge">{t("mvpCoach")}</span>}</div>
                     <span className="coach-rating"><Star size={15} fill="currentColor" />{coach.rating.toFixed(2)} <small>({coach.reviewCount} {t("coachReviews")})</small></span>
                   </div>
-                  <p className="coach-card-bio">{t(coach.bioKey)}</p>
+                  <p className="coach-card-bio">{coach.bioOverride || t(coach.bioKey)}</p>
                   <div className="coach-card-achievement" data-game={coach.game}>
                     <Image src={coachRankCardIconPath(coach.game, coach.peakRank)} alt="" width={52} height={52} />
                     <div><span>{t("coachPeakRank")}</span><strong>{coach.peakRank}</strong></div>

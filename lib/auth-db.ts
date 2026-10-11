@@ -7,7 +7,7 @@ declare global {
   var ascendAuthDatabase: DatabaseSync | undefined;
 }
 
-export type AuthUser = { id: string; name: string; email: string };
+export type AuthUser = { id: string; name: string; email: string; role: "customer" | "user" | "employee" };
 
 function database() {
   if (globalThis.ascendAuthDatabase) return globalThis.ascendAuthDatabase;
@@ -33,16 +33,23 @@ function database() {
     );
     CREATE INDEX IF NOT EXISTS sessions_expiry ON sessions(expires_at);
   `);
+  const columns = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  if (!columns.some(column => column.name === "role")) {
+    db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'employee'))");
+  }
   globalThis.ascendAuthDatabase = db;
   return db;
 }
 
 const tokenHash = (token: string) => createHash("sha256").update(token).digest("hex");
-const safeUser = (row: { id: string; name: string; email: string }): AuthUser => ({
+export const safeUser = (row: AuthUser): AuthUser => ({
   id: row.id,
   name: row.name,
   email: row.email,
+  role: row.role,
 });
+
+export const authDatabase = database;
 
 export function createPasswordHash(password: string) {
   const salt = randomBytes(16);
@@ -64,13 +71,13 @@ export function createUser(name: string, email: string, password: string) {
   database().prepare(
     "INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)",
   ).run(id, name, email.toLowerCase(), createPasswordHash(password), new Date().toISOString());
-  return { id, name, email: email.toLowerCase() } satisfies AuthUser;
+  return { id, name, email: email.toLowerCase(), role: "customer" } satisfies AuthUser;
 }
 
 export function findUserByEmail(email: string) {
   const row = database().prepare(
-    "SELECT id, name, email, password_hash FROM users WHERE email = ?",
-  ).get(email.toLowerCase()) as ({ id: string; name: string; email: string; password_hash: string | null }) | undefined;
+    "SELECT id, name, email, role, password_hash FROM users WHERE email = ?",
+  ).get(email.toLowerCase()) as (AuthUser & { password_hash: string | null }) | undefined;
   return row;
 }
 
@@ -79,12 +86,12 @@ export function createGoogleUser(name: string, email: string, googleSub: string)
   database().prepare(
     "INSERT INTO users (id, name, email, google_sub, created_at) VALUES (?, ?, ?, ?, ?)",
   ).run(id, name, email.toLowerCase(), googleSub, new Date().toISOString());
-  return { id, name, email: email.toLowerCase() } satisfies AuthUser;
+  return { id, name, email: email.toLowerCase(), role: "customer" } satisfies AuthUser;
 }
 
 export function findGoogleUser(subject: string) {
   const row = database().prepare(
-    "SELECT id, name, email FROM users WHERE google_sub = ?",
+    "SELECT id, name, email, role FROM users WHERE google_sub = ?",
   ).get(subject) as AuthUser | undefined;
   return row;
 }
@@ -101,7 +108,7 @@ export function createSession(userId: string) {
 
 export function getUserForSession(token: string): AuthUser | null {
   const row = database().prepare(`
-    SELECT users.id, users.name, users.email
+    SELECT users.id, users.name, users.email, users.role
     FROM sessions JOIN users ON users.id = sessions.user_id
     WHERE sessions.token_hash = ? AND sessions.expires_at > ?
   `).get(tokenHash(token), Date.now()) as AuthUser | undefined;
@@ -110,6 +117,20 @@ export function getUserForSession(token: string): AuthUser | null {
 
 export function deleteSession(token: string) {
   database().prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash(token));
+}
+
+export function changeUserPassword(userId: string, currentPassword: string, newPassword: string, sessionToken: string) {
+  const db = database();
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(userId) as { password_hash: string | null } | undefined;
+    if (!row?.password_hash) { db.exec("ROLLBACK"); return "external-account" as const; }
+    if (!verifyPassword(currentPassword, row.password_hash)) { db.exec("ROLLBACK"); return "incorrect-password" as const; }
+    db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(newPassword), userId);
+    db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(userId, tokenHash(sessionToken));
+    db.exec("COMMIT");
+    return "saved" as const;
+  } catch (error) { db.exec("ROLLBACK"); throw error; }
 }
 
 export type UserProfile = { name: string; email: string; phone: string; country: string; discord: string };
@@ -125,10 +146,17 @@ export function getUserProfile(user: AuthUser): UserProfile {
   const details = profileDatabase().prepare("SELECT phone, country, discord FROM user_profiles WHERE user_id = ?").get(user.id) as Pick<UserProfile, "phone" | "country" | "discord"> | undefined;
   return { name: user.name, email: user.email, phone: "", country: "", discord: "", ...details };
 }
-export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email">): UserProfile {
+export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email">, password?: { currentPassword: string; newPassword: string; sessionToken: string }): UserProfile {
   const db = profileDatabase();
   db.exec("BEGIN IMMEDIATE");
   try {
+    if (password) {
+      const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(user.id) as { password_hash: string | null } | undefined;
+      if (!row?.password_hash) throw new Error("external-account");
+      if (!verifyPassword(password.currentPassword, row.password_hash)) throw new Error("incorrect-password");
+      db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(password.newPassword), user.id);
+      db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(user.id, tokenHash(password.sessionToken));
+    }
     db.prepare("UPDATE users SET name = ? WHERE id = ?").run(profile.name, user.id);
     db.prepare(`INSERT INTO user_profiles (user_id, phone, country, discord) VALUES (?, ?, ?, ?)
       ON CONFLICT(user_id) DO UPDATE SET phone = excluded.phone, country = excluded.country, discord = excluded.discord`).run(user.id, profile.phone, profile.country, profile.discord);

@@ -1,0 +1,2594 @@
+[
+  {
+    "id": "account-v1.getByPuuid",
+    "group": "account-v1",
+    "games": [
+      "lol",
+      "tft",
+      "valorant"
+    ],
+    "path": "/riot/account/v1/accounts/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get account by puuid",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#account-v1/GET_getByPuuid"
+  },
+  {
+    "id": "account-v1.getByRiotId",
+    "group": "account-v1",
+    "games": [
+      "lol",
+      "tft",
+      "valorant"
+    ],
+    "path": "/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}",
+    "pathInputs": [
+      {
+        "name": "tagLine",
+        "required": true,
+        "type": "string",
+        "description": "When querying for a player by their riot id, the gameName and tagLine query params are required.",
+        "choices": []
+      },
+      {
+        "name": "gameName",
+        "required": true,
+        "type": "string",
+        "description": "When querying for a player by their riot id, the gameName and tagLine query params are required.",
+        "choices": []
+      }
+    ],
+    "summary": "Get account by riot id",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#account-v1/GET_getByRiotId"
+  },
+  {
+    "id": "account-v1.getByAccessToken",
+    "group": "account-v1",
+    "games": [
+      "lol",
+      "tft",
+      "valorant"
+    ],
+    "path": "/riot/account/v1/accounts/me",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get account by access token",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe"
+    ],
+    "query": [],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#account-v1/GET_getByAccessToken"
+  },
+  {
+    "id": "account-v1.getActiveShard",
+    "group": "account-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/riot/account/v1/active-shards/by-game/{game}/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "game",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "val",
+          "lor",
+          "2xko"
+        ]
+      },
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get active shard for a player",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#account-v1/GET_getActiveShard"
+  },
+  {
+    "id": "account-v1.getActiveRegion",
+    "group": "account-v1",
+    "games": [
+      "lol",
+      "tft"
+    ],
+    "path": "/riot/account/v1/region/by-game/{game}/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      },
+      {
+        "name": "game",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "lol",
+          "tft"
+        ]
+      }
+    ],
+    "summary": "Get active region (lol and tft)",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#account-v1/GET_getActiveRegion"
+  },
+  {
+    "id": "champion-mastery-v4.getAllChampionMasteriesByPUUID",
+    "group": "champion-mastery-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/champion-mastery/v4/champion-masteries/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get all champion mastery entries sorted by number of champion points descending.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#champion-mastery-v4/GET_getAllChampionMasteriesByPUUID"
+  },
+  {
+    "id": "champion-mastery-v4.getChampionMasteryByPUUID",
+    "group": "champion-mastery-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/champion-mastery/v4/champion-masteries/by-puuid/{encryptedPUUID}/by-champion/{championId}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      },
+      {
+        "name": "championId",
+        "required": true,
+        "type": "integer",
+        "description": "Champion ID to retrieve Champion Mastery.",
+        "choices": []
+      }
+    ],
+    "summary": "Get a champion mastery by puuid and champion ID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#champion-mastery-v4/GET_getChampionMasteryByPUUID"
+  },
+  {
+    "id": "champion-mastery-v4.getTopChampionMasteriesByPUUID",
+    "group": "champion-mastery-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/champion-mastery/v4/champion-masteries/by-puuid/{encryptedPUUID}/top",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get specified number of top champion mastery entries sorted by number of champion points descending.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "count",
+        "required": false,
+        "type": "int",
+        "description": "Number of entries to retrieve, defaults to 3.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#champion-mastery-v4/GET_getTopChampionMasteriesByPUUID"
+  },
+  {
+    "id": "champion-mastery-v4.getChampionMasteryScoreByPUUID",
+    "group": "champion-mastery-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/champion-mastery/v4/scores/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a player's total champion mastery score, which is the sum of individual champion mastery levels.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#champion-mastery-v4/GET_getChampionMasteryScoreByPUUID"
+  },
+  {
+    "id": "champion-v3.getChampionInfo",
+    "group": "champion-v3",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/platform/v3/champion-rotations",
+    "pathInputs": [],
+    "summary": "Returns champion rotations, including free-to-play and low-level free-to-play rotations (REST)",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#champion-v3/GET_getChampionInfo"
+  },
+  {
+    "id": "clash-v1.getPlayersByPUUID",
+    "group": "clash-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/clash/v1/players/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get players by puuid",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#clash-v1/GET_getPlayersByPUUID"
+  },
+  {
+    "id": "clash-v1.getTeamById",
+    "group": "clash-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/clash/v1/teams/{teamId}",
+    "pathInputs": [
+      {
+        "name": "teamId",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get team by ID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#clash-v1/GET_getTeamById"
+  },
+  {
+    "id": "clash-v1.getTournaments",
+    "group": "clash-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/clash/v1/tournaments",
+    "pathInputs": [],
+    "summary": "Get all active or upcoming tournaments.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#clash-v1/GET_getTournaments"
+  },
+  {
+    "id": "clash-v1.getTournamentByTeam",
+    "group": "clash-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/clash/v1/tournaments/by-team/{teamId}",
+    "pathInputs": [
+      {
+        "name": "teamId",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get tournament by team ID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#clash-v1/GET_getTournamentByTeam"
+  },
+  {
+    "id": "clash-v1.getTournamentById",
+    "group": "clash-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/clash/v1/tournaments/{tournamentId}",
+    "pathInputs": [
+      {
+        "name": "tournamentId",
+        "required": true,
+        "type": "int",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get tournament by ID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#clash-v1/GET_getTournamentById"
+  },
+  {
+    "id": "league-exp-v4.getLeagueEntries",
+    "group": "league-exp-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league-exp/v4/entries/{queue}/{tier}/{division}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "Note that the queue value must be a valid ranked queue.",
+        "choices": [
+          "RANKED_SOLO_5x5",
+          "RANKED_TFT",
+          "RANKED_FLEX_SR",
+          "RANKED_FLEX_TT"
+        ]
+      },
+      {
+        "name": "tier",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "CHALLENGER",
+          "GRANDMASTER",
+          "MASTER",
+          "DIAMOND",
+          "EMERALD",
+          "PLATINUM",
+          "GOLD",
+          "SILVER",
+          "BRONZE",
+          "IRON"
+        ]
+      },
+      {
+        "name": "division",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "I",
+          "II",
+          "III",
+          "IV"
+        ]
+      }
+    ],
+    "summary": "Get all the league entries.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "page",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 1. Starts with page 1.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-exp-v4/GET_getLeagueEntries"
+  },
+  {
+    "id": "league-v4.getChallengerLeague",
+    "group": "league-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league/v4/challengerleagues/by-queue/{queue}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "RANKED_SOLO_5x5",
+          "RANKED_FLEX_SR",
+          "RANKED_FLEX_TT"
+        ]
+      }
+    ],
+    "summary": "Get the challenger league for given queue.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-v4/GET_getChallengerLeague"
+  },
+  {
+    "id": "league-v4.getLeagueEntriesByPUUID",
+    "group": "league-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league/v4/entries/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get league entries in all queues for a given puuid",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntriesByPUUID"
+  },
+  {
+    "id": "league-v4.getLeagueEntries",
+    "group": "league-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league/v4/entries/{queue}/{tier}/{division}",
+    "pathInputs": [
+      {
+        "name": "division",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "I",
+          "II",
+          "III",
+          "IV"
+        ]
+      },
+      {
+        "name": "tier",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "DIAMOND",
+          "EMERALD",
+          "PLATINUM",
+          "GOLD",
+          "SILVER",
+          "BRONZE",
+          "IRON"
+        ]
+      },
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "Note that the queue value must be a valid ranked queue.",
+        "choices": [
+          "RANKED_SOLO_5x5",
+          "RANKED_FLEX_SR",
+          "RANKED_FLEX_TT"
+        ]
+      }
+    ],
+    "summary": "Get all the league entries.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "page",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 1. Starts with page 1.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntries"
+  },
+  {
+    "id": "league-v4.getGrandmasterLeague",
+    "group": "league-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league/v4/grandmasterleagues/by-queue/{queue}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "RANKED_SOLO_5x5",
+          "RANKED_FLEX_SR",
+          "RANKED_FLEX_TT"
+        ]
+      }
+    ],
+    "summary": "Get the grandmaster league of a specific queue.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-v4/GET_getGrandmasterLeague"
+  },
+  {
+    "id": "league-v4.getMasterLeague",
+    "group": "league-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/league/v4/masterleagues/by-queue/{queue}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "RANKED_SOLO_5x5",
+          "RANKED_FLEX_SR",
+          "RANKED_FLEX_TT"
+        ]
+      }
+    ],
+    "summary": "Get the master league for given queue.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#league-v4/GET_getMasterLeague"
+  },
+  {
+    "id": "lol-challenges-v1.getAllChallengeConfigs",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/challenges/config",
+    "pathInputs": [],
+    "summary": "List of all basic challenge configuration information (includes all translations for names and descriptions)",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getAllChallengeConfigs"
+  },
+  {
+    "id": "lol-challenges-v1.getAllChallengePercentiles",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/challenges/percentiles",
+    "pathInputs": [],
+    "summary": "Map of level to percentile of players who have achieved it - keys: ChallengeId -&gt; Season -&gt; Level -&gt; percentile of players who achieved it",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getAllChallengePercentiles"
+  },
+  {
+    "id": "lol-challenges-v1.getChallengeConfigs",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/challenges/{challengeId}/config",
+    "pathInputs": [
+      {
+        "name": "challengeId",
+        "required": true,
+        "type": "long",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get challenge configuration (REST)",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getChallengeConfigs"
+  },
+  {
+    "id": "lol-challenges-v1.getChallengeLeaderboards",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/challenges/{challengeId}/leaderboards/by-level/{level}",
+    "pathInputs": [
+      {
+        "name": "level",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "NONE",
+          "IRON",
+          "BRONZE",
+          "SILVER",
+          "GOLD",
+          "PLATINUM",
+          "DIAMOND",
+          "MASTER",
+          "GRANDMASTER",
+          "CHALLENGER",
+          "HIGHEST_NOT_LEADERBOARD_ONLY",
+          "HIGHEST",
+          "LOWEST"
+        ]
+      },
+      {
+        "name": "challengeId",
+        "required": true,
+        "type": "long",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Return top players for each level. Level must be MASTER, GRANDMASTER or CHALLENGER.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "limit",
+        "required": false,
+        "type": "int",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getChallengeLeaderboards"
+  },
+  {
+    "id": "lol-challenges-v1.getChallengePercentiles",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/challenges/{challengeId}/percentiles",
+    "pathInputs": [
+      {
+        "name": "challengeId",
+        "required": true,
+        "type": "long",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Map of level to percentile of players who have achieved it",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getChallengePercentiles"
+  },
+  {
+    "id": "lol-challenges-v1.getPlayerData",
+    "group": "lol-challenges-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/challenges/v1/player-data/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Returns player information with list of all progressed challenges (REST)",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-challenges-v1/GET_getPlayerData"
+  },
+  {
+    "id": "lol-rso-match-v1.getMatchIds",
+    "group": "lol-rso-match-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/rso-match/v1/matches/ids",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a list of match ids by player access token - Includes custom matches",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [
+      {
+        "name": "count",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 20. Valid values: 0 to 100. Number of match ids to return.",
+        "choices": []
+      },
+      {
+        "name": "start",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 0. Start index.",
+        "choices": []
+      },
+      {
+        "name": "type",
+        "required": false,
+        "type": "string",
+        "description": "Filter the list of match ids by the type of match. This filter is mutually inclusive of the queue filter meaning any match ids returned must match both the queue and type filters.",
+        "choices": [
+          "ranked",
+          "normal",
+          "tourney",
+          "tutorial"
+        ]
+      },
+      {
+        "name": "queue",
+        "required": false,
+        "type": "int",
+        "description": "Filter the list of match ids by a specific queue id. This filter is mutually inclusive of the type filter meaning any match ids returned must match both the queue and type filters.",
+        "choices": []
+      },
+      {
+        "name": "endTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds.",
+        "choices": []
+      },
+      {
+        "name": "startTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds. The matchlist started storing timestamps on June 16th, 2021. Any matches played before June 16th, 2021 won't be included in the results if the startTime filter is set.",
+        "choices": []
+      }
+    ],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-rso-match-v1/GET_getMatchIds"
+  },
+  {
+    "id": "lol-rso-match-v1.getMatch",
+    "group": "lol-rso-match-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/rso-match/v1/matches/{matchId}",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a match by match id",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-rso-match-v1/GET_getMatch"
+  },
+  {
+    "id": "lol-rso-match-v1.getTimeline",
+    "group": "lol-rso-match-v1",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/rso-match/v1/matches/{matchId}/timeline",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a match timeline by match id",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-rso-match-v1/GET_getTimeline"
+  },
+  {
+    "id": "lol-status-v4.getPlatformData",
+    "group": "lol-status-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/status/v4/platform-data",
+    "pathInputs": [],
+    "summary": "Get League of Legends status for the given platform.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#lol-status-v4/GET_getPlatformData"
+  },
+  {
+    "id": "match-v5.getMatchIdsByPUUID",
+    "group": "match-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/match/v5/matches/by-puuid/{puuid}/ids",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a list of match ids by puuid",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [
+      {
+        "name": "startTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds. The matchlist started storing timestamps on June 16th, 2021. Any matches played before June 16th, 2021 won't be included in the results if the startTime filter is set.",
+        "choices": []
+      },
+      {
+        "name": "endTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds.",
+        "choices": []
+      },
+      {
+        "name": "queue",
+        "required": false,
+        "type": "int",
+        "description": "Filter the list of match ids by a specific queue id. This filter is mutually inclusive of the type filter meaning any match ids returned must match both the queue and type filters.",
+        "choices": []
+      },
+      {
+        "name": "type",
+        "required": false,
+        "type": "string",
+        "description": "Filter the list of match ids by the type of match. This filter is mutually inclusive of the queue filter meaning any match ids returned must match both the queue and type filters.",
+        "choices": [
+          "ranked",
+          "normal",
+          "tourney",
+          "tutorial"
+        ]
+      },
+      {
+        "name": "start",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 0. Start index.",
+        "choices": []
+      },
+      {
+        "name": "count",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 20. Valid values: 0 to 100. Number of match ids to return.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#match-v5/GET_getMatchIdsByPUUID"
+  },
+  {
+    "id": "match-v5.getReplay",
+    "group": "match-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/match/v5/matches/by-puuid/{puuid}/replays",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get player replays",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#match-v5/GET_getReplay"
+  },
+  {
+    "id": "match-v5.getMatch",
+    "group": "match-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/match/v5/matches/{matchId}",
+    "pathInputs": [
+      {
+        "name": "matchId",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a match by match id",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#match-v5/GET_getMatch"
+  },
+  {
+    "id": "match-v5.getTimeline",
+    "group": "match-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/match/v5/matches/{matchId}/timeline",
+    "pathInputs": [
+      {
+        "name": "matchId",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a match timeline by match id",
+    "hosts": [
+      "americas",
+      "asia",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#match-v5/GET_getTimeline"
+  },
+  {
+    "id": "spectator-v5.getCurrentGameInfoByPuuid",
+    "group": "spectator-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/spectator/v5/active-games/by-summoner/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "The puuid of the summoner.",
+        "choices": []
+      }
+    ],
+    "summary": "Get current game information for the given puuid.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#spectator-v5/GET_getCurrentGameInfoByPuuid"
+  },
+  {
+    "id": "summoner-v4.getByPUUID",
+    "group": "summoner-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/summoner/v4/summoners/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "Summoner ID",
+        "choices": []
+      }
+    ],
+    "summary": "Get a summoner by PUUID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#summoner-v4/GET_getByPUUID"
+  },
+  {
+    "id": "summoner-v4.getByAccessToken",
+    "group": "summoner-v4",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/summoner/v4/summoners/me",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "Bearer token",
+        "choices": []
+      }
+    ],
+    "summary": "Get a summoner by access token.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#summoner-v4/GET_getByAccessToken"
+  },
+  {
+    "id": "tournament-stub-v5.getTournamentCode",
+    "group": "tournament-stub-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/tournament-stub/v5/codes/{tournamentCode}",
+    "pathInputs": [
+      {
+        "name": "tournamentCode",
+        "required": true,
+        "type": "string",
+        "description": "The tournament code string.",
+        "choices": []
+      }
+    ],
+    "summary": "Returns the tournament code DTO associated with a tournament code string - Stub Method",
+    "hosts": [
+      "americas"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": true,
+    "docs": "https://developer.riotgames.com/apis#tournament-stub-v5/GET_getTournamentCode"
+  },
+  {
+    "id": "tournament-stub-v5.getLobbyEventsByCode",
+    "group": "tournament-stub-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/tournament-stub/v5/lobby-events/by-code/{tournamentCode}",
+    "pathInputs": [
+      {
+        "name": "tournamentCode",
+        "required": true,
+        "type": "string",
+        "description": "The short code to look up lobby events for",
+        "choices": []
+      }
+    ],
+    "summary": "Gets a list of lobby events by tournament code - Stub method",
+    "hosts": [
+      "americas"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": true,
+    "docs": "https://developer.riotgames.com/apis#tournament-stub-v5/GET_getLobbyEventsByCode"
+  },
+  {
+    "id": "tournament-v5.getTournamentCode",
+    "group": "tournament-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/tournament/v5/codes/{tournamentCode}",
+    "pathInputs": [
+      {
+        "name": "tournamentCode",
+        "required": true,
+        "type": "string",
+        "description": "The tournament code string.",
+        "choices": []
+      }
+    ],
+    "summary": "Returns the tournament code DTO associated with a tournament code string.",
+    "hosts": [
+      "americas"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": true,
+    "docs": "https://developer.riotgames.com/apis#tournament-v5/GET_getTournamentCode"
+  },
+  {
+    "id": "tournament-v5.getGames",
+    "group": "tournament-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/tournament/v5/games/by-code/{tournamentCode}",
+    "pathInputs": [
+      {
+        "name": "tournamentCode",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get games details",
+    "hosts": [
+      "americas"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": true,
+    "docs": "https://developer.riotgames.com/apis#tournament-v5/GET_getGames"
+  },
+  {
+    "id": "tournament-v5.getLobbyEventsByCode",
+    "group": "tournament-v5",
+    "games": [
+      "lol"
+    ],
+    "path": "/lol/tournament/v5/lobby-events/by-code/{tournamentCode}",
+    "pathInputs": [
+      {
+        "name": "tournamentCode",
+        "required": true,
+        "type": "string",
+        "description": "The short code to look up lobby events for",
+        "choices": []
+      }
+    ],
+    "summary": "Gets a list of lobby events by tournament code.",
+    "hosts": [
+      "americas"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": true,
+    "docs": "https://developer.riotgames.com/apis#tournament-v5/GET_getLobbyEventsByCode"
+  },
+  {
+    "id": "spectator-tft-v5.getCurrentGameInfoByPuuid",
+    "group": "spectator-tft-v5",
+    "games": [
+      "tft"
+    ],
+    "path": "/lol/spectator/tft/v5/active-games/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "The puuid of the summoner.",
+        "choices": []
+      }
+    ],
+    "summary": "Get current game information for the given puuid.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#spectator-tft-v5/GET_getCurrentGameInfoByPuuid"
+  },
+  {
+    "id": "tft-league-v1.getLeagueEntriesByPUUID",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get league entries in all queues for a given puuid",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getLeagueEntriesByPUUID"
+  },
+  {
+    "id": "tft-league-v1.getChallengerLeague",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/challenger",
+    "pathInputs": [],
+    "summary": "Get the challenger league.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "queue",
+        "required": false,
+        "type": "string",
+        "description": "Defaults to RANKED_TFT.",
+        "choices": [
+          "RANKED_TFT",
+          "RANKED_TFT_DOUBLE_UP"
+        ]
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getChallengerLeague"
+  },
+  {
+    "id": "tft-league-v1.getLeagueEntries",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/entries/{tier}/{division}",
+    "pathInputs": [
+      {
+        "name": "tier",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "DIAMOND",
+          "EMERALD",
+          "PLATINUM",
+          "GOLD",
+          "SILVER",
+          "BRONZE",
+          "IRON"
+        ]
+      },
+      {
+        "name": "division",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "I",
+          "II",
+          "III",
+          "IV"
+        ]
+      }
+    ],
+    "summary": "Get all the league entries.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "queue",
+        "required": false,
+        "type": "string",
+        "description": "Defaults to RANKED_TFT.",
+        "choices": [
+          "RANKED_TFT",
+          "RANKED_TFT_DOUBLE_UP"
+        ]
+      },
+      {
+        "name": "page",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 1. Starts with page 1.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getLeagueEntries"
+  },
+  {
+    "id": "tft-league-v1.getGrandmasterLeague",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/grandmaster",
+    "pathInputs": [],
+    "summary": "Get the grandmaster league.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "queue",
+        "required": false,
+        "type": "string",
+        "description": "Defaults to RANKED_TFT.",
+        "choices": [
+          "RANKED_TFT",
+          "RANKED_TFT_DOUBLE_UP"
+        ]
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getGrandmasterLeague"
+  },
+  {
+    "id": "tft-league-v1.getMasterLeague",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/master",
+    "pathInputs": [],
+    "summary": "Get the master league.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [
+      {
+        "name": "queue",
+        "required": false,
+        "type": "string",
+        "description": "Defaults to RANKED_TFT.",
+        "choices": [
+          "RANKED_TFT",
+          "RANKED_TFT_DOUBLE_UP"
+        ]
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getMasterLeague"
+  },
+  {
+    "id": "tft-league-v1.getTopRatedLadder",
+    "group": "tft-league-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/league/v1/rated-ladders/{queue}/top",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "RANKED_TFT_TURBO"
+        ]
+      }
+    ],
+    "summary": "Get the top rated ladder for given queue",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-league-v1/GET_getTopRatedLadder"
+  },
+  {
+    "id": "tft-match-v1.getMatchIdsByPUUID",
+    "group": "tft-match-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/match/v1/matches/by-puuid/{puuid}/ids",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": false,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a list of match ids by PUUID",
+    "hosts": [
+      "americas",
+      "asia",
+      "esports",
+      "esportseu",
+      "europe",
+      "sea"
+    ],
+    "query": [
+      {
+        "name": "start",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 0. Start index.",
+        "choices": []
+      },
+      {
+        "name": "endTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds.",
+        "choices": []
+      },
+      {
+        "name": "startTime",
+        "required": false,
+        "type": "long",
+        "description": "Epoch timestamp in seconds. The matchlist started storing timestamps on June 16th, 2021. Any matches played before June 16th, 2021 won't be included in the results if the startTime filter is set.",
+        "choices": []
+      },
+      {
+        "name": "count",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 20. Number of match ids to return.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-match-v1/GET_getMatchIdsByPUUID"
+  },
+  {
+    "id": "tft-match-v1.getMatch",
+    "group": "tft-match-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/match/v1/matches/{matchId}",
+    "pathInputs": [
+      {
+        "name": "matchId",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get a match by match id",
+    "hosts": [
+      "americas",
+      "asia",
+      "esports",
+      "esportseu",
+      "europe",
+      "sea"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-match-v1/GET_getMatch"
+  },
+  {
+    "id": "tft-status-v1.getPlatformData",
+    "group": "tft-status-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/status/v1/platform-data",
+    "pathInputs": [],
+    "summary": "Get Teamfight Tactics status for the given platform.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "pbe1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-status-v1/GET_getPlatformData"
+  },
+  {
+    "id": "tft-summoner-v1.getByPUUID",
+    "group": "tft-summoner-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/summoner/v1/summoners/by-puuid/{encryptedPUUID}",
+    "pathInputs": [
+      {
+        "name": "encryptedPUUID",
+        "required": true,
+        "type": "string",
+        "description": "Summoner ID",
+        "choices": []
+      }
+    ],
+    "summary": "Get a summoner by PUUID.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-summoner-v1/GET_getByPUUID"
+  },
+  {
+    "id": "tft-summoner-v1.getByAccessToken",
+    "group": "tft-summoner-v1",
+    "games": [
+      "tft"
+    ],
+    "path": "/tft/summoner/v1/summoners/me",
+    "pathInputs": [
+      {
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "Bearer token.",
+        "choices": []
+      }
+    ],
+    "summary": "Get a summoner by access token.",
+    "hosts": [
+      "br1",
+      "eun1",
+      "euw1",
+      "jp1",
+      "kr",
+      "la1",
+      "la2",
+      "me1",
+      "na1",
+      "oc1",
+      "ru",
+      "sg2",
+      "tr1",
+      "tw2",
+      "vn2"
+    ],
+    "query": [],
+    "rso": true,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#tft-summoner-v1/GET_getByAccessToken"
+  },
+  {
+    "id": "val-console-match-v1.getMatch",
+    "group": "val-console-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/console/v1/matches/{matchId}",
+    "pathInputs": [
+      {
+        "name": "matchId",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get match by id",
+    "hosts": [
+      "ap",
+      "br",
+      "eu",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-console-match-v1/GET_getMatch"
+  },
+  {
+    "id": "val-console-match-v1.getMatchlist",
+    "group": "val-console-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/console/v1/matchlists/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get matchlist for games played by puuid and platform type",
+    "hosts": [
+      "ap",
+      "br",
+      "eu",
+      "latam",
+      "na"
+    ],
+    "query": [
+      {
+        "name": "platformType",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "playstation",
+          "xbox"
+        ]
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-console-match-v1/GET_getMatchlist"
+  },
+  {
+    "id": "val-console-match-v1.getRecent",
+    "group": "val-console-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/console/v1/recent-matches/by-queue/{queue}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "console_unrated",
+          "console_swiftplay",
+          "console_hurm",
+          "console_deathmatch",
+          "console_competitive",
+          "console_skirmish2v2",
+          "console_skirmishascension1v1",
+          "console_skirmishascension2v2",
+          "console_abilitydraftarena"
+        ]
+      }
+    ],
+    "summary": "Get recent matches",
+    "hosts": [
+      "ap",
+      "br",
+      "eu",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-console-match-v1/GET_getRecent"
+  },
+  {
+    "id": "val-console-ranked-v1.getLeaderboard",
+    "group": "val-console-ranked-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/console/ranked/v1/leaderboards/by-act/{actId}",
+    "pathInputs": [
+      {
+        "name": "actId",
+        "required": true,
+        "type": "string",
+        "description": "Act ids can be found using the val-content API.",
+        "choices": []
+      }
+    ],
+    "summary": "Get leaderboard for the competitive queue",
+    "hosts": [
+      "ap",
+      "eu",
+      "na"
+    ],
+    "query": [
+      {
+        "name": "platformType",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "playstation",
+          "xbox"
+        ]
+      },
+      {
+        "name": "startIndex",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 0.",
+        "choices": []
+      },
+      {
+        "name": "size",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 200. Valid values: 1 to 200.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-console-ranked-v1/GET_getLeaderboard"
+  },
+  {
+    "id": "val-content-v1.getContent",
+    "group": "val-content-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/content/v1/contents",
+    "pathInputs": [],
+    "summary": "Get content optionally filtered by locale",
+    "hosts": [
+      "ap",
+      "br",
+      "esports",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [
+      {
+        "name": "locale",
+        "required": false,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-content-v1/GET_getContent"
+  },
+  {
+    "id": "val-match-v1.getMatch",
+    "group": "val-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/v1/matches/{matchId}",
+    "pathInputs": [
+      {
+        "name": "matchId",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get match by id",
+    "hosts": [
+      "ap",
+      "br",
+      "esports",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-match-v1/GET_getMatch"
+  },
+  {
+    "id": "val-match-v1.getMatchlist",
+    "group": "val-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/v1/matchlists/by-puuid/{puuid}",
+    "pathInputs": [
+      {
+        "name": "puuid",
+        "required": true,
+        "type": "String",
+        "description": "",
+        "choices": []
+      }
+    ],
+    "summary": "Get matchlist for games played by puuid",
+    "hosts": [
+      "ap",
+      "br",
+      "esports",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-match-v1/GET_getMatchlist"
+  },
+  {
+    "id": "val-match-v1.getRecent",
+    "group": "val-match-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/match/v1/recent-matches/by-queue/{queue}",
+    "pathInputs": [
+      {
+        "name": "queue",
+        "required": true,
+        "type": "string",
+        "description": "",
+        "choices": [
+          "competitive",
+          "unrated",
+          "spikerush",
+          "tournamentmode",
+          "deathmatch",
+          "onefa",
+          "ggteam",
+          "hurm",
+          "swiftplay",
+          "skirmish2v2",
+          "skirmishascension1v1",
+          "skirmishascension2v2",
+          "test",
+          "abilitydraftarena"
+        ]
+      }
+    ],
+    "summary": "Get recent matches",
+    "hosts": [
+      "ap",
+      "br",
+      "esports",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-match-v1/GET_getRecent"
+  },
+  {
+    "id": "val-ranked-v1.getLeaderboard",
+    "group": "val-ranked-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/ranked/v1/leaderboards/by-act/{actId}",
+    "pathInputs": [
+      {
+        "name": "actId",
+        "required": true,
+        "type": "string",
+        "description": "Act ids can be found using the val-content API.",
+        "choices": []
+      }
+    ],
+    "summary": "Get leaderboard for the competitive queue",
+    "hosts": [
+      "ap",
+      "br",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [
+      {
+        "name": "size",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 200. Valid values: 1 to 200.",
+        "choices": []
+      },
+      {
+        "name": "startIndex",
+        "required": false,
+        "type": "int",
+        "description": "Defaults to 0.",
+        "choices": []
+      }
+    ],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-ranked-v1/GET_getLeaderboard"
+  },
+  {
+    "id": "val-status-v1.getPlatformData",
+    "group": "val-status-v1",
+    "games": [
+      "valorant"
+    ],
+    "path": "/val/status/v1/platform-data",
+    "pathInputs": [],
+    "summary": "Get VALORANT status for the given platform.",
+    "hosts": [
+      "ap",
+      "br",
+      "eu",
+      "kr",
+      "latam",
+      "na"
+    ],
+    "query": [],
+    "rso": false,
+    "tournament": false,
+    "docs": "https://developer.riotgames.com/apis#val-status-v1/GET_getPlatformData"
+  }
+]

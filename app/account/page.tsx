@@ -43,7 +43,7 @@ function RankCard({ rank, label, image, tone }: { rank: string; label: string; i
 
 export default function AccountPage() {
   return (
-    <main className="account-detail" id="main">
+    <div className="account-detail">
       <div className="account-detail-wrap">
         <div className="account-breadcrumbs"><Link href="/services"><ArrowLeft size={15} /><UiText english={"Browse services"} /></Link><span>/</span><span><UiText english={"League of Legends accounts"} /></span><span>/</span><strong>#109084</strong></div>
 
@@ -102,6 +102,6 @@ export default function AccountPage() {
           </aside>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

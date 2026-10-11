@@ -1,5 +1,7 @@
 # Payment artwork
 
+iDEAL uses the [Datatrans payment logos collection](https://github.com/datatrans/payment-logos/blob/master/assets/apm/ideal.svg). Footer and checkout share the catalog in `data/payment-methods.ts`, excluding Bitcoin. The footer presents grayscale marks with color on hover.
+
 Visa, Mastercard, American Express, Google Pay, Apple Pay, PayPal, JCB and Discover use vector logo artwork from the installed `@iconify/json` Logos collection. All added white background rectangles have been removed. Brand symbol colors are preserved; dark neutral lettering uses white for contrast on the dark canvas. Visa uses a white wordmark. These are local vectors rather than remote image requests.
 
 Bancontact and EPS retain the existing Datatrans payment-logos vectors. Paysafecard retains its Wikimedia press-artwork wordmark. Revolut retains its retail wordmark from the Revolut developer logo package, rendered in white. All marks float on transparent canvases. No grayscale, invert or brightness filter is applied.

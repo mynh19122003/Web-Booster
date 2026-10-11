@@ -14,7 +14,7 @@ import { Suspense } from "react";
 import { ChatLauncher } from "@/components/account/BoosterChat";
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
+  const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/") || path === "/employee/login";
   const isAdminRoute = path === "/admin" || path.startsWith("/admin/");
 
   if (isAdminRoute || isAuthRoute)
@@ -22,7 +22,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <LanguageProvider>
         <SkipLink />
         <CurrencyProvider />
-        <Experience><main id="main">{children}</main></Experience>
+        {isAuthRoute ? children : <Experience><main id="main">{children}</main></Experience>}
       </LanguageProvider>
     );
   return (
@@ -34,10 +34,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <PointerEffects />
       <Header key={path} />
       <Experience>
-        <main id="main">{children}</main>
+        <main id="main" tabIndex={-1}>{children}</main>
       </Experience>
       <Footer />
-      {path !== "/messages" && <ChatLauncher />}
+      {path !== "/messages" && !path.startsWith("/employee") && <ChatLauncher />}
       <Suspense fallback={null}>
         <Dialogs />
       </Suspense>

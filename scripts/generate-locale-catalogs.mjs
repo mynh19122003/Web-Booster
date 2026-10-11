@@ -176,7 +176,7 @@ async function translateBatch(items, target) {
     });
     if (aligned.every((value) => value !== undefined)) return aligned;
 
-    return Promise.all(items.map(async ({ value }, index) => {
+    return Promise.all(items.map(async (_, index) => {
       const singleUrl = new URL(url);
       singleUrl.searchParams.set("q", protectedItems[index].safe);
       for (let retry = 0; retry < 5; retry += 1) {

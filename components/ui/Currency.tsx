@@ -142,11 +142,11 @@ export function useMoney() {
   const rateState = useStore((s) => s.rateState);
   const amount = (usd: number) =>
     currency === "EUR" ? (usdPerEur ? usd / usdPerEur : null) : usd;
-  const format = (usd: number) => {
+  const format = (usd: number, maximumFractionDigits = 2) => {
     const value = amount(usd);
     return value === null
       ? t("eurUnavailable")
-      : new Intl.NumberFormat(intlLocales[language], { style: "currency", currency }).format(
+      : new Intl.NumberFormat(intlLocales[language], { style: "currency", currency, maximumFractionDigits }).format(
           value,
         );
   };

@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { createSession, createUser } from "@/lib/auth-db";
 import { authError, setSessionCookie } from "@/lib/auth-http";
+import { loginDestination } from "@/lib/auth-redirect";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  let body: { name?: unknown; email?: unknown; password?: unknown };
+  let body: { name?: unknown; email?: unknown; password?: unknown; next?: unknown };
   try {
     body = await request.json();
   } catch {
     return authError("Invalid request.", 400);
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return authError("Invalid request.", 400);
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
   try {
     const user = createUser(name, email, password);
     const session = createSession(user.id);
-    return setSessionCookie(NextResponse.json({ user }), session.token, session.expiresAt);
+    return setSessionCookie(NextResponse.json({ user, redirectTo: loginDestination(user.role, body.next) }), session.token, session.expiresAt);
   } catch (error) {
     if (error instanceof Error && error.message.includes("UNIQUE constraint failed")) {
       return authError("An account with this email already exists.", 409);

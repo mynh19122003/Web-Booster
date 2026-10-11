@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Inter, Rajdhani, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "./glass.css";
+import "./layout-alignment.css";
+import "./support-chat.css";
+import "./riot-matches.css";
+import "./employee-riot.css";
+import "./order-workspace.css";
+import "./coach-refinements.css";
 
 const rajdhani = Rajdhani({
   subsets: ["latin"],

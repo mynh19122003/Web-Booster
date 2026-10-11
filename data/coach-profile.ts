@@ -16,7 +16,7 @@ export function coachOffers(coach: Coach): CoachOffer[] {
     ? [["Gold", "Platinum"], ["Platinum", "Diamond"], ["Diamond", "Ascendant"], ["Ascendant", "Radiant"], ["Unranked", "Unranked"]]
     : tft
       ? [["Iron", "Gold"], ["Gold", "Emerald"], ["Emerald", "Diamond"], ["Diamond", "Challenger"], ["Unranked", "Unranked"]]
-      : [["Iron", "Emerald"], ["Emerald", "Diamond"], ["Diamond", "Master"], ["Master", "Challenger"], ["Unranked", "Unranked"]];
+      : [["Iron", "Bronze"], ["Emerald", "Diamond"], ["Diamond", "Master"], ["Master", "Challenger"], ["Unranked", "Unranked"]];
   const prices = [3.99, 7.99, 12.99, 16.99, 2.99];
 
   return ranges.map(([startRank, targetRank], index) => ({
@@ -65,7 +65,7 @@ export function coachReputation(coach: Coach) {
     { stars: 3, count: three },
     { stars: 2, count: two },
     { stars: 1, count: Math.max(0, coach.reviewCount - five - four - three - two) },
-  ].map(row => ({ ...row, width: row.count / coach.reviewCount * 100 }));
+  ].map(row => ({ ...row, width: coach.reviewCount > 0 ? row.count / coach.reviewCount * 100 : 0 }));
 }
 
 export function coachMockMetrics(coach: Coach) {

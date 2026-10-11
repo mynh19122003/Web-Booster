@@ -1,8 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { coaches, coachFor } from "@/data/coaches";
+import { coaches } from "@/data/coaches";
 import { CoachProfile } from "@/components/coaches/CoachProfile";
 import { metadata } from "@/lib/seo";
+import { getCoachWithOverride } from "@/lib/coach-profile-db";
+import { currentUser } from "@/lib/current-user";
+import { canManageCoach } from "@/lib/coach-ownership";
+import { cachedCoachHistory } from "@/lib/coach-history";
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return coaches.map((coach) => ({ slug: coach.slug }));
@@ -10,13 +16,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/coaches/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const coach = coachFor(slug);
+  const coach = getCoachWithOverride(slug);
   return metadata(coach?.name ?? "Coach not found", coach ? coach.gameName + " coach profile." : "The requested coach could not be found.", "/coaches/" + slug);
 }
 
 export default async function CoachPage({ params }: PageProps<"/coaches/[slug]">) {
   const { slug } = await params;
-  const coach = coachFor(slug);
+  const coach = getCoachWithOverride(slug);
   if (!coach) notFound();
-  return <CoachProfile coach={coach} />;
+  const canEdit = canManageCoach(await currentUser(), slug);
+  return <CoachProfile coach={coach} canEdit={canEdit} initialHistory={cachedCoachHistory(coach)} />;
 }

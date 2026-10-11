@@ -1,5 +1,22 @@
 # Bảng giá rank và quy tắc ASCEND
 
+## Bảng giá đang áp dụng: 10/10/2026
+
+Phiên bản `2026-10-10` bổ sung giá Duo; các giá rank và category từ 09/10 giữ nguyên. Nguồn rank là bảng `Bang_Gia_Project_Theo_Server_2026-10-09.xlsx`, tính từ giá bán USD tại NA trong khảo sát BoostRoyal ngày 09/10.
+
+- NA: hệ số 1. KR: hệ số 1,20. EUW, EUNE, OCE, CN, SEA và các vùng khác đang có trong UI: hệ số 0,85. Không áp dụng giảm riêng cho rank thấp.
+- Master 0–500 LP: NA 1,80 USD/LP. Grandmaster 500–1.000 LP: 2,50 USD/LP. Challenger từ 1.000 LP: 3,10 USD/LP. LoL/TFT chia phần LP tăng theo từng dải, áp dụng hệ số server và làm tròn tổng cuối đến cent. UI hiện hỗ trợ đến 1.500 LP.
+- `data/pricing/project-prices.json` giữ 177 cấu hình NA và 15 gói Smurf NA từ dữ liệu đứng sau Excel. Chạy `node scripts/build-project-pricing.mjs` để tạo lại từ bản khảo sát lưu trong `outputs/boostroyal-20261009/research/`.
+- Rank dùng giá từng chặng NA trong file mới. LoL mặc định 19–22 LP/trận; các mức LP khác và các chặng Immortal chưa có trong file dùng snapshot NA 07/10 làm dữ liệu bổ sung, cùng hệ số mới.
+- TFT Double Up có giá tự động cho các chặng dưới Master và đơn bắt đầu trong Master+. Chặng Diamond I lên Master cần báo giá riêng vì dữ liệu nguồn đã bao gồm 50 LP, không thể tách giá để áp đơn giá LP mới.
+- Các category khác chỉ có giá tự động khi rank, số lượng, chế độ, level, tướng hoặc mục tiêu khớp cấu hình đã khảo sát. Không nội suy tuyến tính số trận/level. Đổi cấu hình ngoài phạm vi sẽ chuyển sang yêu cầu báo giá. LoL Pro Games dùng [ma trận Duo](duo-pricing.md), hỗ trợ tự động 1–20 trận.
+- Smurf dùng các gói có giá NA trong Excel rồi áp hệ số server; tài khoản cụ thể cần xác nhận sẵn có. Accounts và coaching không có giá nguồn tương ứng trong Excel; Accounts giữ kho hiện có, coaching dùng gói của từng coach.
+- Form rank, category, giá LP theo server, thanh mobile, giỏ hàng và checkout dùng giá của cấu hình đã chọn. Checkout hiện vẫn là mô phỏng; backend thanh toán thật phải tính lại từ cấu hình, không tin số tiền trong URL.
+
+## Lịch sử bảng giá 07/10/2026
+
+Các phần dưới mô tả lần thu thập và quy tắc trước đây, không phải quy tắc đang áp dụng.
+
 ## Nguồn dữ liệu
 
 - File người dùng: `BoostRoyal_Bang_Gia_2026-10-06_Partial (2).xlsx`, ngày 06/10/2026. Đã đọc 702 báo giá: 617 LoL, 84 TFT, 1 Valorant. Bản trích được giữ trong `data/pricing/boostroyal-workbook.json`; file Excel gốc không bị sửa.

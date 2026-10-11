@@ -9,6 +9,8 @@ import { AscendLogo } from "@/components/ui/AscendLogo";
 import { BackToHomeButton } from "@/components/ui/BackToHomeButton";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import type { MessageKey } from "@/lib/i18n";
+import { translateText } from "@/lib/i18n";
+import { loginDestination } from "@/lib/auth-redirect";
 
 type Mode = "login" | "register";
 
@@ -18,8 +20,10 @@ const googleErrors: Record<string, MessageKey> = {
   "google-failed": "googleFailed",
 };
 
-export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/" }: { initialMode: Mode; googleConfigured: boolean; error?: string; returnTo?: string }) {
-  const { t } = useLanguage();
+export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/", audience = "customer" }: { initialMode: Mode; googleConfigured: boolean; error?: string; returnTo?: string; audience?: "customer" | "employee" }) {
+  const { t, language } = useLanguage();
+  const employee = audience === "employee";
+  const copy = (english: string, vietnamese: string) => translateText(language, english, vietnamese);
   const router = useRouter();
   const [mode, setMode] = useState(initialMode);
   const [message, setMessage] = useState(error ? t(googleErrors[error] ?? "authFailed") : "");
@@ -42,11 +46,11 @@ export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/"
       const response = await fetch(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, next: returnTo }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || t("unableSignIn"));
-      router.replace(returnTo);
+      router.replace(result.redirectTo || loginDestination(result.user?.role, returnTo));
       router.refresh();
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : t("unableSignInNow"));
@@ -64,21 +68,21 @@ export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/"
           </Link>
           <div className="auth-aside-copy">
             <p className="eyebrow">{t("authSpace")}</p>
-            <h1>{t("authPlanLead")}<br />{t("authPlanFinish")}</h1>
-            <p>{t("authKeepPlans")}</p>
+            <h1>{employee ? copy("Support players.", "Hỗ trợ khách hàng.") : t("authPlanLead")}<br />{employee ? copy("Move requests forward.", "Xử lý từng yêu cầu.") : t("authPlanFinish")}</h1>
+            <p>{employee ? copy("Receive customer requests and keep every conversation in one place.", "Tiếp nhận yêu cầu và quản lý hội thoại với khách hàng tại một nơi.") : t("authKeepPlans")}</p>
           </div>
-          <span className="auth-aside-index">{t("playerAccount")} <span>01 / 03</span></span>
+          <span className="auth-aside-index">{employee ? copy("EMPLOYEE ACCESS", "ĐĂNG NHẬP NHÂN VIÊN") : t("playerAccount")} <span>01 / 03</span></span>
         </aside>
 
         <section className="auth-content" aria-labelledby="auth-heading">
           <div className="auth-form-wrap">
-            <div className="auth-tabs" role="tablist" aria-label={t("accountAccess")}>
+            {!employee && <div className="auth-tabs" role="tablist" aria-label={t("accountAccess")}>
               <button role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setMessage(""); }}>{t("signIn")}</button>
               <button role="tab" aria-selected={mode === "register"} onClick={() => { setMode("register"); setMessage(""); }}>{t("createAccount")}</button>
-            </div>
+            </div>}
             <p className="eyebrow">{mode === "login" ? t("welcomeBack") : t("welcomeAscend")}</p>
-            <h2 id="auth-heading">{mode === "login" ? t("signInTitle") : t("createAccountTitle")}</h2>
-            <p className="auth-description">{mode === "login" ? t("signInDescription") : t("createAccountDescription")}</p>
+            <h2 id="auth-heading">{employee ? copy("Employee sign in", "Đăng nhập nhân viên") : mode === "login" ? t("signInTitle") : t("createAccountTitle")}</h2>
+            <p className="auth-description">{employee ? copy("Use the account granted employee access by your team.", "Sử dụng tài khoản đã được cấp quyền nhân viên.") : mode === "login" ? t("signInDescription") : t("createAccountDescription")}</p>
 
             <form className="auth-form" onSubmit={submit}>
               {mode === "register" && <label>{t("fullName")}<input name="name" autoComplete="name" minLength={2} maxLength={80} placeholder={t("yourName")} required /></label>}
@@ -89,13 +93,14 @@ export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/"
               {message && <p className="auth-message" role="alert">{message}</p>}
             </form>
 
-            <div className="auth-divider"><span>{t("continueWith")}</span></div>
+            {!employee && <><div className="auth-divider"><span>{t("continueWith")}</span></div>
             <div className="auth-providers">
-              <a className="auth-provider" href="/api/auth/google" aria-disabled={!googleConfigured} onClick={(event) => { if (!googleConfigured) { event.preventDefault(); setMessage(t("googleUnconfigured")); } }}>
+              <a className="auth-provider" href={`/api/auth/google?next=${encodeURIComponent(returnTo)}`} aria-disabled={!googleConfigured} onClick={(event) => { if (!googleConfigured) { event.preventDefault(); setMessage(t("googleUnconfigured")); } }}>
                 <GoogleMark /> <span>Google</span>
               </a>
               <button className="auth-provider" type="button" disabled><Image src="/images/logos/riot-games-mark.png" alt="" width={20} height={20} style={{ objectFit: "contain" }} /><span>Riot Games</span></button>
-            </div>
+            </div></>}
+            <p className="auth-access-link"><Link href={employee ? "/login" : "/employee/login"}>{employee ? copy("Customer sign in", "Đăng nhập khách hàng") : copy("Employee sign in", "Đăng nhập nhân viên")}</Link></p>
             <p className="auth-legal">{t("authLegalStart")} <Link href="/legal/terms">{t("terms")}</Link> {t("authLegalAnd")} <Link href="/legal/privacy">{t("privacyPolicy")}</Link>.</p>
           </div>
         </section>

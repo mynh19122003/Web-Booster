@@ -8,5 +8,8 @@ export const runtime = "nodejs";
 export async function POST() {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (token) deleteSession(token);
-  return clearSessionCookie(NextResponse.json({ ok: true }));
+  const response = clearSessionCookie(NextResponse.json({ ok: true }));
+  response.cookies.delete("ascend_riot_connection");
+  response.cookies.delete("ascend_riot_state");
+  return response;
 }

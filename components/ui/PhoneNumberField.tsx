@@ -1,33 +1,49 @@
 "use client";
 import { translateText } from "@/lib/i18n";
 
-import Image from "next/image";
+import { LanguageFlag } from "./LanguageFlag";
 import { ChevronDown, Search, Check } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { intlLocales } from "@/lib/i18n";
 import { internationalPhone, phoneCountries, phoneCountryForLanguage } from "@/lib/phone-countries";
 import { useLanguage } from "./LanguageProvider";
 
-export function PhoneNumberField() {
+export function PhoneNumberField({ value, onChange, countries = phoneCountries }: { value?: string; onChange?: (value: string) => void; countries?: typeof phoneCountries } = {}) {
   const { language, t } = useLanguage();
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [chosenCountry, setChosenCountry] = useState<string | null>(null);
-  const [national, setNational] = useState("");
+  const parseValue = (external?: string) => {
+    const digits = (external ?? "").replace(/\D/g, "");
+    const matching = external?.startsWith("+") ? [...phoneCountries].sort((a, b) => b.dial.length - a.dial.length).find(item => digits.startsWith(item.dial)) : undefined;
+    return { country: matching?.code ?? null, national: matching ? digits.slice(matching.dial.length) : digits };
+  };
+  const [chosenCountry, setChosenCountry] = useState<string | null>(() => parseValue(value).country);
+  const [national, setNational] = useState(() => parseValue(value).national);
+  const [lastExternalValue, setLastExternalValue] = useState(value);
   const [open, setOpen] = useState(false);
   const [menuAbove, setMenuAbove] = useState(false);
   const [query, setQuery] = useState("");
   const [error, setError] = useState(false);
-  const country = phoneCountries.find((item) => item.code === (chosenCountry ?? phoneCountryForLanguage(language)))!;
+  const country = phoneCountries.find((item) => item.code === (chosenCountry ?? phoneCountryForLanguage(language))) ?? countries[0];
   const names = new Intl.DisplayNames([intlLocales[language]], { type: "region" });
   const countryName = (code: string) => names.of(code.toUpperCase()) ?? code.toUpperCase();
-  const options = phoneCountries.filter((item) => `${countryName(item.code)} ${item.code} +${item.dial}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())).sort((a, b) => countryName(a.code).localeCompare(countryName(b.code), intlLocales[language]));
+  const options = countries.filter((item) => `${countryName(item.code)} ${item.code} +${item.dial}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())).sort((a, b) => countryName(a.code).localeCompare(countryName(b.code), intlLocales[language]));
   const formatted = internationalPhone(country.code, national);
   const invalid = Boolean(national.trim()) && (national.replace(/\D/g, "").length < 6 || formatted.replace(/\D/g, "").length > 15);
   const errorText = translateText(language, "Enter a valid phone number (at least 6 digits, up to 15 including the country code).", "Vui lòng nhập số điện thoại hợp lệ (6 chữ số trở lên, tối đa 15 chữ số gồm mã quốc gia).");
+
+  if (value !== lastExternalValue) {
+    setLastExternalValue(value);
+    if (value !== undefined && value !== formatted) {
+      const parsed = parseValue(value);
+      if (parsed.country) setChosenCountry(parsed.country);
+      setNational(parsed.national);
+      setError(false);
+    }
+  }
 
   useEffect(() => { inputRef.current?.setCustomValidity(invalid ? errorText : ""); }, [invalid, errorText]);
 
@@ -53,7 +69,7 @@ export function PhoneNumberField() {
         setMenuAbove(Boolean(bounds && bounds.top > 300 && window.innerHeight - bounds.bottom < 300));
         setQuery(""); setOpen(!open);
       }}>
-        <Image src={`/images/phone-flags/${country.code}.svg`} width={22} height={22} alt="" /><span>+{country.dial}</span><ChevronDown size={14} aria-hidden="true" />
+        <LanguageFlag code={country.code} /><span>+{country.dial}</span><ChevronDown size={14} aria-hidden="true" />
       </button>
       <input ref={inputRef} id={id} name="phone-national" className="phone-national-input" type="tel" inputMode="tel" autoComplete="tel-national" value={national} placeholder={translateText(language, "Phone number", "Số điện thoại")} maxLength={24} aria-invalid={error && invalid} aria-describedby={`${id}-hint${error && invalid ? " " + id + "-error" : ""}`}
         onChange={(event) => {
@@ -65,8 +81,10 @@ export function PhoneNumberField() {
             if (matching) { setChosenCountry(matching.code); value = digits.slice(matching.dial.length); }
           }
           if (!/^[\d\s().-]*$/.test(value)) return;
-          setChosenCountry((selected) => selected ?? country.code);
+          const pastedCountry = event.target.value.trim().startsWith("+") ? [...phoneCountries].sort((a, b) => b.dial.length - a.dial.length).find(item => event.target.value.replace(/\D/g, "").startsWith(item.dial)) : undefined;
+          setChosenCountry((selected) => pastedCountry?.code ?? selected ?? country.code);
           setNational(value); setError(false);
+          onChange?.(internationalPhone(pastedCountry?.code ?? country.code, value));
         }}
         onBlur={(event) => { setError(invalid); event.currentTarget.setCustomValidity(invalid ? errorText : ""); }}
         onInvalid={() => setError(true)}
@@ -83,8 +101,8 @@ export function PhoneNumberField() {
         const index = buttons.indexOf(event.target as HTMLButtonElement);
         if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); buttons[(index + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]?.focus(); }
       }}>
-        {options.map((item) => <button type="button" className="phone-country-option" key={item.code} aria-pressed={item.code === country.code} onClick={() => { setChosenCountry(item.code); setOpen(false); trigger.current?.focus(); }}>
-          <Image src={`/images/phone-flags/${item.code}.svg`} width={22} height={22} alt="" /><span className="phone-dial-code">+{item.dial}</span><span>{countryName(item.code)}</span>{item.code === country.code && <Check size={15} aria-hidden="true" />}
+        {options.map((item) => <button type="button" className="phone-country-option" key={item.code} aria-pressed={item.code === country.code} onClick={() => { setChosenCountry(item.code); onChange?.(internationalPhone(item.code, national)); setOpen(false); trigger.current?.focus(); }}>
+          <LanguageFlag code={item.code} /><span className="phone-dial-code">+{item.dial}</span><span>{countryName(item.code)}</span>{item.code === country.code && <Check size={15} aria-hidden="true" />}
         </button>)}
         {!options.length && <p>{translateText(language, "No matching countries", "Không tìm thấy quốc gia")}</p>}
       </div>

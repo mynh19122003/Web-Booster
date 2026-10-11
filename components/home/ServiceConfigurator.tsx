@@ -1,4 +1,5 @@
 "use client";
+import { GameIdentity } from "@/components/ui/GameIdentity";
 import { translateText } from "@/lib/i18n";
 
 import { NumberInput } from "@/components/ui/NumberInput";
@@ -23,13 +24,13 @@ import {
   Check,
 } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { games } from "@/data/games";
+import Image from "next/image";
 import { ranksFor, servicesFor } from "@/lib/service-options";
 import { RankPicker } from "@/components/services/RankPicker";
 import { estimateQuote } from "@/lib/quote";
 import { CurrencySwitch, useMoney } from "@/components/ui/Currency";
 import { RegionSelector } from "@/components/ui/RegionSelector";
-import { regions, regionsForGame } from "@/data/regions";
+import { regionsForGame } from "@/data/regions";
 import { GameSelector } from "@/components/home/GameSelector";
 import { gameConfigFor } from "@/lib/game-config";
 import { useLanguage } from "@/components/ui/LanguageProvider";
@@ -59,6 +60,8 @@ const extraCopy: Record<string, { vi: string; enDetail: string }> = {
   "Moderate KDA": { vi: "KDA vừa phải", enDetail: "Keep KDA at a moderate level." },
 };
 import { AccountShop } from "@/components/services/AccountShop";
+import { SmurfPricing } from "@/components/services/SmurfPricing";
+import { PRICING_VERSION } from "@/lib/rank-pricing";
 
 const roleIcons: Record<string, Record<string, string>> = {
   "league-of-legends": {
@@ -184,6 +187,7 @@ export function ServiceConfigurator() {
       lpGain: s.lpGain, units: String(s.units), amount: String(adjustedPrice),
       base: String(price), delivery: `${minHours}–${maxHours}`,
       quote: String(quoteRequired),
+      pricingVersion: PRICING_VERSION,
     });
     extras.forEach(id => params.append("option", gameExtras.find(extra => extra.id === id)?.title ?? id));
     const href = `/checkout?${params.toString()}`;
@@ -237,8 +241,10 @@ export function ServiceConfigurator() {
 
           {/* Coaching opens the coach discovery flow; other services keep the configurator. */}
           <div id="category-content" role="tabpanel" aria-label={t("services")} tabIndex={0}>
-          {categoryProduct === "accounts" || categoryProduct === "smurfs" ? (
-            <AccountShop key={`${s.game}:${categoryProduct}`} game={s.game} smurfs={categoryProduct === "smurfs"} />
+          {categoryProduct === "smurfs" ? (
+            <SmurfPricing key={s.game} game={s.game} />
+          ) : categoryProduct === "accounts" ? (
+            <AccountShop key={`${s.game}:${categoryProduct}`} game={s.game} />
           ) : hasCategoryForm ? (
             <CategoryConfigurator key={`${s.game}:${categoryProduct}`} game={s.game} productId={categoryProduct!} />
           ) : service.slug === "coaching" ? (
@@ -284,6 +290,7 @@ export function ServiceConfigurator() {
                   <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-4 lg:gap-6 mb-6">
                     <RankPicker
                       game={s.game}
+                      region={s.region}
                       label={t("currentRank")}
                       value={current}
                       lp={currentLp}
@@ -309,6 +316,7 @@ export function ServiceConfigurator() {
 
                     <RankPicker
                       game={s.game}
+                      region={s.region}
                       label={t("desiredRank")}
                       value={target}
                       lp={targetLp}
@@ -348,7 +356,7 @@ export function ServiceConfigurator() {
                           aria-label={`${s.game === "valorant" ? t("playerRole") : t("role")}: ${s.role}`}
                           className="mt-[10px] flex h-12 w-full cursor-pointer list-none items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 text-left text-sm font-medium text-white outline-none transition-colors hover:border-white/20 focus-visible:ring-2 focus-visible:ring-[#FF9F3C]/70 [&::-webkit-details-marker]:hidden"
                         >
-                          <img
+                          <Image width={18} height={18}
                             src={roleIcons[s.game]?.[s.role] ?? "/images/roles/lol/mid.svg"}
                             alt=""
                             aria-hidden="true"
@@ -372,7 +380,7 @@ export function ServiceConfigurator() {
                                 }}
                                 className="flex w-full items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-left text-sm text-zinc-200 transition-all hover:border-[#FF9F3C]/60 hover:bg-[#FF9F3C]/10 hover:shadow-[0_0_18px_rgba(255,159,60,0.22),inset_0_0_12px_rgba(255,159,60,0.07)] focus-visible:border-[#FF9F3C]/60 focus-visible:bg-[#FF9F3C]/10 focus-visible:outline-none focus-visible:shadow-[0_0_18px_rgba(255,159,60,0.22)] aria-selected:border-[#FF9F3C]/60 aria-selected:bg-[#FF9F3C]/10 aria-selected:text-white aria-selected:shadow-[0_0_16px_rgba(255,159,60,0.2)]"
                               >
-                                <img
+                                <Image width={18} height={18}
                                   src={roleIcons[s.game]?.[role] ?? "/images/roles/lol/mid.svg"}
                                   alt=""
                                   aria-hidden="true"
@@ -479,9 +487,7 @@ export function ServiceConfigurator() {
 
                 {/* Plan Selection Details */}
                 <p className="text-sm font-medium text-zinc-300 leading-relaxed py-2">
-                  <strong className="text-white block font-heading font-bold uppercase tracking-wide text-base mb-1">
-                    {games.find((game) => game.slug === s.game)?.name}
-                  </strong>
+                  <GameIdentity game={s.game} />
                   {unitService
                     ? `${s.units} ${service.slug === "coaching" ? "hours" : "matches"}`
                     : rankSummary}
