@@ -81,6 +81,14 @@ DE dịch `Name A–Z` thành `Nennen Sie A–Z`, và `listed skin` thành `geli
 
 Khuyến nghị: lập glossary cho skin, rank, booster, duo, placements, VOD; review thủ công nhãn giao dịch và hành động chính. Ưu tiên các locale thực sự được hỗ trợ trước khi mở rộng thêm.
 
+### 9. P2 — Trang chủ tiếng Ả Rập tràn ngang trên mobile
+
+Vị trí cần kiểm tra: layout dùng chung trong `components/layout/Navbar.tsx`, `components/home/Hero.tsx` và CSS container/RTL.
+
+Sau khi chọn AR và reload ở 390×844, `document.documentElement.scrollWidth` là 406px trong khi `innerWidth` là 390px. Ảnh `typography-home-ar-390.png` có thanh cuộn ngang; vùng heading/body sát mép phải và phần chữ bị cắt. Nhóm control header cũng có mép trái khoảng -4.4px. Ở 1440px sau khi chờ animation, không còn tràn ngang toàn tài liệu. Các phần tử hiệu ứng nền/carousel nằm ngoài viewport không đủ để xác định nguyên nhân; chưa quy lỗi cho một selector cụ thể.
+
+Khuyến nghị: rà container và header với `dir="rtl"`, dùng khoảng cách logical và chiều rộng theo vùng khả dụng; tránh che lỗi bằng `overflow-x:hidden` trước khi sửa layout. Kiểm tra lại cả trạng thái header/menu/cart và nội dung hero tại 360/390/430px.
+
 ## Hệ cỡ chữ đề xuất
 
 | Vai trò | Desktop | Mobile | Font |
@@ -110,4 +118,4 @@ Body line-height khoảng 1.5–1.7; heading 1.15–1.3, tăng phù hợp với 
 1. Sửa hydration và bảo đảm locale server/client thống nhất.
 2. Hoàn thiện dịch của checkout/auth/lỗi, sau đó coach/profile/Riot.
 3. Chuẩn hóa token font và các vùng chữ 8–11px; thống nhất input mobile 16px.
-4. Dịch blog/chính sách, biên tập glossary và kiểm tra lại DE/JA/AR trên mobile.
+4. Sửa tràn ngang RTL mobile, dịch blog/chính sách, biên tập glossary và kiểm tra lại DE/JA/AR.
