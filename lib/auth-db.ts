@@ -119,13 +119,14 @@ export function deleteSession(token: string) {
   database().prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash(token));
 }
 
-export function changeUserPassword(userId: string, currentPassword: string, newPassword: string, sessionToken: string) {
+export function changeUserPassword(userId: string, newPassword: string, sessionToken: string) {
+  if (getUserForSession(sessionToken)?.id !== userId) return "unauthorized" as const;
   const db = database();
   db.exec("BEGIN IMMEDIATE");
   try {
     const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(userId) as { password_hash: string | null } | undefined;
     if (!row?.password_hash) { db.exec("ROLLBACK"); return "external-account" as const; }
-    if (!verifyPassword(currentPassword, row.password_hash)) { db.exec("ROLLBACK"); return "incorrect-password" as const; }
+    if (verifyPassword(newPassword, row.password_hash)) { db.exec("ROLLBACK"); return "same-password" as const; }
     db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(newPassword), userId);
     db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(userId, tokenHash(sessionToken));
     db.exec("COMMIT");
@@ -133,27 +134,35 @@ export function changeUserPassword(userId: string, currentPassword: string, newP
   } catch (error) { db.exec("ROLLBACK"); throw error; }
 }
 
-export type UserProfile = { name: string; email: string; phone: string; country: string; discord: string };
+export type UserProfile = { name: string; email: string; phone: string; country: string; discord: string; avatar: string | null };
 function profileDatabase() {
   const db = database();
   db.exec(`CREATE TABLE IF NOT EXISTS user_profiles (
     user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     phone TEXT NOT NULL DEFAULT '', country TEXT NOT NULL DEFAULT '', discord TEXT NOT NULL DEFAULT ''
   )`);
+  const columns = db.prepare("PRAGMA table_info(user_profiles)").all() as { name: string }[];
+  if (!columns.some(column => column.name === "avatar")) db.exec("ALTER TABLE user_profiles ADD COLUMN avatar TEXT");
   return db;
 }
 export function getUserProfile(user: AuthUser): UserProfile {
-  const details = profileDatabase().prepare("SELECT phone, country, discord FROM user_profiles WHERE user_id = ?").get(user.id) as Pick<UserProfile, "phone" | "country" | "discord"> | undefined;
-  return { name: user.name, email: user.email, phone: "", country: "", discord: "", ...details };
+  const details = profileDatabase().prepare("SELECT phone, country, discord, avatar FROM user_profiles WHERE user_id = ?").get(user.id) as Pick<UserProfile, "phone" | "country" | "discord" | "avatar"> | undefined;
+  return { name: user.name, email: user.email, phone: "", country: "", discord: "", avatar: null, ...details };
 }
-export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email">, password?: { currentPassword: string; newPassword: string; sessionToken: string }): UserProfile {
+export function updateUserAvatar(user: AuthUser, avatar: string | null): UserProfile {
+  profileDatabase().prepare(`INSERT INTO user_profiles (user_id, avatar) VALUES (?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET avatar = excluded.avatar`).run(user.id, avatar);
+  return getUserProfile(user);
+}
+export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email" | "avatar">, password?: { newPassword: string; sessionToken: string }): UserProfile {
+  if (password && getUserForSession(password.sessionToken)?.id !== user.id) throw new Error("unauthorized");
   const db = profileDatabase();
   db.exec("BEGIN IMMEDIATE");
   try {
     if (password) {
       const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(user.id) as { password_hash: string | null } | undefined;
       if (!row?.password_hash) throw new Error("external-account");
-      if (!verifyPassword(password.currentPassword, row.password_hash)) throw new Error("incorrect-password");
+      if (verifyPassword(password.newPassword, row.password_hash)) throw new Error("same-password");
       db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(password.newPassword), user.id);
       db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(user.id, tokenHash(password.sessionToken));
     }
@@ -162,5 +171,5 @@ export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "em
       ON CONFLICT(user_id) DO UPDATE SET phone = excluded.phone, country = excluded.country, discord = excluded.discord`).run(user.id, profile.phone, profile.country, profile.discord);
     db.exec("COMMIT");
   } catch (error) { db.exec("ROLLBACK"); throw error; }
-  return { ...profile, email: user.email };
+  return getUserProfile({ ...user, name: profile.name });
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "motion/react";
+import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, CheckCheck, Inbox, MessageCircle, Plus, Search, Send, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/components/ui/LanguageProvider";
@@ -12,6 +14,7 @@ import { CustomerOrderPanel } from "@/components/employee/CustomerOrderPanel";
 
 export function SupportInbox({ employee = false, compact = false, direct = false, initialRequestId = "" }: { employee?: boolean; compact?: boolean; direct?: boolean; initialRequestId?: string }) {
   const { language } = useLanguage();
+  const { entry } = useInteractionMotion();
   const copy = (english: string, vietnamese: string) => translateText(language, english, vietnamese);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -137,9 +140,9 @@ export function SupportInbox({ employee = false, compact = false, direct = false
         {employeeMode && <option value="mine">{copy("Assigned to me", "Tôi đang xử lý")}</option>}
         <option value="open">{copy("Waiting", "Đang chờ")}</option><option value="assigned">{copy("In progress", "Đang xử lý")}</option><option value="resolved">{copy("Completed", "Hoàn tất")}</option>
       </select>
-      <nav aria-label={copy("Requests", "Danh sách yêu cầu")}>{filtered.map(row => <button type="button" key={row.id} disabled={busy} aria-pressed={selected === row.id && !creating} onClick={() => choose(row.id)}>
+      <nav aria-label={copy("Requests", "Danh sách yêu cầu")}>{filtered.map((row, index) => <motion.button {...entry(index)} type="button" key={row.id} disabled={busy} aria-pressed={selected === row.id && !creating} onClick={() => choose(row.id)}>
         <span className="support-request-status" data-status={row.status}>{statusLabel(row.status)}</span><strong>{row.subject}</strong><small>{employeeMode ? row.customerName + " · " : ""}{row.game}</small><p>{row.lastMessage}</p>
-      </button>)}</nav>
+      </motion.button>)}</nav>
       {filtered.length === 0 && <p className="support-inbox-empty">{copy("No requests yet.", "Chưa có yêu cầu.")}</p>}
       <p className="support-inbox-note"><ShieldCheck size={15} />{copy("Conversations with the ASCEND team", "Hội thoại với đội ngũ ASCEND")}</p>
     </aside>}

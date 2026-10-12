@@ -1,4 +1,6 @@
 "use client";
+import { motion } from "motion/react";
+import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { intlLocales, translateText } from "@/lib/i18n";
 import { UiText } from "@/components/ui/UiText";
@@ -66,6 +68,7 @@ function date(value: string, locale = "en-GB") {
   return new Date(value).toLocaleDateString(locale);
 }
 export function AdminDashboard() {
+  const { entry } = useInteractionMotion();
   const { language } = useLanguage();
   const applications = useApplications();
   const requests = useRequests();
@@ -241,8 +244,8 @@ export function AdminDashboard() {
                     </button>
                   </div>
                   {requests.length ? (
-                    requests.slice(0, 5).map((r) => (
-                      <button
+                    requests.slice(0, 5).map((r, index) => (
+                      <motion.button {...entry(index)}
                         className="activity-row"
                         onClick={() => setDetail(r)}
                         key={r.id}
@@ -254,7 +257,7 @@ export function AdminDashboard() {
                           </small>
                         </span>
                         <span className="record-status"><UiText english={r.status} /></span>
-                      </button>
+                      </motion.button>
                     ))
                   ) : (
                     <div className="admin-empty">
@@ -352,8 +355,8 @@ export function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r) => (
-                      <tr key={r.id}>
+                    {rows.map((r, index) => (
+                      <motion.tr {...entry(index)} key={r.id}>
                         <td>
                           <strong>{r.name}</strong>
                           <small>{r.email}</small>
@@ -402,7 +405,7 @@ export function AdminDashboard() {
                             </button>
                           </div>
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>

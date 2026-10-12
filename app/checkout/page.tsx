@@ -2,9 +2,11 @@ import { UiText } from "@/components/ui/UiText";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { WalletCheckout } from "@/components/account/WalletCheckout";
+import { privateRobots } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Checkout",
+  robots: privateRobots,
   description: "Review your service order and choose your preferred payment method.",
 };
 

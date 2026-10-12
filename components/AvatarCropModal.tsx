@@ -115,7 +115,11 @@ export function AvatarCropModal({ source, onCancel, onConfirm }: Props) {
         if (event.target === event.currentTarget && !busy) onCancel();
       }}
     >
-      <div
+      <motion.div
+        initial={reduceMotion ? false : { scale: 0.95 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: reduceMotion ? 1 : 0.95 }}
+        transition={{ duration: reduceMotion ? 0 : 0.16 }}
         ref={dialog}
         role="dialog"
         aria-modal="true"
@@ -266,7 +270,7 @@ export function AvatarCropModal({ source, onCancel, onConfirm }: Props) {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>,
     document.body,
   );

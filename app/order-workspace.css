@@ -16,7 +16,7 @@
 }
 .riot-checkout-heading h3 {
   margin: 0 0 6px;
-  font-family: var(--font-ascend-heading);
+  font-family: var(--font-heading);
   font-size: 21px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -111,7 +111,7 @@
 .riot-checkout-preferences legend {
   padding: 0 8px;
   color: #f5d7a1;
-  font-family: var(--font-ascend-heading);
+  font-family: var(--font-heading);
   font-size: 20px;
 }
 .riot-checkout-preferences textarea {

@@ -29,8 +29,8 @@
 .employee-header-status:hover { border-color: #FF9F3C80; background: #ffffff0d; }
 .employee-header-status:focus-visible { outline: 2px solid #FF9F3C; outline-offset: 3px; }
 .employee-header-status:disabled { opacity: .65; cursor: wait; }
-.employee-header-status > span { width: 7px; height: 7px; border-radius: 50%; background: #737373; }
+.employee-header-status > span:first-child { width: 7px; height: 7px; border-radius: 50%; background: #737373; }
 .employee-header-status.is-online { color: #34D399; border-color: #34D39940; }
-.employee-header-status.is-online > span { background: #34D399; box-shadow: 0 0 8px #34D39990; }
+.employee-header-status.is-online > span:first-child { background: #34D399; box-shadow: 0 0 8px #34D39990; }
 .employee-header-status-error { position: absolute; top: calc(100% + 8px); right: 0; width: 210px; padding: 10px; background: #1F1F23; border: 1px solid #f8717150; border-radius: 8px; color: #fca5a5; font-size: 12px; }
 @media (max-width: 480px) { .employee-header-status { font-size: 9px; padding: 7px; } }

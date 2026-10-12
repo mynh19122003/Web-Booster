@@ -20,7 +20,7 @@ export default async function EditCoachPage({ params }: PageProps<"/employee/coa
   return <div className="employee-workspace">
     <div className="employee-dashboard-header"><div className="employee-dashboard-brand">
       <Link href={published ? `/coaches/${slug}` : "/employee/coaches"} className="employee-back-link"><ArrowLeft size={15} /><UiText english={published ? "Back to coach profile" : "Back to coach workspace"} vietnamese={published ? "Về hồ sơ coach" : "Về không gian coach"} /></Link>
-      <h1><Pencil size={26} /> <UiText english="Edit profile" vietnamese="Chỉnh sửa hồ sơ" /> · {coach.name}</h1>
+      <h1><Pencil size={26} aria-hidden="true" /><span><UiText english="Edit profile" vietnamese="Chỉnh sửa hồ sơ" /> · {coach.name}</span></h1>
       <p className="employee-dashboard-desc"><UiText english="Update profile information, coaching availability and your Riot account." vietnamese="Cập nhật thông tin hồ sơ, trạng thái nhận coaching và tài khoản Riot." /></p>
     </div></div>
     <CoachRiotAccounts selectedSlug={slug} editMode />

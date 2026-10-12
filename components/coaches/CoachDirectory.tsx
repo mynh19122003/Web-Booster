@@ -4,6 +4,8 @@ import { NumberInput } from "@/components/ui/NumberInput";
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "motion/react";
+import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Heart, Search, ShieldCheck, Star, X } from "lucide-react";
 import { coachGameLogoPath, coachRankCardIconPath, type Coach } from "@/data/coaches";
@@ -19,6 +21,7 @@ const games = [
 ] as const;
 
 export function CoachDirectory({ gameSlug, initialCoaches }: { gameSlug?: string; initialCoaches?: Coach[] }) {
+  const { card } = useInteractionMotion();
   const { t } = useLanguage();
   const money = useMoney();
   const [search, setSearch] = useState("");
@@ -184,7 +187,7 @@ export function CoachDirectory({ gameSlug, initialCoaches }: { gameSlug?: string
       {filtered.length ? (
         <div className="coach-grid">
           {filtered.map((coach) => (
-            <article className="coach-card" key={coach.slug} style={{ "--coach-accent": coach.accent } as React.CSSProperties}>
+            <motion.article {...card} className="coach-card" key={coach.slug} style={{ "--coach-accent": coach.accent } as React.CSSProperties}>
               <Link className="coach-card-main" href={"/coaches/" + coach.slug + "?game=" + coach.game} aria-label={t("viewCoachProfile") + ": " + coach.name}>
                 <div className="coach-card-cover">
                   <span className="coach-card-game"><Image src={coachGameLogoPath(coach.game)} alt="" width={26} height={26} />{coach.gameName}</span>
@@ -214,7 +217,7 @@ export function CoachDirectory({ gameSlug, initialCoaches }: { gameSlug?: string
               <button type="button" className={"coach-favorite " + (favorites.includes(coach.slug) ? "is-favorite" : "")} aria-label={t("filterFavorites")} aria-pressed={favorites.includes(coach.slug)} onClick={() => toggleFavorite(coach.slug)}>
                 <Heart size={17} fill={favorites.includes(coach.slug) ? "currentColor" : "none"} />
               </button>
-            </article>
+            </motion.article>
           ))}
         </div>
       ) : (

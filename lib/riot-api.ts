@@ -133,12 +133,12 @@ export function cachedRiotMatchHistory(account: LinkedRiotAccount, tft: boolean)
   return saved;
 }
 
-export async function riotMatchHistory(account: LinkedRiotAccount, tft: boolean): Promise<MatchHistory> {
+export async function riotMatchHistory(account: LinkedRiotAccount, tft: boolean, fresh = false): Promise<MatchHistory> {
   const cacheKey = `${tft}:${account.platform}:${account.puuid}:${account.gameName}#${account.tagLine}`;
   const cached = shared.cache.get(cacheKey);
-  if (cached && cached.expires > Date.now()) return cached.value;
+  if (cached && cached.expires > Date.now() && (!fresh || cached.value.status === "unavailable")) return cached.value;
   const saved = savedRiotHistory(account, tft);
-  if (saved?.updatedAt && saved.updatedAt + (saved.rankError ? 60_000 : 300_000) > Date.now()) return saved;
+  if (!fresh && saved?.updatedAt && saved.updatedAt + (saved.rankError ? 60_000 : 300_000) > Date.now()) return saved;
   const running = shared.pending.get(cacheKey);
   if (running) return running;
   const task = (async (): Promise<MatchHistory> => {

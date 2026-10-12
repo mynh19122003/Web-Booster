@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { siteUrl } from "@/lib/seo";
+import { siteUrl, absoluteUrl } from "@/lib/site-url";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { pageCopyFor, type PageCopyKey } from "@/data/page-copy";
 
@@ -25,7 +26,7 @@ export function PageIntro({
       <nav aria-label={t("breadcrumb")}>
         <Link href="/">{t("home")}</Link>
         <span>/</span>
-        <span>{copy.title}</span>
+        <span aria-current="page">{copy.title}</span>
       </nav>
       <p className="eyebrow">{copy.eyebrow}</p>
       <h1>
@@ -36,7 +37,7 @@ export function PageIntro({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
@@ -45,7 +46,7 @@ export function PageIntro({
                 "@type": "ListItem",
                 position: 2,
                 name: copy.title,
-                item: `${siteUrl}${path}`,
+                item: absoluteUrl(path),
               },
             ],
           }),

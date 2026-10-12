@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import { services } from "@/data/services";
-import { metadata } from "@/lib/seo";
+import { metadata, siteUrl } from "@/lib/seo";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { GameSync } from "@/components/ui/GameSync";
 import { ServiceConfigurator } from "@/components/home/ServiceConfigurator";
 import { games } from "@/data/games";
+export const dynamicParams = false;
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
 }
@@ -15,9 +17,10 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const s = services.find((s) => s.slug === slug);
+  if (!s) notFound();
   return metadata(
-    s?.name ?? "Service not found",
-    s?.description ?? "Explore gaming services",
+    s.name,
+    s.description,
     `/services/${slug}`,
   );
 }
@@ -54,12 +57,13 @@ export default async function ServicePage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "Service",
             name: s.name,
             description: s.description,
-            provider: { "@type": "Organization", name: "ASCEND" },
+            url: `${siteUrl}/services/${slug}`,
+            provider: { "@id": `${siteUrl}/#organization` },
           }),
         }}
       />

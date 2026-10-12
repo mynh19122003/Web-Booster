@@ -19,6 +19,6 @@ export async function GET(request: Request) {
   if (coach.game !== "league-of-legends") return NextResponse.json({ status: "unsupported", topChampions: [], sampleSize: 0 }, { headers });
   const account = coachRiotAccount(coach.slug);
   if (!account) return NextResponse.json({ status: "unlinked", topChampions: [], sampleSize: 0 }, { headers });
-  const stats = await coachChampionStats(account);
+  const stats = await coachChampionStats(account, params.get("refresh") === "1");
   return NextResponse.json(stats, { headers: { ...headers, ...(stats.retryAfter ? { "Retry-After": String(stats.retryAfter) } : {}) } });
 }

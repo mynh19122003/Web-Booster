@@ -51,6 +51,52 @@ let respond = () => Response.json({ ok: true });
 globalThis.fetch = async (url, options) => { calls.push({ url: String(url), options, at: Date.now() }); return respond(String(url), options); };
 const signIn = session => { jar.clear(); if (session) jar.set("ascend_session", session.token); };
 
+test("customer avatar persists across profile edits and password changes preserve only the active session", async () => {
+  const profileApi = load("app/api/profile/route.ts");
+  const avatarApi = load("app/api/profile/avatar/route.ts");
+  const passwordApi = load("app/api/profile/password/route.ts");
+  const user = db.createUser("Avatar User", "avatar-user@example.test", "original-password");
+  const active = db.createSession(user.id), other = db.createSession(user.id);
+  const origin = "http://localhost:3000";
+  const request = (path, body, method = "PATCH") => new Request(`${origin}${path}`, { method, headers: { origin, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  signIn(null);
+  assert.equal((await avatarApi.DELETE(new Request(`${origin}/api/profile/avatar`, { method: "DELETE", headers: { origin } }))).status, 401);
+  signIn(active);
+  const form = new FormData();
+  form.set("file", new File([Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX9sAAAAASUVORK5CYII=", "base64")], "avatar.png", { type: "image/png" }));
+  assert.equal((await avatarApi.POST(new Request(`${origin}/api/profile/avatar`, { method: "POST", headers: { origin: "https://other.test" }, body: form }))).status, 403);
+  const uploaded = await avatarApi.POST(new Request(`${origin}/api/profile/avatar`, { method: "POST", headers: { origin }, body: form }));
+  assert.equal(uploaded.status, 200);
+  const avatar = (await uploaded.json()).profile.avatar;
+  assert.ok(avatar.startsWith("data:image/png;base64,"));
+  const fake = new FormData(); fake.set("file", new File(["invalid"], "fake.png", { type: "image/png" }));
+  assert.equal((await avatarApi.POST(new Request(`${origin}/api/profile/avatar`, { method: "POST", headers: { origin }, body: fake }))).status, 400);
+  const details = { name: "Updated User", phone: "", country: "", discord: "" };
+  const mismatch = await profileApi.PATCH(request("/api/profile", { ...details, password: { newPassword: "updated-password", confirmPassword: "different-password" } }));
+  assert.equal(mismatch.status, 400);
+  assert.equal((await mismatch.json()).error, "mismatch");
+  assert.equal(db.verifyPassword("original-password", db.findUserByEmail(user.email).password_hash), true);
+  assert.equal(db.getUserForSession(other.token).id, user.id);
+  assert.equal((await profileApi.PATCH(request("/api/profile", { ...details, password: { newPassword: "updated-password" } }))).status, 400);
+  const saved = await profileApi.PATCH(request("/api/profile", { ...details, password: { newPassword: "updated-password", confirmPassword: "updated-password" } }));
+  assert.equal(saved.status, 200);
+  assert.equal((await saved.json()).profile.avatar, avatar);
+  assert.equal(db.getUserForSession(other.token), null);
+  assert.equal(db.getUserForSession(active.token).id, user.id);
+  assert.equal(db.verifyPassword("original-password", db.findUserByEmail(user.email).password_hash), false);
+  assert.equal(db.verifyPassword("updated-password", db.findUserByEmail(user.email).password_hash), true);
+  assert.equal((await login.POST(request("/api/auth/login", { email: user.email, password: "original-password" }, "POST"))).status, 401);
+  assert.equal((await login.POST(request("/api/auth/login", { email: user.email, password: "updated-password" }, "POST"))).status, 200);
+  assert.equal((await passwordApi.PATCH(request("/api/profile/password", { newPassword: "second-password", confirmPassword: "different-password" }))).status, 400);
+  assert.equal((await passwordApi.PATCH(request("/api/profile/password", { newPassword: "short" }))).status, 400);
+  assert.equal((await passwordApi.PATCH(request("/api/profile/password", { newPassword: "updated-password", confirmPassword: "updated-password" }))).status, 400);
+  assert.equal((await passwordApi.PATCH(request("/api/profile/password", { newPassword: "second-password", confirmPassword: "second-password" }))).status, 200);
+  const removed = await avatarApi.DELETE(new Request(`${origin}/api/profile/avatar`, { method: "DELETE", headers: { origin } }));
+  assert.equal((await removed.json()).profile.avatar, null);
+  assert.equal(db.getUserProfile(db.getUserForSession(active.token)).name, details.name);
+  signIn(null);
+});
+
 test("checkout keeps encrypted specifications private and restricts access to the assigned employee", async () => {
   const checkout = load("app/api/checkout/route.ts");
   const requests = load("app/api/requests/route.ts");
@@ -447,6 +493,12 @@ test("20 matches are paced within the request budget and subsequent reads reuse 
   assert.equal(calls.length, 22);
   assert.ok(calls.every(call => calls.filter(other => other.at >= call.at && other.at - call.at < 1000).length <= 18));
   assert.deepEqual(await riot.riotMatchHistory(account, false), first); assert.equal(calls.length, 22);
+  calls = []; globalThis.riotState.requests = [];
+  respond = url => Response.json(url.includes("/league/") ? [] : []);
+  const fresh = await riot.riotMatchHistory(account, false, true);
+  assert.equal(fresh.matches.length, 0);
+  assert.equal(calls.length, 2);
+  assert.equal(riot.cachedRiotMatchHistory(account, false).matches.length, 0);
 });
 
 test("rank failure preserves real match history and is not reported as unranked", async () => {
@@ -695,6 +747,12 @@ test("coach champion statistics aggregate 30 ranked games, return top five and p
     assert.deepEqual(await (await statsApi.GET(request())).json(), stats);
     assert.deepEqual(await (await statsApi.GET(new Request(`http://localhost:3000/api/riot/coach-stats?puuid=${account.puuid}&region=asia`))).json(), stats);
     assert.equal(calls.length, count);
+    calls = []; globalThis.riotState.requests = [];
+    respond = () => Response.json([]);
+    const fresh = await statsApi.GET(new Request("http://localhost:3000/api/riot/coach-stats?coach=luna&refresh=1"));
+    assert.equal((await fresh.json()).sampleSize, 0);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].options.cache, "no-store");
     assert.equal((await statsApi.GET(new Request("http://localhost:3000/api/riot/coach-stats?puuid=arbitrary&region=asia"))).status, 404);
     ownership.setCoachPublished("luna", false);
     assert.equal((await statsApi.GET(request())).status, 404);

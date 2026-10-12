@@ -58,6 +58,11 @@
   --slate: #1F1F23;
   --metallic-gold: #F5D7A1;
   --orange: #FF9F3C;
+  --control-accent: var(--prime-gold);
+  --control-accent-border: color-mix(in srgb, var(--control-accent) 75%, transparent);
+  --control-accent-text: var(--metallic-gold);
+  --control-accent-surface: linear-gradient(120deg, color-mix(in srgb, var(--control-accent) 20%, transparent), color-mix(in srgb, var(--control-accent) 6%, transparent));
+  --control-accent-glow: inset 0 1px 0 color-mix(in srgb, var(--control-accent) 18%, transparent), inset 0 0 14px color-mix(in srgb, var(--control-accent) 8%, transparent), 0 0 20px color-mix(in srgb, var(--control-accent) 24%, transparent);
   --green: #8ddab4;
 }
 * {
@@ -5687,6 +5692,108 @@ select {
 .rank-tier-btn .rank-emblem {
   width: 48px;
   height: 48px;
+}
+.rank-division-section {
+  padding-top: 18px;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+.rank-division-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.rank-division-label {
+  color: #d4d4d8;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.rank-division-tier {
+  color: #a1a1aa;
+  font-size: 12px;
+  text-align: end;
+}
+.rank-division-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 10px;
+  background: #202126;
+  color: #f4f4f5;
+  font-size: 15px;
+  font-weight: 700;
+}
+.rank-division-option[aria-pressed="true"] {
+  border-color: var(--control-accent);
+  background: var(--control-accent-surface), #202126;
+  color: var(--control-accent-text);
+  box-shadow: var(--control-accent-glow);
+}
+.rank-division-option:is(:hover, :focus-visible):not(:disabled) {
+  border-color: var(--control-accent);
+  background: #373029;
+  color: var(--control-accent-text);
+}
+.rank-confirm-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  border: 1px solid #ffbb72;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #ffb85d, var(--control-accent));
+  color: #211407;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 20px rgb(255 159 60 / 22%);
+}
+.rank-confirm-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 26px rgb(255 159 60 / 35%);
+}
+.rank-division-option:focus-visible,
+.rank-confirm-button:focus-visible {
+  outline: 2px solid var(--control-accent);
+  outline-offset: 3px;
+}
+.rank-division-option:disabled,
+.rank-confirm-button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.rank-tier-btn {
+  border: 1px solid rgb(255 255 255 / 5%);
+  transition: color 180ms ease;
+}
+.rank-tier-btn[aria-pressed="true"] {
+  border-color: var(--rank-tier-glow);
+  box-shadow: 0 0 20px var(--rank-tier-glow);
+}
+.rank-tier-btn:is(:hover, :focus-visible):not(:disabled) {
+  border-color: var(--control-accent-border);
+  background: var(--control-accent-surface);
+  box-shadow: var(--control-accent-glow);
+}
+.rank-tier-btn:focus-visible:not(:disabled) {
+  outline: 2px solid var(--control-accent);
+  outline-offset: 3px;
+}
+.rank-tier-btn:is(:hover, :focus-visible):not(:disabled) > span {
+  color: var(--control-accent-text);
 }
 .rank-grid button {
   min-height: 112px;

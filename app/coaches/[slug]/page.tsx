@@ -6,7 +6,6 @@ import { metadata } from "@/lib/seo";
 import { getCoachWithOverride } from "@/lib/coach-profile-db";
 import { currentUser } from "@/lib/current-user";
 import { canManageCoach } from "@/lib/coach-ownership";
-import { cachedCoachHistory } from "@/lib/coach-history";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +16,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/coaches/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const coach = getCoachWithOverride(slug);
-  return metadata(coach?.name ?? "Coach not found", coach ? coach.gameName + " coach profile." : "The requested coach could not be found.", "/coaches/" + slug);
+  if (!coach) notFound();
+  return metadata(`${coach.name} — ${coach.gameName} Coach`, `Explore ${coach.name}'s ${coach.gameName} coaching profile, session options and availability.`, "/coaches/" + slug);
 }
 
 export default async function CoachPage({ params }: PageProps<"/coaches/[slug]">) {
@@ -25,5 +25,5 @@ export default async function CoachPage({ params }: PageProps<"/coaches/[slug]">
   const coach = getCoachWithOverride(slug);
   if (!coach) notFound();
   const canEdit = canManageCoach(await currentUser(), slug);
-  return <CoachProfile coach={coach} canEdit={canEdit} initialHistory={cachedCoachHistory(coach)} />;
+  return <CoachProfile coach={coach} canEdit={canEdit} />;
 }

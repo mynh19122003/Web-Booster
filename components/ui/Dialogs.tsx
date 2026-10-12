@@ -2,6 +2,7 @@
 import { GameIdentity } from "@/components/ui/GameIdentity";
 import { translateText } from "@/lib/i18n";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { X, Check, ArrowUpRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
@@ -17,6 +18,7 @@ import type { ServiceSlug } from "@/lib/service-options";
 import Link from "next/link";
 import { lpGainLabel, PRICING_VERSION } from "@/lib/rank-pricing";
 export function Dialogs() {
+  const reduced = useReducedMotion();
   const s = useStore();
   const setStore = useStore(state => state.set);
   const money = useMoney();
@@ -33,9 +35,6 @@ export function Dialogs() {
     if (s.modal) {
       ref.current?.showModal();
       document.body.style.overflow = "hidden";
-    } else {
-      ref.current?.close();
-      document.body.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
@@ -226,11 +225,17 @@ export function Dialogs() {
       aria-label={
         s.modal === "checkout" ? t("reviewPlan") : t("savedPlans")
       }
-      onCancel={close}
+      onCancel={(event) => { event.preventDefault(); close(); }}
       onClick={(e) => {
         if (e.target === ref.current) close();
       }}
     >
+      <AnimatePresence onExitComplete={() => { if (!s.modal) ref.current?.close(); }}>
+      {s.modal && <motion.div key={s.modal}
+        initial={{ opacity: 0, scale: reduced ? 1 : 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: reduced ? 1 : 0.95 }}
+        transition={{ duration: reduced ? 0 : 0.16 }}>
       <button
         className="dialog-close icon-button"
         aria-label={t("closeDialog")}
@@ -353,6 +358,8 @@ export function Dialogs() {
         </>
       )}
       {error && <p role="alert">{error}</p>}
+      </motion.div>}
+      </AnimatePresence>
     </dialog>
   );
 }

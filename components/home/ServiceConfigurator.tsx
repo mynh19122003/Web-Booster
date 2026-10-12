@@ -539,14 +539,14 @@ export function ServiceConfigurator() {
                 </section>
 
                 {/* Summary rows */}
-                <div className="space-y-3 pt-4 border-t border-white/[0.06] text-sm">
-                  <div className="flex items-center justify-between text-zinc-400">
+                <div className="order-summary-details">
+                  <div className="order-summary-detail">
                     <span>{t("estimatedDelivery")}</span>
-                    <strong className="text-white font-medium tabular-nums">
+                    <strong className="order-delivery-time">
                       {quoteRequired ? (translateText(language, "To be confirmed", "Cần xác nhận")) : `${minHours}–${maxHours} ${translateText(language, "hours", "giờ")}`}
                     </strong>
                   </div>
-                  <div className="flex items-center justify-between text-zinc-400">
+                  <div className="order-summary-detail">
                     <span>{t("services")}</span>
                     <strong className="text-white font-medium">
                       {serviceCopyFor(language, service.slug as ServiceSlug).name}

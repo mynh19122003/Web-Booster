@@ -8,8 +8,10 @@ import "./riot-matches.css";
 import "./employee-riot.css";
 import "./order-workspace.css";
 import "./coach-refinements.css";
+import "./interaction-refinements.css";
 
 const rajdhani = Rajdhani({
+  // Rajdhani has no Vietnamese glyph subset; Vietnamese headings use the body font.
   subsets: ["latin"],
   weight: ["600", "700"],
   variable: "--font-ascend-heading",
@@ -24,7 +26,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 const interPrice = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   weight: ["600"],
   variable: "--font-ascend-price",
   display: "swap",
@@ -33,6 +35,7 @@ const interPrice = Inter({
 
 import { SiteShell } from "@/components/layout/SiteShell";
 import { metadata as makeMetadata, siteUrl } from "@/lib/seo";
+import { serializeJsonLd } from "@/lib/json-ld";
 export const metadata: Metadata = { ...metadataBase() };
 function metadataBase(): Metadata {
   return {
@@ -41,6 +44,12 @@ function metadataBase(): Metadata {
       "Expert gaming services, personal coaching, and a clear path to your next level.",
     ),
     metadataBase: new URL(siteUrl),
+    // Every indexable page sets its own canonical; never inherit the homepage URL.
+    alternates: undefined,
+    openGraph: undefined,
+    verification: process.env.GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+      : undefined,
     title: {
       default: "ASCEND — Boost Your Potential",
       template: "%s | ASCEND",
@@ -60,9 +69,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: serializeJsonLd({
               "@context": "https://schema.org",
               "@type": "Organization",
+              "@id": `${siteUrl}/#organization`,
               name: "ASCEND",
               url: siteUrl,
               description:

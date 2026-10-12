@@ -5,7 +5,8 @@ import { NumberInput } from "@/components/ui/NumberInput";
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { ActiveIndicator } from "@/components/ui/InteractionMotion";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, Clock3, GraduationCap, ShieldCheck, Star, Users, Trophy, Swords, Pencil } from "lucide-react";
 import { coachGameLogoPath, coachRankCardIconPath, type Coach } from "@/data/coaches";
@@ -21,19 +22,23 @@ import { DuoPackageGrid } from "@/components/coaches/DuoPackageGrid";
 import { CoachingSessionFormats } from "@/components/coaches/CoachingSessionFormats";
 import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
 import type { MatchHistory } from "@/lib/riot-types";
+import { CoachDataLoading } from "./CoachDataLoading";
 
 export function CoachProfile({ coach: initialCoach, canEdit = false, initialHistory = null }: { coach: Coach; canEdit?: boolean; initialHistory?: MatchHistory | null }) {
   const [coach, setCoach] = useState(initialCoach);
   const { language, t } = useLanguage();
   const money = useMoney();
+  const modeIndicatorId = useId();
   const router = useRouter();
   const [online, setOnline] = useState(coach.online);
+  const [profileLoading, setProfileLoading] = useState(true);
   useEffect(() => {
     const abort = new AbortController();
     let pending = false;
     async function refresh() {
       if (document.hidden || pending) return;
       pending = true;
+      setProfileLoading(true);
       try {
         const response = await fetch(`/api/coaches/${coach.slug}`, { cache: "no-store", signal: abort.signal });
         if (response.status === 404) { router.refresh(); return; }
@@ -44,7 +49,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             setOnline(Boolean(data.coach.online));
           }
         }
-      } catch {} finally { pending = false; }
+      } catch {} finally { pending = false; if (!abort.signal.aborted) setProfileLoading(false); }
     }
     void refresh();
     const timer = setInterval(refresh, 15000);
@@ -52,7 +57,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => { unsubscribe(); abort.abort(); clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
-  }, [coach.slug, coach.online, router]);
+  }, [coach.slug, router]);
   const savedBooking = useStore(state => state.coachBooking);
   const previous = savedBooking?.coachId === coach.slug ? savedBooking : null;
   const [selectedFormat, setSelectedFormat] = useState<"live" | "vod">(previous?.sessionFormat ?? coach.sessionFormats[0]);
@@ -116,6 +121,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
   return (
     <div className="coach-profile-page">
       <div className="container">
+        {profileLoading && <CoachDataLoading label={translateText(language, "Loading coach profile…", "Đang tải hồ sơ coach…")} />}
         <Link className="coach-back-link" href={"/coaches?game=" + coach.game}><ArrowLeft size={16} />{t("coachBackToList")}</Link>
         <p className="coach-demo-note">{translateText(language, "Profile details, availability, coaching statistics and reviews use demo data. Match history comes from the linked Riot account.", "Hồ sơ, lịch rảnh, thống kê coaching và đánh giá là dữ liệu mẫu. Lịch sử trận đấu lấy từ tài khoản Riot đã liên kết.")}</p>
         <section className="coach-profile-hero" style={{ "--coach-accent": coach.accent } as React.CSSProperties}>
@@ -152,8 +158,8 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             <section className="coach-profile-panel coach-offers-panel">
               <div className="coach-profile-section-heading"><div><p className="eyebrow">{t("coachDuoPackages")}</p><h2>{t("coachBuyWithCoach")}</h2></div><span>{coach.gameName}</span></div>
               <div className="coach-offer-mode" role="tablist" aria-label={t("coachDuoPackages")}>
-                <button type="button" role="tab" aria-selected={mode === "duo"} className={mode === "duo" ? "is-active" : ""} onClick={() => setMode("duo")}><Swords size={16} />{t("coachPlayTogether")}</button>
-                <button type="button" role="tab" aria-selected={mode === "coaching"} className={mode === "coaching" ? "is-active" : ""} onClick={() => setMode("coaching")}><GraduationCap size={16} />{t("coachLearnFrom")}</button>
+                <button type="button" role="tab" aria-selected={mode === "duo"} className={mode === "duo" ? "is-active" : ""} onClick={() => setMode("duo")}>{mode === "duo" && <ActiveIndicator id={modeIndicatorId} />}<Swords size={16} /><span>{t("coachPlayTogether")}</span></button>
+                <button type="button" role="tab" aria-selected={mode === "coaching"} className={mode === "coaching" ? "is-active" : ""} onClick={() => setMode("coaching")}>{mode === "coaching" && <ActiveIndicator id={modeIndicatorId} />}<GraduationCap size={16} /><span>{t("coachLearnFrom")}</span></button>
               </div>
               {mode === "duo" ? (
                 <DuoPackageGrid game={coach.game} offers={offers} selectedOfferId={selectedOffer.id} onSelect={setSelectedOfferId} />

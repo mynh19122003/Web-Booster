@@ -13,11 +13,11 @@ export async function PATCH(request: Request) {
   let body: unknown;
   try { body = await request.json(); } catch { return authError("invalid-request", 400); }
   if (!body || typeof body !== "object" || Array.isArray(body)) return authError("invalid-request", 400);
-  const { currentPassword, newPassword } = body as Record<string, unknown>;
-  if (typeof currentPassword !== "string" || !currentPassword || currentPassword.length > 128 || typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 128) return authError("invalid-password", 400);
-  if (currentPassword === newPassword) return authError("same-password", 400);
+  const { newPassword, confirmPassword } = body as Record<string, unknown>;
+  if (typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 128) return authError("invalid-password", 400);
+  if (typeof confirmPassword !== "string" || confirmPassword !== newPassword) return authError("mismatch", 400);
   try {
-    const result = changeUserPassword(user.id, currentPassword, newPassword, token);
+    const result = changeUserPassword(user.id, newPassword, token);
     return result === "saved" ? NextResponse.json({ saved: true }) : authError(result, 400);
   } catch { return authError("save-failed", 500); }
 }

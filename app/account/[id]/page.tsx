@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { privateRobots } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { demoShopAccounts, type ShopAccount } from "@/data/shop-accounts";
 import { BoostRoyalAccountView } from "@/components/account/BoostRoyalAccountView";
@@ -18,8 +19,9 @@ function getAccount(id: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const account = getAccount(id);
+  if (!account) notFound();
   const gameName = account?.game === "valorant" ? "Valorant" : account?.game === "teamfight-tactics" ? "Teamfight Tactics" : "League of Legends";
-  return { title: account ? `${gameName} Account #${account.id}` : "Account not found" };
+  return { title: `${gameName} Account #${account.id}`, robots: privateRobots };
 }
 
 export default async function AccountListingPage({ params }: Props) {

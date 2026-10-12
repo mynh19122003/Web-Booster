@@ -9,7 +9,7 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { FAQ } from "@/components/home/FAQ";
 import { CTA } from "@/components/home/CTA";
 import { faqs } from "@/data/faqs";
-import { RecruitmentSection } from "@/components/home/RecruitmentSection";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { metadata as makeMetadata } from "@/lib/seo";
 export const metadata = makeMetadata(
   "LoL, Valorant & TFT Gaming Services",
@@ -24,7 +24,6 @@ export default function Home() {
       <FeatureShowcase />
       <TrophyBreak />
       <Reviews />
-      <RecruitmentSection />
       <SecuritySection />
       <HowItWorks />
       <FAQ />
@@ -32,7 +31,7 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: faqs.map((f) => ({

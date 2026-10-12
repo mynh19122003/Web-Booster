@@ -6,7 +6,8 @@ import { NumberInput } from "@/components/ui/NumberInput";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/store/useCart";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { ActiveIndicator } from "@/components/ui/InteractionMotion";
 import { createPortal } from "react-dom";
 import { ArrowRight, Check, Minus, Plus, Search, ShieldCheck } from "lucide-react";
 import { productsByGame, categoryKeys } from "@/lib/product-categories";
@@ -39,6 +40,7 @@ const categoryCopy: Record<string, { en: string; vi: string; unit: string; unitV
 };
 
 export function CategoryConfigurator({ game, productId }: { game: string; productId: string }) {
+  const indicatorId = useId();
   const s = useStore();
   const router = useRouter();
   const { language, t } = useLanguage();
@@ -146,6 +148,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
 
         {options.length > 0 && <div className="category-packages" role="group" aria-label={text("Choose a plan", "Chọn gói")}>
           {options.map((option) => <button key={option} type="button" aria-pressed={mode === option} onClick={() => setMode(option)}>
+            {mode === option && <ActiveIndicator id={indicatorId} />}
             <Icon size={20} aria-hidden="true" /><strong>{optionName(option)}</strong>{mode === option && <Check size={16} aria-hidden="true" />}
           </button>)}
         </div>}
@@ -255,8 +258,10 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         <div className="category-price" aria-live="polite">{quoteRequired ? <><strong>{text("Custom quote", "Báo giá riêng")}</strong><p>{text("Price confirmed after reviewing your preferences.", "Giá được xác nhận theo yêu cầu của bạn.")}</p></> : <><strong>{money.format(price)}</strong><span>{money.currency} · {t("estimatedQuote")}</span></>}</div>
         {!account && <button type="button" className="category-extra" aria-pressed={express} onClick={() => setExpress(!express)}><span><strong>{translateText(language, "Express priority", "Ưu tiên xử lý")}</strong><small>{quoteRequired ? text("Include in quote", "Thêm vào yêu cầu báo giá") : "+20%"}</small></span><span className="category-check">{express && <Check size={16} />}</span></button>}
         {!quoteRequired && base.maxHours > 0 && <p className="category-delivery">{t("estimatedDelivery")} <strong>{base.minHours}–{base.maxHours} {translateText(language, "hours", "giờ")}</strong></p>}
-        {!quoteRequired && <button type="button" className="add-to-cart-button" disabled={unavailablePrice} onClick={() => review(true)}>{text("Add to cart", "Thêm vào giỏ hàng")} ＋</button>}
-        <button type="button" className="order-start-boost category-review" disabled={unavailablePrice} onClick={() => review()}>{quoteRequired ? reviewLabel : checkoutLabel}<ArrowRight size={18} aria-hidden="true" /></button>
+        <div className="category-summary-actions">
+          {!quoteRequired && <button type="button" className="add-to-cart-button" disabled={unavailablePrice} onClick={() => review(true)}><span>{text("Add to cart", "Thêm vào giỏ hàng")}</span><Plus size={18} aria-hidden="true" /></button>}
+          <button type="button" className="order-start-boost category-review" disabled={unavailablePrice} onClick={() => review()}><span>{quoteRequired ? reviewLabel : checkoutLabel}</span><ArrowRight size={18} aria-hidden="true" /></button>
+        </div>
         {unavailablePrice && <p className="category-validation" role="status">{text("Currency rate unavailable. Choose USD to continue.", "Chưa có tỷ giá. Chọn USD để tiếp tục.")}</p>}
         <p className="category-summary-note"><ShieldCheck size={15} aria-hidden="true" />{text("Review your details before submitting", "Kiểm tra thông tin trước khi gửi")}</p>
       </aside>

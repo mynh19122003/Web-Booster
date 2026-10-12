@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
+import { motion } from "motion/react";
+import { ActiveIndicator, useInteractionMotion } from "@/components/ui/InteractionMotion";
 import Image from "next/image";
 import { Trophy, Swords } from "lucide-react";
 import { AccountImage } from "@/components/account/AccountImage";
@@ -12,6 +14,8 @@ import { riotPlatforms, type MatchHistory } from "@/lib/riot-types";
 
 export function RiotProfileHistory({ history, tft, loading = false, valorant = false }: { history: MatchHistory | null; tft: boolean; loading?: boolean; valorant?: boolean }) {
   const { language } = useLanguage();
+  const indicatorId = useId();
+  const { entry } = useInteractionMotion();
   const text = (en: string, vi: string) => translateText(language, en, vi);
   const [filter, setFilter] = useState(tft ? "ranked" : "solo");
   const [expanded, setExpanded] = useState(false);
@@ -53,6 +57,7 @@ export function RiotProfileHistory({ history, tft, loading = false, valorant = f
     <section className="riot-history-card" aria-label={text("Match history", "Lịch sử đấu")}>
       <div className="riot-mode-filters" role="group" aria-label={text("Filter game modes", "Lọc chế độ đấu")}>
         {filters.map(item => <button key={item.id} type="button" aria-pressed={filter === item.id} onClick={() => { setFilter(item.id); setExpanded(false); }}>
+          {filter === item.id && <ActiveIndicator id={indicatorId} />}
           {item.id === "all" ? text("All", "Tất cả") : item.id === "normal" && !valorant ? text("Normal", "Thường") : item.label} <span>({filterRiotMatches(matches, item.id, tft).length})</span>
         </button>)}
       </div>
@@ -60,7 +65,7 @@ export function RiotProfileHistory({ history, tft, loading = false, valorant = f
       {history?.updatedAt && <p className="riot-history-caption">{text("Updated", "Cập nhật")} <time dateTime={new Date(history.updatedAt).toISOString()}>{date(history.updatedAt)}</time></p>}
       {status && <div className="riot-history-empty" role="status"><Swords size={24} /><p>{status}</p></div>}
       {!status && !filtered.length && <div className="riot-history-empty" role="status"><Swords size={24} /><p>{text("No recent matches in this mode. Choose another filter.", "Chưa có trận gần đây trong chế độ này. Chọn bộ lọc khác để xem.")}</p></div>}
-      <div className="riot-rich-match-list">{filtered.slice(0, expanded ? 20 : 5).map(match => <article className="riot-rich-match" data-result={match.won ? "win" : "loss"} key={match.id}>
+      <div className="riot-rich-match-list">{filtered.slice(0, expanded ? 20 : 5).map((match, index) => <motion.article {...entry(index)} className="riot-rich-match" data-result={match.won ? "win" : "loss"} key={match.id}>
         <div className="riot-match-portrait"><AccountImage key={match.championId ?? match.pick} sources={tft ? ["/images/logos/teamfight-tactics-source.png"] : championIconSources(match.pick, match.championId)} alt={match.pick} width={58} height={58} fallbackLabel={match.pick} />{match.level != null && <span>{match.level}</span>}</div>
         <div className="riot-match-details"><strong>{match.pick}</strong><small>{match.mode} · {match.role}</small>
           {!tft && <div className="riot-match-loadout">
@@ -73,7 +78,7 @@ export function RiotProfileHistory({ history, tft, loading = false, valorant = f
         <div className="riot-match-kda"><strong>{tft ? `#${match.placement}` : `${match.kills ?? 0}/${match.deaths ?? 0}/${match.assists ?? 0}`}</strong><small>{tft ? text("Placement", "Xếp hạng") : "KDA"}</small></div>
         {!tft && <div className="riot-match-cs"><strong>{number(match.cs ?? 0)} CS</strong><small>{((match.cs ?? 0) / Math.max(1, match.duration / 60)).toFixed(1)} {text("CS/min", "CS/phút")}</small></div>}
         <div className="riot-match-outcome"><strong>{tft ? match.won ? "Top 4" : text("Bottom 4", "Ngoài Top 4") : match.won ? text("Victory", "Thắng") : text("Defeat", "Thua")}</strong><small>{Math.floor(match.duration / 60)}:{String(match.duration % 60).padStart(2, "0")}</small><time dateTime={new Date(match.playedAt).toISOString()}>{date(match.playedAt)}</time></div>
-      </article>)}</div>
+      </motion.article>)}</div>
       {filtered.length > 5 && <button type="button" className="riot-show-more" onClick={() => setExpanded(value => !value)}>{expanded ? text("Show fewer", "Thu gọn") : text("Show more matches", "Xem thêm trận")}</button>}
     </section>
   </div>;

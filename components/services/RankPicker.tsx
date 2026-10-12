@@ -264,7 +264,7 @@ export function RankPicker({
                       whileHover={reduced || !candidates.length ? undefined : { scale: 1.04, y: -2 }}
                       whileTap={reduced || !candidates.length ? undefined : { scale: 0.97 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={active ? { borderColor: glow, boxShadow: `0 0 20px ${glow}` } : undefined}
+                      style={{ "--rank-tier-glow": glow } as CSSProperties}
                       className={`rank-tier-btn group isolate relative flex flex-col items-center justify-center py-4 px-2 rounded-2xl border transition-colors duration-300 cursor-pointer ${
                         active
                           ? "border-[#FF9F3C] bg-white/[0.05] shadow-[0_0_15px_rgba(255,159,60,0.2)]"
@@ -299,12 +299,12 @@ export function RankPicker({
 
               {/* 3. DEDICATED DIVISION SELECTOR (IV, III, II, I) */}
               {divisions.length > 1 && (
-                <div className="pt-4 border-t border-white/[0.08]">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                <div className="rank-division-section">
+                  <div className="rank-division-heading">
+                    <span className="rank-division-label">
                       {t("selectDivision")}
                     </span>
-                    <span className="text-xs text-zinc-400">
+                    <span className="rank-division-tier">
                       {t("tier")}: <strong className="text-white font-medium">{draftSelected.tier}</strong>
                     </span>
                   </div>
@@ -316,11 +316,7 @@ export function RankPicker({
                         aria-label={`${label}: ${rank.label}`}
                         aria-pressed={draft === rank.index}
                         disabled={rank.index < min || rank.index > max}
-                        className={`h-10 rounded-lg text-sm font-bold transition-all flex items-center justify-center cursor-pointer ${
-                          draft === rank.index
-                            ? "bg-black/60 text-[#FF9F3C] border border-[#FF9F3C] shadow-[0_0_15px_rgba(255,159,60,0.25)]"
-                            : "bg-black/40 border border-white/10 text-white hover:border-[#FF9F3C]/50 hover:bg-black/60"
-                        } disabled:opacity-20 disabled:cursor-not-allowed`}
+                        className="rank-division-option"
                         onClick={() => {
                           setDraft(rank.index);
                         }}
@@ -341,7 +337,7 @@ export function RankPicker({
                   selectRank(isApexRank(game, draft) ? apexRankAtLp(game, points) : draft, points);
                   setOpen(false);
                 }}
-                className="w-full mt-6 h-12 rounded-xl bg-gradient-to-r from-[#FF9F3C] via-[#F59E0B] to-[#D97706] text-black font-extrabold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,159,60,0.35)] hover:shadow-[0_0_30px_rgba(255,159,60,0.5)] hover:brightness-110 active:scale-[0.99] transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="rank-confirm-button"
               >
                 {t("confirmSelection")}
               </button>

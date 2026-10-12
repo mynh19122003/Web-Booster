@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
+  async redirects() {
+    return [{ source: "/games/tft", destination: "/games/teamfight-tactics", permanent: true }];
+  },
   async headers() {
     return [
       {

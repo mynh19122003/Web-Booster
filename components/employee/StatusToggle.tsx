@@ -52,7 +52,7 @@ export function StatusToggle() {
           } catch { setOnline(previous); setError(true); }
           finally { mutating.current = false; }
         });
-      }}><span aria-hidden="true" />{online ? translateText(language, "ONLINE", "TRỰC TUYẾN") : translateText(language, "OFFLINE", "NGOẠI TUYẾN")}</button>
+      }}><span aria-hidden="true" /><span className="employee-header-status-label max-sm:sr-only">{online ? translateText(language, "ONLINE", "TRỰC TUYẾN") : translateText(language, "OFFLINE", "NGOẠI TUYẾN")}</span></button>
     {error && <span className="employee-header-status-error" role="alert">{translateText(language, "Could not save status. Try again.", "Chưa lưu được trạng thái. Hãy thử lại.")}</span>}
   </div>;
 }

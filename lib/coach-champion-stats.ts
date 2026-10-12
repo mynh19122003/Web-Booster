@@ -13,20 +13,20 @@ function database() {
   db.exec("CREATE TABLE IF NOT EXISTS riot_champion_stats (account_key TEXT PRIMARY KEY, summary TEXT NOT NULL)");
   return db;
 }
-export async function coachChampionStats(account: LinkedRiotAccount): Promise<CoachChampionStats> {
+export async function coachChampionStats(account: LinkedRiotAccount, fresh = false): Promise<CoachChampionStats> {
   const key = riotHistoryKey(account, false);
   const db = database();
   const row = db.prepare("SELECT summary FROM riot_champion_stats WHERE account_key = ?").get(key) as { summary: string } | undefined;
   let saved: CoachChampionStats | undefined;
   if (row) { try { saved = JSON.parse(row.summary); } catch {} }
-  if (saved?.status === "ready" && saved.updatedAt && saved.updatedAt + 3_600_000 > Date.now()) return saved;
+  if (!fresh && saved?.status === "ready" && saved.updatedAt && saved.updatedAt + 3_600_000 > Date.now()) return saved;
   const running = pending.get(key);
   if (running) return running;
   const task = (async (): Promise<CoachChampionStats> => {
     try {
       const host = riotRegions[account.platform];
       const base = "/lol/match/v5/matches";
-      const options = { game: "lol", revalidate: 3600 };
+      const options = { game: "lol", ...(fresh ? {} : { revalidate: 3600 }) };
       await paceHistoryRequests(1);
       const ids = await riotRequest<unknown>(host, `${base}/by-puuid/${encodeURIComponent(account.puuid)}/ids?queue=420&start=0&count=30`, options);
       if (!Array.isArray(ids) || ids.length > 30 || ids.some(id => typeof id !== "string" || !id)) throw new RiotError("invalid-response");
@@ -59,7 +59,7 @@ export async function coachChampionStats(account: LinkedRiotAccount): Promise<Co
     } catch (error) {
       const problem = error instanceof RiotError ? error : new RiotError("riot-unavailable");
       // A failed refresh must never replace a previously complete sample with partial numbers.
-      return { ...(saved ?? { topChampions: [], sampleSize: 0 }), status: saved ? "ready" : "unavailable", error: problem.code, retryAfter: problem.retryAfter };
+      return { ...(!fresh && saved ? saved : { topChampions: [], sampleSize: 0 }), status: !fresh && saved ? "ready" : "unavailable", error: problem.code, retryAfter: problem.retryAfter };
     }
   })();
   pending.set(key, task);

@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "test:auth-riot": "node --test tests/auth-riot.test.mjs",
     "test:pricing": "node --test tests/duo-pricing.test.mjs",
+    "test:seo": "node --test tests/seo.test.mjs",
     "riot:sync": "node scripts/sync-riot-catalog.mjs",
     "audit:lighthouse": "node scripts/lighthouse.mjs"
   },

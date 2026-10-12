@@ -1,5 +1,8 @@
 "use client";
 import Image from "next/image";
+import { useId } from "react";
+import { motion } from "motion/react";
+import { ActiveIndicator, useInteractionMotion } from "@/components/ui/InteractionMotion";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -21,6 +24,8 @@ const icons = {
   placements: Target,
 };
 export function ServiceCatalog() {
+  const indicatorId = useId();
+  const { card } = useInteractionMotion();
   const { language, t } = useLanguage();
   const game = useStore((s) => s.game);
   const set = useStore((s) => s.set);
@@ -39,7 +44,7 @@ export function ServiceCatalog() {
               aria-pressed={game === g.slug}
               onClick={() => set({ game: g.slug, product: null, checkoutDetails: null, quoteOverride: null })}
             >
-              {g.name}
+              {game === g.slug && <ActiveIndicator id={indicatorId} />}{g.name}
             </button>
           ))}
         </div>
@@ -59,7 +64,7 @@ export function ServiceCatalog() {
             const Icon = icons[s.slug as keyof typeof icons];
             const copy = serviceCopyFor(language, s.slug as ServiceSlug);
             return (
-              <article className="catalog-item" key={s.slug}>
+              <motion.article {...card} className="catalog-item" key={s.slug}>
                 <Icon size={25} />
                 <h3>{copy.name}</h3>
                 <p>{copy.description}</p>
@@ -69,7 +74,7 @@ export function ServiceCatalog() {
                 >
                   {t("configureService")} <ArrowUpRight size={17} />
                 </Link>
-              </article>
+              </motion.article>
             );
           })}
         </div>

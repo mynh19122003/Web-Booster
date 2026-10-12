@@ -39,11 +39,11 @@ export function Navbar() {
   const [localeMenu, setLocaleMenu] = useState(false);
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; role?: "customer" | "user" | "employee" } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; avatar?: string | null; role?: "customer" | "user" | "employee" } | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const [coachPhoto, setCoachPhoto] = useState<{ email: string; avatar: string | null } | null>(null);
-  const employeeAvatar = user?.role === "employee" && coachPhoto?.email === user.email ? coachPhoto.avatar : null;
+  const accountAvatar = user?.avatar || (user?.role === "employee" && coachPhoto?.email === user.email ? coachPhoto.avatar : null);
   const currency = useStore((state) => state.currency);
   const { language: languageCode, t } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -309,12 +309,18 @@ export function Navbar() {
             >
               <LanguageFlag code={language.flagCode} />
               <span>{language.short}</span>
-              <span className="text-zinc-600" aria-hidden="true">|</span>
-              <span className="text-zinc-400">{currency}</span>
+              <span className="text-zinc-600 max-sm:hidden" aria-hidden="true">|</span>
+              <span className="text-zinc-400 max-sm:hidden">{currency}</span>
               <ChevronDown size={12} className={`text-zinc-500 transition-transform ${localeMenu ? "rotate-180" : ""}`} aria-hidden="true" />
             </button>
+            <AnimatePresence>
             {localeMenu && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.95 }}
+                transition={{ duration: reduceMotion ? 0 : 0.16 }}
+                style={{ transformOrigin: "top right" }}
                 id="header-locale-menu"
                 className="locale-glass absolute right-0 top-full z-50 mt-3 w-64 rounded-2xl border border-white/20 p-3 text-sm text-zinc-200 max-sm:fixed max-sm:left-4 max-sm:right-4 max-sm:top-20 max-sm:mt-2 max-sm:w-auto"
               >
@@ -342,8 +348,9 @@ export function Navbar() {
                   <span className="font-semibold">{t("currency")}</span>
                   <CurrencySwitch compact />
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
 
           {user?.role === "employee" && <StatusToggle key={user.email} />}
@@ -369,7 +376,7 @@ export function Navbar() {
                   className="w-7 h-7 rounded-full overflow-hidden bg-[#FF9F3C] text-black font-bold text-xs flex items-center justify-center flex-shrink-0"
                   aria-hidden="true"
                 >
-                  {employeeAvatar ? <Image src={employeeAvatar} alt="" width={28} height={28} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
+                  {accountAvatar ? <Image src={accountAvatar} alt="" width={28} height={28} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
                 </span>
                 <span className="hidden sm:block text-xs font-medium text-zinc-200 max-w-[100px] md:max-w-[120px] truncate">{user.name}</span>
               </button>
@@ -456,7 +463,7 @@ export function Navbar() {
 
               <Link href="/profile" onClick={() => setUserMenu(false)} className="profile-drawer-profile">
                 <span className="profile-drawer-avatar" aria-hidden="true" style={{ overflow: "hidden" }}>
-                  {employeeAvatar ? <Image src={employeeAvatar} alt="" width={56} height={56} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
+                  {accountAvatar ? <Image src={accountAvatar} alt="" width={56} height={56} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
                 </span>
                 <div className="profile-drawer-identity">
                   <h2 id="profile-dashboard-title">{user.name}</h2>

@@ -1,5 +1,6 @@
 import { UiText } from "@/components/ui/UiText";
 import type { Metadata } from "next";
+import { privateRobots } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,6 +21,7 @@ import {
 
 export const metadata: Metadata = {
   title: "League of Legends Account #109084",
+  robots: privateRobots,
   description: "View the rank, champion pool, skins and seller details for League of Legends account #109084.",
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { LoaderCircle } from "lucide-react";
 import { ProfileAvatarSection } from "@/components/ProfileAvatarSection";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { translateText } from "@/lib/i18n";
@@ -8,6 +9,7 @@ import type { CoachProfileOverride } from "@/lib/coach-profile-db";
 import { notifyCoachProfileUpdated } from "@/lib/coach-profile-events";
 import { coachLanguageOptions, coachRoleOptions, normalizeCoachLanguages } from "@/lib/coach-options";
 import { ProfileChecklist } from "@/components/coaches/ProfileChecklist";
+import { CoachDataLoading } from "./CoachDataLoading";
 
 type CoachProfileEditorProps = {
   slug: string;
@@ -45,6 +47,8 @@ export function CoachProfileEditor({
   const text = (en: string, vi: string) => translateText(language, en, vi);
 
   const [base, setBase] = useState<BaseCoachData | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [hourlyRate, setHourlyRate] = useState<string>("");
   const [isMvp, setIsMvp] = useState<boolean>(false);
   const [sessionLive, setSessionLive] = useState<boolean>(true);
@@ -91,11 +95,11 @@ export function CoachProfileEditor({
   useEffect(() => {
     let ignore = false;
     fetch(`/api/employee/coaches/${slug}/profile`, { cache: "no-store" })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => { if (!ignore && data?.base) applyData(data.base, data.override); })
-      .catch(() => {});
+      .then(res => { if (!res.ok) throw new Error("load-failed"); return res.json(); })
+      .then(data => { if (!data?.base) throw new Error("load-failed"); if (!ignore) applyData(data.base, data.override); })
+      .catch(() => { if (!ignore) setLoadFailed(true); });
     return () => { ignore = true; };
-  }, [slug]);
+  }, [slug, loadAttempt]);
 
   async function saveAvatar(file: File | null) {
     setBusy(true); setMessage(""); setIsError(false);
@@ -176,6 +180,7 @@ export function CoachProfileEditor({
       {isOpen && (
         <form id={`${slug}-profile-editor`} onSubmit={handleSave} className="coach-profile-form" aria-busy={busy}>
           <p className="coach-editor-help">{base ? text("Leave a field empty to keep its default value. Changes appear on the public coach profile after saving.", "Để trống trường để dùng giá trị mặc định. Thay đổi sẽ hiển thị trên hồ sơ công khai sau khi lưu.") : text("Loading profile settings…", "Đang tải cài đặt hồ sơ…")}</p>
+          {!base && (loadFailed ? <div role="alert"><p>{text("Could not load profile settings.", "Không tải được cài đặt hồ sơ.")}</p><button type="button" className="coach-btn-secondary" onClick={() => { setLoadFailed(false); setLoadAttempt(value => value + 1); }}>{text("Retry", "Thử lại")}</button></div> : <CoachDataLoading label={text("Loading profile settings…", "Đang tải cài đặt hồ sơ…")} />)}
           <fieldset className="coach-editor-fields" disabled={busy || !base}>
             <div className="coach-editor-sections">
               <section className="coach-editor-section">
@@ -228,7 +233,7 @@ export function CoachProfileEditor({
 
           <div className="coach-actions-row">
             {privileged && <button type="button" className="coach-btn-secondary" onClick={handleReset} disabled={busy || !base}>{text("Reset to defaults", "Khôi phục mặc định")}</button>}
-            <button type="submit" className="coach-editor-save" disabled={busy || !base}>{busy ? text("Saving…", "Đang lưu…") : text("Save profile", "Lưu hồ sơ")}</button>
+            <button type="submit" className="coach-editor-save" disabled={busy || !base} aria-busy={busy}>{busy && <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />}{busy ? text("Saving…", "Đang lưu…") : text("Save profile", "Lưu hồ sơ")}</button>
           </div>
           {message && <p className="coach-editor-message" role={isError ? "alert" : "status"} data-error={isError}>{message}</p>}
         </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { AccountImage } from "@/components/account/AccountImage";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { championIconSources } from "@/lib/account-artwork";
@@ -10,6 +11,7 @@ import type { TopChampionSummary } from "@/lib/riot-types";
 export function TopChampionsList({ champions }: { champions: TopChampionSummary[] }) {
   const { language } = useLanguage();
   const reducedMotion = useReducedMotion();
+  const { card } = useInteractionMotion();
   const copy = (en: string, vi: string) => translateText(language, en, vi);
 
   return (
@@ -17,13 +19,14 @@ export function TopChampionsList({ champions }: { champions: TopChampionSummary[
       className="champion-stats-list"
       initial={reducedMotion ? false : "hidden"}
       animate="visible"
-      variants={{ visible: { transition: { staggerChildren: reducedMotion ? 0 : 0.07 } } }}
+      variants={{ visible: { transition: { staggerChildren: reducedMotion ? 0 : 0.05 } } }}
     >
       {champions.map((champion) => {
         const winRate = Number.isFinite(champion.winRate) ? Math.min(100, Math.max(0, champion.winRate)) : 0;
         const tier = winRate >= 60 ? "high" : winRate >= 50 ? "medium" : "low";
         return (
           <motion.li
+            {...card}
             key={champion.championId}
             className="champion-stats-row"
             variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
@@ -39,9 +42,8 @@ export function TopChampionsList({ champions }: { champions: TopChampionSummary[
               <div className="champion-win-rate-track" role="progressbar" aria-label={`${champion.championName} ${copy("win rate", "tỷ lệ thắng")}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={winRate}>
                 <motion.span
                   className="champion-win-rate-fill"
-                  style={{ width: `${winRate}%` }}
-                  initial={reducedMotion ? false : { scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
+                  initial={reducedMotion ? false : { width: "0%" }}
+                  animate={{ width: `${winRate}%` }}
                   transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.15 }}
                 />
               </div>
