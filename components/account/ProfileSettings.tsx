@@ -1,10 +1,15 @@
 "use client";
+import { publicRequest } from "@/services/public";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, LoaderCircle, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { intlLocales } from "@/lib/i18n";
-type UserProfile = { name: string; email: string; phone: string; country: string; discord: string };
+import type { UserProfile } from "@/lib/auth-db";
+import { PhoneNumberField } from "@/components/ui/PhoneNumberField";
+import { headerPhoneCountries } from "@/lib/phone-countries";
+import { PasswordSettings, type PasswordValues } from "./PasswordSettings";
+import { ProfileAvatarSection } from "@/components/ProfileAvatarSection";
 
 export function ProfileSettings() {
   const { language, t, text } = useLanguage();
@@ -12,43 +17,61 @@ export function ProfileSettings() {
   const [saved, setSaved] = useState<UserProfile | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "unauthorized" | "error">("loading");
   const [saving, setSaving] = useState(false);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [notice, setNotice] = useState("");
+  const [passwords, setPasswords] = useState<PasswordValues>({ newPassword: "", confirmPassword: "" });
   const countries = useMemo(() => {
     const names = new Intl.DisplayNames([intlLocales[language]], { type: "region" });
-    return Array.from({ length: 676 }, (_, i) => String.fromCharCode(65 + Math.floor(i / 26), 65 + i % 26)).filter(code => names.of(code) !== code && !["EU", "UN", "EZ", "XA", "XB", "ZZ", "AC", "CP", "DG", "EA", "IC", "TA"].includes(code)).map(code => ({ code, name: names.of(code)! })).sort((a, b) => a.name.localeCompare(b.name, intlLocales[language]));
+    return headerPhoneCountries.map(({ code }) => ({ code: code.toUpperCase(), name: names.of(code.toUpperCase())! })).sort((a, b) => a.name.localeCompare(b.name, intlLocales[language]));
   }, [language]);
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/auth/me", { cache: "no-store", signal: controller.signal }).then(async response => {
+    publicRequest("/api/profile", { cache: "no-store", signal: controller.signal }).then(async response => {
       if (response.status === 401) { setState("unauthorized"); return; }
       if (!response.ok) throw new Error();
-      const result = await response.json();
-      if (!result.user) { setState("unauthorized"); return; }
-      const initial: UserProfile = { name: result.user.name, email: result.user.email, phone: "", country: "", discord: "" };
-      try {
-        const draft = JSON.parse(localStorage.getItem("ascend-profile-draft:" + result.user.id) ?? "null");
-        if (draft && ["name", "phone", "country", "discord"].every(key => typeof draft[key] === "string")) Object.assign(initial, draft, { email: result.user.email });
-      } catch { /* A stored draft is optional. */ }
-      setProfile(initial); setSaved(initial); setState("ready");
+      const result = await response.json(); setProfile(result.profile); setSaved(result.profile); setState("ready");
     }).catch(() => { if (!controller.signal.aborted) setState("error"); });
     return () => controller.abort();
-  }, []);
-  const dirty = JSON.stringify(profile) !== JSON.stringify(saved);
+  }, [loadAttempt]);
+  const changingPassword = Object.values(passwords).some(Boolean);
+  const passwordValid = !changingPassword || (passwords.newPassword.length >= 8 && passwords.newPassword.length <= 128 && passwords.newPassword === passwords.confirmPassword);
+  async function saveAvatar(file: File | null) {
+    setAvatarSaving(true);
+    try {
+      const form = new FormData();
+      if (file) form.append("file", file);
+      const response = await publicRequest("/api/profile/avatar", { method: file ? "POST" : "DELETE", ...(file ? { body: form } : {}) });
+      if (response.status === 401) setState("unauthorized");
+      if (!response.ok) throw new Error("avatar-save-failed");
+      const result = await response.json();
+      setProfile(current => current ? { ...current, avatar: result.profile.avatar } : current);
+      setSaved(current => current ? { ...current, avatar: result.profile.avatar } : current);
+      window.dispatchEvent(new Event("ascend-profile-updated"));
+    } finally { setAvatarSaving(false); }
+  }
+  const dirty = JSON.stringify(profile) !== JSON.stringify(saved) || changingPassword;
   function change(key: keyof UserProfile, value: string) { setProfile(current => current ? { ...current, [key]: value } : current); setNotice(""); }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!profile || saving || !dirty) return;
+    if (changingPassword && passwords.newPassword !== passwords.confirmPassword) { setNotice("mismatch"); return; }
     setSaving(true); setNotice("");
     try {
-      const response = await fetch("/api/auth/me", { cache: "no-store" });
-      if (!response.ok) throw new Error();
-      const { user } = await response.json();
-      if (!user) { setState("unauthorized"); return; }
-      if (profile.name.trim().length < 2) { setNotice("invalid-name"); return; }
-      localStorage.setItem("ascend-profile-draft:" + user.id, JSON.stringify(profile));
-      setSaved(profile); setNotice("saved");
+      const response = await publicRequest("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...profile, ...(changingPassword ? { password: { newPassword: passwords.newPassword, confirmPassword: passwords.confirmPassword } } : {}) }) });
+      const result = await response.json();
+      if (response.status === 401) { setState("unauthorized"); return; }
+      if (!response.ok) { setNotice(result.error || "save-failed"); return; }
+      setProfile(result.profile); setSaved(result.profile); setEditing(false); setNotice("saved");
+      setPasswords({ newPassword: "", confirmPassword: "" });
+      window.dispatchEvent(new Event("ascend-profile-updated"));
     } catch { setNotice("save-failed"); } finally { setSaving(false); }
   }
   const errors: Record<string, string> = {
+    "mismatch": text("The new passwords do not match.", "Mật khẩu mới và xác nhận chưa khớp."),
+    "same-password": text("Choose a different new password.", "Mật khẩu mới phải khác mật khẩu hiện tại."),
+    "invalid-password": text("Use between 8 and 128 characters for your new password.", "Mật khẩu mới cần từ 8 đến 128 ký tự."),
+    "external-account": text("Manage your password in your Google account.", "Vui lòng quản lý mật khẩu trong tài khoản Google."),
     "invalid-name": text("Enter your full name (at least 2 characters).", "Nhập họ tên từ 2 đến 80 ký tự."),
     "invalid-phone": text("Enter a valid phone number.", "Vui lòng nhập số điện thoại hợp lệ."),
     "invalid-country": text("Choose your country.", "Vui lòng chọn quốc gia."),
@@ -56,20 +79,21 @@ export function ProfileSettings() {
   };
   return <>
     <Link href="/services" className="wallet-page-back"><ArrowLeft size={15} />{text("Back to services", "Quay lại dịch vụ")}</Link>
-    <header className="profile-settings-heading"><span><UserRound size={25} /></span><div><h1>{text("Profile settings", "Cài đặt hồ sơ")}</h1><p>{text("Preview your profile. Changes are saved only in this browser.", "Xem trước hồ sơ. Thay đổi chỉ được lưu trong trình duyệt này.")}</p></div></header>
-    {state === "loading" ? <p className="profile-settings-status" role="status"><LoaderCircle className="profile-settings-spinner" size={20} />{text("Loading…", "Đang tải…")}</p> : state === "unauthorized" ? <section className="profile-settings-card"><h2>{text("Sign in to manage your profile", "Đăng nhập để cập nhật hồ sơ")}</h2><Link className="button" href="/login?next=%2Fprofile">{text("Sign in", "Đăng nhập")}</Link></section> : state === "error" ? <p role="alert">{text("Could not load your profile. Please try again.", "Không tải được hồ sơ. Vui lòng thử lại.")}</p> : profile && <div className="profile-settings-grid">
-      <aside className="profile-settings-card profile-settings-summary"><span className="profile-settings-avatar">{profile.name.trim().charAt(0).toUpperCase()}</span><h2>{profile.name}</h2><p><Mail size={15} />{profile.email}</p><div><ShieldCheck size={20} /><span>{text("Your account", "Tài khoản của bạn")}<small>{text("Keep your details up to date for your orders and coaching sessions.", "Cập nhật thông tin để thuận tiện trao đổi về đơn hàng và buổi coaching.")}</small></span></div></aside>
+    <header className="profile-settings-heading"><span><UserRound size={25} /></span><div><h1>{text("Profile settings", "Cài đặt hồ sơ")}</h1><p>{text("Manage your personal information and contact details.", "Cập nhật thông tin cá nhân và thông tin liên hệ của bạn.")}</p></div></header>
+    {state === "loading" ? <p className="profile-settings-status" role="status"><LoaderCircle className="profile-settings-spinner" size={20} />{text("Loading…", "Đang tải…")}</p> : state === "unauthorized" ? <section className="profile-settings-card"><h2>{text("Sign in to manage your profile", "Đăng nhập để cập nhật hồ sơ")}</h2><Link className="button" href="/login?next=%2Fprofile">{text("Sign in", "Đăng nhập")}</Link></section> : state === "error" ? <section className="profile-settings-card profile-settings-load-error" role="alert"><p>{text("Could not load your profile. Please try again.", "Không tải được hồ sơ. Vui lòng thử lại.")}</p><button type="button" className="button" onClick={() => { setState("loading"); setLoadAttempt(value => value + 1); }}>{text("Try again", "Thử lại")}</button></section> : profile && <div className="profile-settings-grid">
+      <aside className="profile-settings-card profile-settings-summary"><section className="profile-avatar-editor"><ProfileAvatarSection avatar={profile.avatar} name={profile.name} hasCustomPhoto={Boolean(profile.avatar)} disabled={saving} onSave={saveAvatar} /></section><h2>{profile.name}</h2><p><Mail size={15} />{profile.email}</p><div><ShieldCheck size={20} /><span>{text("Your account", "Tài khoản của bạn")}<small>{text("Keep your details up to date for your orders and coaching sessions.", "Cập nhật thông tin để thuận tiện trao đổi về đơn hàng và buổi coaching.")}</small></span></div></aside>
       <form className="profile-settings-card profile-settings-form" onSubmit={submit} aria-busy={saving}>
-        <div className="profile-settings-form-title"><h2>{text("Personal information", "Thông tin cá nhân")}</h2><p>{text("Contact details are optional.", "Thông tin liên hệ là tùy chọn.")}</p></div>
-        <fieldset disabled={saving}>
+        <div className="profile-settings-form-title"><div><h2>{text("Personal information", "Thông tin cá nhân")}</h2><p>{editing ? text("Update the details used for your orders and coaching sessions.", "Cập nhật thông tin dùng cho đơn hàng và buổi coaching.") : text("Review the details saved to your account.", "Xem thông tin đã lưu trong tài khoản của bạn.")}</p></div>{!editing && <button type="button" className="button profile-settings-edit" onClick={() => { setEditing(true); setNotice(""); }}>{text("Edit information", "Chỉnh sửa thông tin")}</button>}</div>
+        <fieldset disabled={saving || avatarSaving || !editing}>
           <label><span>{t("fullName")} *</span><input required minLength={2} maxLength={80} autoComplete="name" value={profile.name} onChange={e => change("name", e.target.value)} /></label>
-          <label><span>{text("Email address", "Địa chỉ email")}</span><input type="email" readOnly autoComplete="email" value={profile.email} /><small>{text("This email is linked to your sign-in account.", "Email này được liên kết với tài khoản đăng nhập.")}</small></label>
-          <label><span>{t("phoneNumber")}<small>{text("Optional", "Tùy chọn")}</small></span><input type="tel" autoComplete="tel" maxLength={30} placeholder="+84 912 345 678" value={profile.phone} onChange={e => change("phone", e.target.value)} /></label>
+          <label><span>{text("Email address", "Địa chỉ email")}</span><input type="email" readOnly autoComplete="email" value={profile.email} /><small>{text("Used to sign in. Contact support if you need to change it.", "Dùng để đăng nhập. Vui lòng liên hệ hỗ trợ nếu bạn cần đổi email.")}</small></label>
+          <PhoneNumberField countries={headerPhoneCountries} value={profile.phone} onChange={value => change("phone", value)} />
           <label><span>{text("Country / region", "Quốc gia / khu vực")}<small>{text("Optional", "Tùy chọn")}</small></span><select autoComplete="country" value={profile.country} onChange={e => change("country", e.target.value)}><option value="">{text("Choose your country", "Chọn quốc gia")}</option>{countries.map(country => <option key={country.code} value={country.code}>{country.name}</option>)}</select></label>
           <label className="profile-settings-wide"><span>Discord<small>{text("Optional", "Tùy chọn")}</small></span><input maxLength={80} autoComplete="off" placeholder="username" value={profile.discord} onChange={e => change("discord", e.target.value)} /></label>
         </fieldset>
-        <div className="profile-settings-actions"><button type="button" className="button ghost" disabled={saving || !dirty} onClick={() => { setProfile(saved); setNotice(""); }}>{text("Cancel", "Hủy thay đổi")}</button><button className="button" type="submit" disabled={saving || !dirty}>{saving ? <LoaderCircle size={17} className="profile-settings-spinner" /> : <Check size={17} />}{saving ? text("Saving…", "Đang lưu…") : text("Save changes", "Lưu thay đổi")}</button></div>
-        {notice && <p className="profile-settings-notice" data-success={notice === "saved"} role={notice === "saved" ? "status" : "alert"}>{notice === "saved" ? text("Draft saved in this browser. Server sync is not connected.", "Đã lưu bản nháp trong trình duyệt. Chưa kết nối đồng bộ máy chủ.") : errors[notice] ?? text("Could not save your profile. Please try again.", "Không lưu được hồ sơ. Vui lòng thử lại.")}</p>}
+        <PasswordSettings values={passwords} onChange={values => { setPasswords(values); setNotice(""); }} disabled={saving || avatarSaving || !editing} />
+        {editing && <div className="profile-settings-actions"><button type="button" className="button ghost" disabled={saving} onClick={() => { setProfile(saved); setPasswords({ newPassword: "", confirmPassword: "" }); setEditing(false); setNotice(""); }}>{text("Cancel", "Hủy")}</button><button className="button" type="submit" disabled={saving || avatarSaving || !dirty || !passwordValid}>{saving ? <LoaderCircle size={17} className="profile-settings-spinner" /> : <Check size={17} />}{saving ? text("Saving…", "Đang lưu…") : text("Save changes", "Lưu thay đổi")}</button></div>}
+        {notice && <p className="profile-settings-notice" data-success={notice === "saved"} role={notice === "saved" ? "status" : "alert"}>{notice === "saved" ? text("Your profile has been updated.", "Hồ sơ đã được cập nhật.") : errors[notice] ?? text("Could not save your profile. Please try again.", "Không lưu được hồ sơ. Vui lòng thử lại.")}</p>}
       </form>
     </div>}
   </>;

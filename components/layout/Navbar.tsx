@@ -1,4 +1,5 @@
 "use client";
+import { publicRequest } from "@/services/public";
 import { translateText } from "@/lib/i18n";
 
 import Link from "next/link";
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 import { DashboardMenu } from "@/components/account/DashboardMenu";
 import { CartIcon } from "@/components/account/Cart";
+import { StatusToggle } from "@/components/employee/StatusToggle";
 import { DashboardLanguage } from "@/components/account/DashboardLanguage";
 import { games } from "@/data/games";
 import { CurrencySwitch } from "@/components/ui/Currency";
@@ -28,6 +30,7 @@ import { useStore } from "@/store/useStore";
 import { languages } from "@/lib/i18n";
 import { setLanguage, useLanguage } from "@/components/ui/LanguageProvider";
 import { LanguageFlag } from "@/components/ui/LanguageFlag";
+import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
 
 export function Navbar() {
   const router = useRouter();
@@ -37,9 +40,11 @@ export function Navbar() {
   const [localeMenu, setLocaleMenu] = useState(false);
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; avatar?: string | null; role?: "customer" | "user" | "employee" } | null>(null);
+  const [sessionLoaded, setSessionLoaded] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
-  const setStore = useStore((state) => state.set);
+  const [coachPhoto, setCoachPhoto] = useState<{ email: string; avatar: string | null } | null>(null);
+  const accountAvatar = user?.avatar || (user?.role === "employee" && coachPhoto?.email === user.email ? coachPhoto.avatar : null);
   const currency = useStore((state) => state.currency);
   const { language: languageCode, t } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -59,13 +64,13 @@ export function Navbar() {
   useEffect(() => {
     let active = true;
     const loadUser = () => {
-      fetch("/api/auth/me", { cache: "no-store" })
+      publicRequest("/api/auth/me", { cache: "no-store" })
       .then((response) => response.json())
       .then((result) => {
-        if (active) setUser(result.user ?? null);
+        if (active) { setUser(result.user ?? null); setSessionLoaded(true); }
       })
       .catch(() => {
-        if (active) setUser(null);
+        if (active) { setUser(null); setSessionLoaded(true); }
       });
     };
     loadUser();
@@ -75,6 +80,28 @@ export function Navbar() {
       window.removeEventListener("ascend-profile-updated", loadUser);
     };
   }, [pathname]);
+
+  useEffect(() => {
+    if (user?.role !== "employee") return;
+    const email = user.email;
+    const abort = new AbortController();
+    async function refreshPhoto() {
+      if (document.hidden) return;
+      try {
+        const response = await publicRequest("/api/employee/coaches", { cache: "no-store", signal: abort.signal });
+        if (!response.ok) return;
+        const data = await response.json();
+        const coach = data.coaches?.length === 1 ? data.coaches[0] : null;
+        if (!abort.signal.aborted) setCoachPhoto({ email, avatar: coach ? coach.profile?.avatar || coach.avatar || null : null });
+      } catch {}
+    }
+    void refreshPhoto();
+    const unsubscribe = subscribeCoachProfileUpdates(() => { void refreshPhoto(); });
+    const timer = setInterval(refreshPhoto, 15000);
+    window.addEventListener("focus", refreshPhoto);
+    document.addEventListener("visibilitychange", refreshPhoto);
+    return () => { unsubscribe(); abort.abort(); clearInterval(timer); window.removeEventListener("focus", refreshPhoto); document.removeEventListener("visibilitychange", refreshPhoto); };
+  }, [user?.role, user?.email, pathname]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = "dark";
@@ -254,10 +281,10 @@ export function Navbar() {
 
         {/* Action buttons */}
         <div className="flex h-9 items-center gap-2 sm:gap-4 justify-self-end shrink-0">
-          <CartIcon />
+          {sessionLoaded && user?.role !== "employee" && <CartIcon />}
           <button
             ref={searchButtonRef}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all shrink-0"
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all shrink-0 ${user?.role === "employee" ? "max-sm:hidden" : ""}`}
             aria-label={t("searchGames")}
             onClick={() => {
               setSearch(!search);
@@ -283,12 +310,18 @@ export function Navbar() {
             >
               <LanguageFlag code={language.flagCode} />
               <span>{language.short}</span>
-              <span className="text-zinc-600" aria-hidden="true">|</span>
-              <span className="text-zinc-400">{currency}</span>
+              <span className="text-zinc-600 max-sm:hidden" aria-hidden="true">|</span>
+              <span className="text-zinc-400 max-sm:hidden">{currency}</span>
               <ChevronDown size={12} className={`text-zinc-500 transition-transform ${localeMenu ? "rotate-180" : ""}`} aria-hidden="true" />
             </button>
+            <AnimatePresence>
             {localeMenu && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.95 }}
+                transition={{ duration: reduceMotion ? 0 : 0.16 }}
+                style={{ transformOrigin: "top right" }}
                 id="header-locale-menu"
                 className="locale-glass absolute right-0 top-full z-50 mt-3 w-64 rounded-2xl border border-white/20 p-3 text-sm text-zinc-200 max-sm:fixed max-sm:left-4 max-sm:right-4 max-sm:top-20 max-sm:mt-2 max-sm:w-auto"
               >
@@ -316,11 +349,13 @@ export function Navbar() {
                   <span className="font-semibold">{t("currency")}</span>
                   <CurrencySwitch compact />
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
 
-          {user ? (
+          {user?.role === "employee" && <StatusToggle key={user.email} />}
+          {!sessionLoaded ? <span className="w-9 h-9 shrink-0" aria-hidden="true" /> : user ? (
             <div className="relative">
               <button
                 ref={userTriggerRef}
@@ -339,10 +374,10 @@ export function Navbar() {
                 }}
               >
                 <span
-                  className="w-7 h-7 rounded-full bg-[#FF9F3C] text-black font-bold text-xs flex items-center justify-center flex-shrink-0"
+                  className="w-7 h-7 rounded-full overflow-hidden bg-[#FF9F3C] text-black font-bold text-xs flex items-center justify-center flex-shrink-0"
                   aria-hidden="true"
                 >
-                  {user.name.trim().charAt(0).toUpperCase()}
+                  {accountAvatar ? <Image src={accountAvatar} alt="" width={28} height={28} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
                 </span>
                 <span className="hidden sm:block text-xs font-medium text-zinc-200 max-w-[100px] md:max-w-[120px] truncate">{user.name}</span>
               </button>
@@ -428,8 +463,8 @@ export function Navbar() {
               </div>
 
               <Link href="/profile" onClick={() => setUserMenu(false)} className="profile-drawer-profile">
-                <span className="profile-drawer-avatar" aria-hidden="true">
-                  {user.name.trim().charAt(0).toUpperCase()}
+                <span className="profile-drawer-avatar" aria-hidden="true" style={{ overflow: "hidden" }}>
+                  {accountAvatar ? <Image src={accountAvatar} alt="" width={56} height={56} unoptimized className="w-full h-full object-cover" /> : user.name.trim().charAt(0).toUpperCase()}
                 </span>
                 <div className="profile-drawer-identity">
                   <h2 id="profile-dashboard-title">{user.name}</h2>
@@ -438,7 +473,7 @@ export function Navbar() {
                 <ChevronRight size={18} aria-hidden="true" />
               </Link>
 
-              <DashboardMenu email={user.email} close={() => setUserMenu(false)} />
+              <DashboardMenu email={user.email} employee={user.role === "employee"} close={() => setUserMenu(false)} />
 
               <div className="profile-drawer-footer">
                 <DashboardLanguage />
@@ -446,7 +481,7 @@ export function Navbar() {
                   type="button"
                   className="profile-drawer-signout"
                   onClick={async () => {
-                    await fetch("/api/auth/logout", { method: "POST" });
+                    await publicRequest("/api/auth/logout", { method: "POST" });
                     setUser(null);
                     setUserMenu(false);
                     router.replace("/");

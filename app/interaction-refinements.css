@@ -1,0 +1,128 @@
+/* Translation-safe sizing shared by the storefront and employee workspace. */
+html:lang(vi) {
+  --font-heading: var(--font-ascend-body), "Segoe UI", sans-serif;
+}
+html:lang(vi) :is(h1, h2, h3, h4, h5, h6, .font-heading) {
+  font-family: var(--font-heading);
+  line-height: 1.5;
+}
+:is(.coach-offer-mode, .category-packages, .catalog-tabs, .riot-mode-filters) button,
+.game-product-tab {
+  min-width: 0;
+  height: auto;
+  padding-block: 10px;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+:is(.coach-offer-mode, .category-packages, .catalog-tabs, .riot-mode-filters) button,
+.game-product-tab { position: relative; isolation: isolate; }
+.active-choice-indicator {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(110deg, #ff9f3c24, #ff9f3c0c);
+  box-shadow: inset 0 0 0 1px #ffad5340;
+}
+.coach-offer-mode button.is-active,
+.category-packages button[aria-pressed="true"],
+.catalog-tabs button[aria-pressed="true"],
+.riot-mode-filters button[aria-pressed="true"],
+.game-product-tab[aria-selected="true"] { background: transparent; }
+.game-product-tab { max-width: 16rem; flex-shrink: 0; }
+.game-product-tab svg, .coach-offer-mode svg { flex-shrink: 0; }
+.coach-profile-page .coach-offer-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+.coach-profile-page .coach-duo-package .coach-offer-card {
+  grid-template-rows: auto auto auto auto 1fr auto;
+  align-content: stretch;
+  padding-top: 12px;
+}
+.coach-offer-featured {
+  position: static;
+  justify-self: start;
+  max-width: 100%;
+  min-height: 24px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.coach-offer-featured-placeholder { min-height: 24px; }
+.coach-offer-price { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; line-height: 1.5; }
+.coach-offer-detail { overflow-wrap: anywhere; line-height: 1.6; }
+.coach-offer-mode button { padding-inline: 10px; }
+.coach-session-option > div, .coach-profile-section-heading > div,
+.coach-booking-heading > div { min-width: 0; }
+.coach-session-rate { overflow-wrap: anywhere; }
+:is(.category-summary, .boost-checkout-details, .coach-checkout-details) dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 16px;
+  align-items: start;
+}
+:is(.category-summary, .boost-checkout-details, .coach-checkout-details) :is(dt, dd) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.category-summary-heading, .coach-profile-section-heading { flex-wrap: wrap; }
+:is(.wallet-checkout-line, .coach-estimate, .coach-discount-summary) { gap: 12px; flex-wrap: wrap; }
+:is(.wallet-checkout-line, .coach-estimate, .coach-discount-summary) > * { min-width: 0; overflow-wrap: anywhere; }
+.wallet-checkout-product { min-width: 0; }
+.wallet-checkout-product > strong { min-width: 0; overflow-wrap: anywhere; }
+.employee-dashboard-brand { min-width: 0; }
+.employee-dashboard-brand h1 { display: flex; align-items: center; gap: 10px; }
+.employee-dashboard-brand h1 > svg { flex-shrink: 0; }
+.employee-dashboard-brand h1 > span { min-width: 0; }
+.riot-sync-fields.has-server { grid-template-columns: minmax(0, 1fr) minmax(110px, .45fr) minmax(120px, auto) 44px; }
+.riot-sync-fields :is(input, select) { min-height: 44px; height: auto; line-height: 1.5; }
+.riot-sync-fields button { min-width: 0; white-space: normal; line-height: 1.5; }
+.employee-header-status { min-width: 112px; justify-content: center; transition: color .2s, border-color .2s, background-color .2s; }
+.employee-header-status > span { flex-shrink: 0; transition: background-color .2s, box-shadow .2s; }
+.coach-availability-switch { min-width: min(100%, 240px); }
+.coach-availability-switch > span:last-of-type { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+.coach-switch-track { flex-shrink: 0; }
+.catalog-item, .champion-stats-row { transition: border-color .2s, box-shadow .2s, background-color .2s; }
+:is(.catalog-item, .champion-stats-row):is(:hover, :focus-within) {
+  border-color: #ff9f3c80;
+  box-shadow: 0 8px 24px #ff9f3c26;
+}
+:is(.button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button) {
+  min-width: 0;
+  height: auto;
+  white-space: normal;
+  line-height: 1.5;
+  transition: transform .2s, filter .2s, box-shadow .2s, border-color .2s;
+}
+:is(.button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button) svg { flex-shrink: 0; }
+:is(.button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button):hover:not(:disabled) {
+  box-shadow: 0 0 18px #ff9f3c26;
+}
+:is(.button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button):active:not(:disabled) { transform: scale(.98); }
+.coach-editor-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.coach-avatar-upload-row { flex-wrap: wrap; }
+.coach-avatar-upload-row > button { flex-shrink: 0; }
+.coach-avatar-actions { flex: 1 1 150px; min-width: 0; }
+.dialog > div > p:not(.eyebrow) { font-size: 12px; margin: 16px 0; }
+@media (max-width: 1023px) {
+  body:has(.category-mobile-review) .booster-chat-widget { bottom: calc(120px + env(safe-area-inset-bottom)); }
+  body:has(.category-mobile-review) .booster-chat-popup { max-height: calc(100dvh - 210px); }
+}
+@media (max-width: 900px) {
+  .riot-sync-fields.has-server { grid-template-columns: minmax(0, 1fr) 44px; }
+  .riot-sync-fields.has-server label { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .coaching-format-cards { grid-template-columns: minmax(0, 1fr); }
+  .coach-session-option { grid-template-columns: auto minmax(0, 1fr); }
+  .coach-session-rate { grid-column: 2; }
+}
+@media (max-width: 639px) {
+  .employee-header-status { min-width: 36px; width: 36px; min-height: 36px; padding: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.catalog-item, .champion-stats-row, .employee-header-status, .employee-header-status > span,
+  .button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button) { transition: none; }
+  :is(.button, .coach-editor-save, .riot-sync-button, .wallet-pay-now, .order-start-boost, .mobile-start-boost, .add-to-cart-button):active:not(:disabled) { transform: none !important; }
+}

@@ -2,12 +2,14 @@ import { UiText } from "@/components/ui/UiText";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { WalletCheckout } from "@/components/account/WalletCheckout";
+import { privateRobots } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Checkout",
-  description: "Review your boost plan, coaching session or wallet top-up before checkout.",
+  robots: privateRobots,
+  description: "Review your service order and choose your preferred payment method.",
 };
 
 export default function CheckoutPage() {
-  return <Suspense fallback={<main className="wallet-checkout-page" aria-busy="true"><UiText english={"Loading checkout…"} /></main>}><WalletCheckout /></Suspense>;
+  return <Suspense fallback={<div className="wallet-checkout-page" aria-busy="true"><UiText english={"Loading checkout…"} /></div>}><WalletCheckout /></Suspense>;
 }

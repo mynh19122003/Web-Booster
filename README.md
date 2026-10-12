@@ -54,7 +54,7 @@ Static pages; idle-priority WebGL chunk; one canvas reused across three sections
 
 ## SEO and accessibility
 
-Per-page title, description, canonical, Open Graph, and Twitter metadata; Organization, Service, FAQ, and Breadcrumb JSON-LD; robots and sitemap. Set `NEXT_PUBLIC_SITE_URL` to your actual origin before deployment. The default `ascend.example` is intentionally a placeholder.
+Public pages have titles, descriptions, canonical URLs and social previews, plus Organization, Service, BlogPosting, FAQ and Breadcrumb JSON-LD. Indexing is disabled until launch: set `NEXT_PUBLIC_SITE_URL` to the actual HTTPS origin and `SITE_INDEXABLE=true`, then rebuild. Without configuration, URLs use `http://localhost:3000`, pages are noindex and the sitemap is empty. Vercel previews stay noindex. See [the SEO launch guide](docs/SEO.md) for setup, verification and current language limitations.
 
 Semantic headings and landmarks, keyboard-operable controls, visible focus rings, skip navigation, native modal focus management, named inputs, rank value text, live quote announcements, and reduced-motion handling. Canvas content is decorative and hidden from assistive technology. See `docs/VERIFICATION.md` for measured checks and limitations.
 
@@ -85,7 +85,7 @@ Playwright uses locally installed Microsoft Edge on Windows. On other systems, i
 
 1. Push this project to your repository and import it into Vercel as a Next.js project.
 2. Use Node.js 24, install command `npm ci`, build command `npm run build`, and the default Next.js output setting.
-3. Set `NEXT_PUBLIC_SITE_URL=https://your-domain.example` in Preview and Production environments as appropriate.
-4. Deploy a preview, check metadata and interactive flows, then promote the reviewed build.
+3. Set `NEXT_PUBLIC_SITE_URL` to your actual HTTPS domain. Keep `SITE_INDEXABLE=false` in Preview and enable it only for the production launch.
+4. Deploy a preview, check metadata and interactive flows, then rebuild for Production with `SITE_INDEXABLE=true`; do not promote a noindex preview build unchanged.
 
 No deployment or external service provisioning is performed by this project. No secrets are required for the current demo.

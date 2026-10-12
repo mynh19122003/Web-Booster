@@ -24,3 +24,15 @@ export function clearSessionCookie(response: NextResponse) {
 export function authError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
+
+// Next's internal URL can use localhost even when the browser uses a public host.
+export function isSameOrigin(request: Request) {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+  const url = new URL(request.url);
+  const host = request.headers.get("host") ?? url.host;
+  const forwardedProtocol = request.headers.get("x-forwarded-proto");
+  const protocol = forwardedProtocol === "https" || forwardedProtocol === "http"
+    ? `${forwardedProtocol}:` : url.protocol;
+  return origin === `${protocol}//${host}`;
+}

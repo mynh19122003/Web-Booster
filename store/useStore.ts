@@ -92,7 +92,7 @@ export const useStore = create<State>((set) => ({
   target: 24,
   currentLp: 0,
   targetLp: 0,
-  lpGain: "22-25 LP",
+  lpGain: "19-22 LP",
   quoteAddOns: [],
   queue: "Solo",
   region: "EUW",

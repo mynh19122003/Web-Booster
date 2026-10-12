@@ -23,7 +23,7 @@ import { useShopFavorites } from "@/lib/shop-favorites";
 
 export function AccountShop({ game, smurfs = false }: { game: string; smurfs?: boolean }) {
   const router = useRouter();
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const lolChampions = useLolChampions(game === "league-of-legends");
   const { favorites, toggleFavorite } = useShopFavorites();
   const text = (en: string, vi: string) => translateText(language, en, vi);

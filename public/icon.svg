@@ -2,31 +2,31 @@
   <rect width="160" height="160" rx="36" fill="#0F0F10"/>
   <defs>
     <linearGradient id="asc-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#F5D7A1" />
-      <stop offset="45%" stopColor="#FF9F3C" />
-      <stop offset="100%" stopColor="#D97706" />
+      <stop offset="0%" stop-color="#F5D7A1" />
+      <stop offset="45%" stop-color="#FF9F3C" />
+      <stop offset="100%" stop-color="#D97706" />
     </linearGradient>
     <linearGradient id="asc-burnt" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#FF9F3C" />
-      <stop offset="60%" stopColor="#D97706" />
-      <stop offset="100%" stopColor="#8A3E00" />
+      <stop offset="0%" stop-color="#FF9F3C" />
+      <stop offset="60%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#8A3E00" />
     </linearGradient>
     <linearGradient id="asc-slate-l" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#3A3A42" />
-      <stop offset="50%" stopColor="#25252B" />
-      <stop offset="100%" stopColor="#151518" />
+      <stop offset="0%" stop-color="#3A3A42" />
+      <stop offset="50%" stop-color="#25252B" />
+      <stop offset="100%" stop-color="#151518" />
     </linearGradient>
     <linearGradient id="asc-slate-r" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#454550" />
-      <stop offset="50%" stopColor="#2C2C33" />
-      <stop offset="100%" stopColor="#18181C" />
+      <stop offset="0%" stop-color="#454550" />
+      <stop offset="50%" stop-color="#2C2C33" />
+      <stop offset="100%" stop-color="#18181C" />
     </linearGradient>
     <linearGradient id="asc-ray" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#FF9F3C" stopOpacity="0" />
-      <stop offset="30%" stopColor="#FF9F3C" stopOpacity="0.6" />
-      <stop offset="50%" stopColor="#FFFFFF" stopOpacity="1" />
-      <stop offset="70%" stopColor="#FF9F3C" stopOpacity="0.6" />
-      <stop offset="100%" stopColor="#D97706" stopOpacity="0" />
+      <stop offset="0%" stop-color="#FF9F3C" stop-opacity="0" />
+      <stop offset="30%" stop-color="#FF9F3C" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="1" />
+      <stop offset="70%" stop-color="#FF9F3C" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0" />
     </linearGradient>
   </defs>
 

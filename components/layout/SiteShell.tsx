@@ -29,7 +29,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <InitialLoader />
           <PointerEffects />
           <Header key={path} />
-          <Experience><main id="main">{children}</main></Experience>
+          <Experience><main id="main" tabIndex={-1}>{children}</main></Experience>
           <Footer />
           {path !== "/messages" && <ChatLauncher />}
           <Suspense fallback={null}><Dialogs /></Suspense>

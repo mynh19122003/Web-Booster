@@ -1,6 +1,7 @@
 "use client";
+import { publicRequest } from "@/services/public";
 import { useEffect, useId } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Coins } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useLanguage } from "@/components/ui/LanguageProvider";
@@ -34,7 +35,7 @@ export function CurrencyProvider() {
     const controller = new AbortController();
     async function refresh() {
       try {
-        const response = await fetch("/api/exchange-rate", {
+        const response = await publicRequest("/api/exchange-rate", {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error("Unavailable");
@@ -86,6 +87,7 @@ export function CurrencySwitch({
   const set = useStore((s) => s.set);
   const autoId = useId();
   const activeLayoutId = layoutId ?? `activeCurrency-${autoId}`;
+  const reduced = useReducedMotion();
 
   const handleSelect = (code: "USD" | "EUR") => {
     set({ currency: code });
@@ -123,7 +125,7 @@ export function CurrencySwitch({
               <motion.span
                 layoutId={activeLayoutId}
                 className="absolute inset-0 bg-gradient-to-r from-[#FF9F3C] to-[#D97706] rounded-full shadow-[0_0_12px_rgba(255,159,60,0.3)]"
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 35 }}
               />
             )}
             <span className="relative z-10">{code}</span>
@@ -142,11 +144,11 @@ export function useMoney() {
   const rateState = useStore((s) => s.rateState);
   const amount = (usd: number) =>
     currency === "EUR" ? (usdPerEur ? usd / usdPerEur : null) : usd;
-  const format = (usd: number) => {
+  const format = (usd: number, maximumFractionDigits = 2) => {
     const value = amount(usd);
     return value === null
       ? t("eurUnavailable")
-      : new Intl.NumberFormat(intlLocales[language], { style: "currency", currency }).format(
+      : new Intl.NumberFormat(intlLocales[language], { style: "currency", currency, maximumFractionDigits }).format(
           value,
         );
   };

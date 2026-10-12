@@ -948,3 +948,4 @@ export const mockLolSkinNames = [
   ...Array.from({ length: Math.max(...byChampion.map((skins) => skins.length)) }, (_, index) =>
     byChampion.flatMap((skins) => skins[index] ? [skins[index].name] : [])).flat(),
 ];
+

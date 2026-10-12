@@ -220,3 +220,4 @@ export const lolSplashFallbacks: Record<string, string> = {
   "Camille_32": "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/camille/skins/skin32/images/camille_splash_uncentered_32.jpg",
   "Camille_44": "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/camille/skins/skin44/images/camille_splash_uncentered_44.jpg"
 };
+

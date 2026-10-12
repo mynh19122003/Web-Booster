@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createGoogleUser, createSession, findGoogleUser, findUserByEmail } from "@/lib/auth-db";
 import { setSessionCookie } from "@/lib/auth-http";
+import { loginDestination } from "@/lib/auth-redirect";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
   const clearOauthCookies = (response: NextResponse) => {
     response.cookies.delete("ascend_oauth_state");
     response.cookies.delete("ascend_oauth_verifier");
+    response.cookies.delete("ascend_oauth_next");
     return response;
   };
   const returnedBytes = Buffer.from(returnedState);
@@ -61,7 +63,7 @@ export async function GET(request: Request) {
       user = createGoogleUser(profile.name?.slice(0, 80) || profile.email.split("@")[0], profile.email, profile.sub);
     }
     const session = createSession(user.id);
-    const response = NextResponse.redirect(new URL("/account", request.url));
+    const response = NextResponse.redirect(new URL(loginDestination(user.role, cookieStore.get("ascend_oauth_next")?.value), request.url));
     setSessionCookie(response, session.token, session.expiresAt);
     return clearOauthCookies(response);
   } catch {

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
+import { MotionConfig } from "motion/react";
 import { intlLocales, isLanguageCode, translate, translateText, type LanguageCode, type MessageKey } from "@/lib/i18n";
 
 const LanguageContext = createContext<LanguageCode>("en");
@@ -34,19 +35,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const language = useSyncExternalStore(subscribe, getSavedLanguage, getServerLanguage);
 
   useEffect(() => {
-    const previous = { lang: document.documentElement.lang, dir: document.documentElement.dir, language: document.documentElement.dataset.language };
     document.documentElement.lang = intlLocales[language];
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
     document.documentElement.dataset.language = language;
-    return () => {
-      document.documentElement.lang = previous.lang;
-      document.documentElement.dir = previous.dir;
-      if (previous.language === undefined) delete document.documentElement.dataset.language;
-      else document.documentElement.dataset.language = previous.language;
-    };
   }, [language]);
 
-  return <LanguageContext.Provider value={language}>{children}</LanguageContext.Provider>;
+  return <LanguageContext.Provider value={language}><MotionConfig reducedMotion="user">{children}</MotionConfig></LanguageContext.Provider>;
 }
 
 export function useLanguage() {

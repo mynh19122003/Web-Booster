@@ -1,13 +1,15 @@
 "use client";
+import { publicRequest } from "@/services/public";
 import { translateText } from "@/lib/i18n";
 
 import { NumberInput } from "@/components/ui/NumberInput";
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { ActiveIndicator } from "@/components/ui/InteractionMotion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Check, Clock3, GraduationCap, ShieldCheck, Star, Users, Trophy, Swords } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Clock3, GraduationCap, ShieldCheck, Star, Users, Trophy, Swords, Pencil } from "lucide-react";
 import { coachGameLogoPath, coachRankCardIconPath, type Coach } from "@/data/coaches";
 import { coachMockMetrics, coachOffers, coachRankHistory, coachReputation, coachPricing, coachMockFeedback } from "@/data/coach-profile";
 import { rankLevelsFor } from "@/lib/service-options";
@@ -16,20 +18,51 @@ import { useMoney } from "@/components/ui/Currency";
 import { useStore } from "@/store/useStore";
 import { CoachAttributes } from "@/components/coaches/CoachAttributes";
 import { CoachGameplay } from "@/components/coaches/CoachGameplay";
+import { CoachTopChampions } from "@/components/coaches/CoachTopChampions";
+import { DuoPackageGrid } from "@/components/coaches/DuoPackageGrid";
+import { CoachingSessionFormats } from "@/components/coaches/CoachingSessionFormats";
+import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
+import type { MatchHistory } from "@/lib/riot-types";
+import { CoachDataLoading } from "./CoachDataLoading";
 
-export function CoachProfile({ coach }: { coach: Coach }) {
+export function CoachProfile({ coach: initialCoach, canEdit = false, initialHistory = null }: { coach: Coach; canEdit?: boolean; initialHistory?: MatchHistory | null }) {
+  const [coach, setCoach] = useState(initialCoach);
   const { language, t } = useLanguage();
   const money = useMoney();
+  const modeIndicatorId = useId();
   const router = useRouter();
+  const [online, setOnline] = useState(coach.online);
+  const [profileLoading, setProfileLoading] = useState(true);
+  useEffect(() => {
+    const abort = new AbortController();
+    let pending = false;
+    async function refresh() {
+      if (document.hidden || pending) return;
+      pending = true;
+      setProfileLoading(true);
+      try {
+        const response = await publicRequest(`/api/coaches/${coach.slug}`, { cache: "no-store", signal: abort.signal });
+        if (response.status === 404) { router.refresh(); return; }
+        if (response.ok) {
+          const data = await response.json();
+          if (!abort.signal.aborted) {
+            setCoach(data.coach);
+            setOnline(Boolean(data.coach.online));
+          }
+        }
+      } catch {} finally { pending = false; if (!abort.signal.aborted) setProfileLoading(false); }
+    }
+    void refresh();
+    const timer = setInterval(refresh, 15000);
+    const unsubscribe = subscribeCoachProfileUpdates(() => { void refresh(); });
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { unsubscribe(); abort.abort(); clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+  }, [coach.slug, router]);
   const savedBooking = useStore(state => state.coachBooking);
   const previous = savedBooking?.coachId === coach.slug ? savedBooking : null;
-  const [sessionFormat, setSessionFormat] = useState<"live" | "vod">(previous?.sessionFormat ?? coach.sessionFormats[0]);
-  const [date, setDate] = useState(previous?.date ?? "");
-  const [time, setTime] = useState(previous?.time ?? "18:00");
-  const [timeZone, setTimeZone] = useState(previous?.timeZone ?? "Asia/Bangkok");
-  const [goals, setGoals] = useState(previous?.goals ?? "");
-  const [replayUrl, setReplayUrl] = useState(previous?.replayUrl ?? "");
-  const [bookingError, setBookingError] = useState("");
+  const [selectedFormat, setSelectedFormat] = useState<"live" | "vod">(previous?.sessionFormat ?? coach.sessionFormats[0]);
+  const sessionFormat = coach.sessionFormats.includes(selectedFormat) ? selectedFormat : coach.sessionFormats[0];
   const set = useStore((state) => state.set);
   const [mode, setMode] = useState<"duo" | "coaching">(previous?.format === "hourly" ? "coaching" : "duo");
   const [selectedOfferId, setSelectedOfferId] = useState(previous?.packageId ?? "duo-2");
@@ -51,9 +84,6 @@ export function CoachProfile({ coach }: { coach: Coach }) {
   }
 
   function bookSession() {
-    if (!date || date < new Date().toISOString().slice(0, 10)) { setBookingError(translateText(language, "Please choose today or a future session date.", "Vui lòng chọn ngày hiện tại hoặc tương lai cho buổi học.")); return; }
-    if (replayUrl && !/^https?:\/\//i.test(replayUrl)) { setBookingError(translateText(language, "Use a replay link starting with https:// or http://.", "Link replay cần bắt đầu bằng https:// hoặc http://.")); return; }
-    setBookingError("");
     const packageName = mode === "duo" ? `${selectedOffer.startRank} → ${selectedOffer.targetRank} Duo` : `${quantity}h Coaching Session`;
     set({
       game: coach.game,
@@ -72,7 +102,7 @@ export function CoachProfile({ coach }: { coach: Coach }) {
         quoteRequired: false,
       },
       coachBooking: {
-        sessionFormat, date, time, timeZone, goals, replayUrl, discount,
+        sessionFormat, discount,
         coachId: coach.slug,
         coachName: coach.name,
         coachSlug: coach.slug,
@@ -85,23 +115,27 @@ export function CoachProfile({ coach }: { coach: Coach }) {
       },
       modal: null,
     });
-    const params = new URLSearchParams({ type: "coaching", coach: coach.slug, game: coach.game, name: `${coach.name} · ${mode === "duo" ? "Duo" : "Coaching"}`, amount: String(total), mode, offer: selectedOffer.id, quantity: String(quantity), format: sessionFormat, date, time, timezone: timeZone });
+    const params = new URLSearchParams({ type: "coaching", coach: coach.slug, game: coach.game, name: `${coach.name} · ${mode === "duo" ? "Duo" : "Coaching"}`, amount: String(total), mode, offer: selectedOffer.id, quantity: String(quantity), format: sessionFormat });
     router.push(`/checkout?${params}`);
   }
 
   return (
     <div className="coach-profile-page">
       <div className="container">
+        {profileLoading && <CoachDataLoading label={translateText(language, "Loading coach profile…", "Đang tải hồ sơ coach…")} />}
         <Link className="coach-back-link" href={"/coaches?game=" + coach.game}><ArrowLeft size={16} />{t("coachBackToList")}</Link>
-        <p className="coach-demo-note">{translateText(language, "Profile details, availability, statistics and reviews use demo data.", "Hồ sơ, lịch rảnh, thống kê và đánh giá là dữ liệu mẫu.")}</p>
+        <p className="coach-demo-note">{translateText(language, "Profile details, availability, coaching statistics and reviews use demo data. Match history comes from the linked Riot account.", "Hồ sơ, lịch rảnh, thống kê coaching và đánh giá là dữ liệu mẫu. Lịch sử trận đấu lấy từ tài khoản Riot đã liên kết.")}</p>
         <section className="coach-profile-hero" style={{ "--coach-accent": coach.accent } as React.CSSProperties}>
           <div className="coach-profile-identity">
             <div className="coach-profile-avatar-wrap">
-              <Image className="coach-profile-avatar" src={"/images/coaches/" + coach.slug + ".svg"} alt={coach.name} width={132} height={132} />
-              <span className={"coach-profile-online-dot " + (coach.online ? "is-online" : "")} />
+              <Image className="coach-profile-avatar" src={coach.avatar || ("/images/coaches/" + coach.slug + ".svg")} alt={coach.name} width={132} height={132} unoptimized={Boolean(coach.avatar?.startsWith("data:"))} />
+              <span className={"coach-profile-online-dot " + (online ? "is-online" : "")} />
             </div>
             <div className="coach-profile-intro">
-              <span className="coach-verified"><ShieldCheck size={14} />{t("verifiedCoach")}</span>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                <span className="coach-verified"><ShieldCheck size={14} />{t("verifiedCoach")}</span>
+                {coach.isMvp && <span className="coach-mvp-badge">{t("mvpCoach")}</span>}
+              </div>
               <h1>{coach.name}</h1>
               <p className="coach-profile-game"><Image src={coachGameLogoPath(coach.game)} alt="" width={23} height={23} />{coach.gameName}<span>· {coach.server}</span></p>
               <div className="coach-profile-rank-rating">
@@ -113,7 +147,8 @@ export function CoachProfile({ coach }: { coach: Coach }) {
             </div>
           </div>
           <div className="coach-profile-hero-side">
-            <div className={"coach-profile-presence " + (coach.online ? "is-online" : "is-offline")}><i className={coach.online ? "is-online" : ""} />{coach.online ? t("coachOnline") : t("coachOffline")}</div>
+            <div className={"coach-profile-presence " + (online ? "is-online" : "is-offline")}><i className={online ? "is-online" : ""} />{online ? t("coachOnline") : t("coachOffline")}</div>
+            {canEdit && <Link className="coach-profile-edit-link" href={`/employee/coaches/${coach.slug}/edit`}><Pencil size={15} />{translateText(language, "Edit profile", "Chỉnh sửa hồ sơ")}</Link>}
             <a className="coach-profile-hero-cta" href="#coach-booking">{t("coachLearnFrom")} <ArrowUpRight size={16} /></a>
           </div>
           <div className="coach-profile-hero-copy"><strong>{t("coachBuyWithCoach")}</strong></div>
@@ -124,45 +159,23 @@ export function CoachProfile({ coach }: { coach: Coach }) {
             <section className="coach-profile-panel coach-offers-panel">
               <div className="coach-profile-section-heading"><div><p className="eyebrow">{t("coachDuoPackages")}</p><h2>{t("coachBuyWithCoach")}</h2></div><span>{coach.gameName}</span></div>
               <div className="coach-offer-mode" role="tablist" aria-label={t("coachDuoPackages")}>
-                <button type="button" role="tab" aria-selected={mode === "duo"} className={mode === "duo" ? "is-active" : ""} onClick={() => setMode("duo")}><Swords size={16} />{t("coachPlayTogether")}</button>
-                <button type="button" role="tab" aria-selected={mode === "coaching"} className={mode === "coaching" ? "is-active" : ""} onClick={() => setMode("coaching")}><GraduationCap size={16} />{t("coachLearnFrom")}</button>
+                <button type="button" role="tab" aria-selected={mode === "duo"} className={mode === "duo" ? "is-active" : ""} onClick={() => setMode("duo")}>{mode === "duo" && <ActiveIndicator id={modeIndicatorId} />}<Swords size={16} /><span>{t("coachPlayTogether")}</span></button>
+                <button type="button" role="tab" aria-selected={mode === "coaching"} className={mode === "coaching" ? "is-active" : ""} onClick={() => setMode("coaching")}>{mode === "coaching" && <ActiveIndicator id={modeIndicatorId} />}<GraduationCap size={16} /><span>{t("coachLearnFrom")}</span></button>
               </div>
               {mode === "duo" ? (
-                <div className="coach-offer-grid">
-                  {offers.map((offer) => (
-                    <button type="button" key={offer.id} className={"coach-offer-card " + (selectedOffer.id === offer.id ? "is-selected" : "")} onClick={() => setSelectedOfferId(offer.id)}>
-                      {offer.featured && <span className="coach-offer-featured">{t("coachMostPicked")}</span>}
-                      <span className="coach-offer-emblems">{offer.startRank === "Unranked" ? <Swords size={23} /> : <Image src={coachRankCardIconPath(coach.game, offer.startRank)} alt="" width={34} height={34} />}<ArrowUpRight size={14} />{offer.targetRank === "Unranked" ? <Swords size={23} /> : <Image src={coachRankCardIconPath(coach.game, offer.targetRank)} alt="" width={34} height={34} />}</span>
-                      <strong>{t("coachPlayTogether")} {offer.startRank}</strong>
-                      <small>{offer.startRank} → {offer.targetRank}</small>
-                      <span className="coach-offer-detail">{offer.startRank === "Unranked" ? (translateText(language, "Casual games · any rank", "Chơi thường · mọi rank")) : (translateText(language, "Ranked duo · {value0}+ lobbies", "Duo xếp hạng · lobby {value0}+", {value0: offer.startRank}))}</span>
-                      <span className="coach-offer-price">{money.format(offer.price)} <small>/ {translateText(language, "game", "trận")}</small></span>
-                    </button>
-                  ))}
-                </div>
+                <DuoPackageGrid game={coach.game} offers={offers} selectedOfferId={selectedOffer.id} onSelect={setSelectedOfferId} />
               ) : (
                 <div className="coach-session-option">
                   <span className="coach-session-icon"><GraduationCap size={21} /></span>
-                  <div><strong>{t("coachCoachingOptions")}</strong><p>{t(coach.bioKey)}</p><div className="coach-profile-tags">{coach.sessionFormats.map((format) => <span key={format}>{format === "live" ? t("coachLiveSession") : t("coachVodReview")}</span>)}</div></div>
+                  <div><strong>{t("coachCoachingOptions")}</strong><p>{coach.bioOverride || t(coach.bioKey)}</p><div className="coach-profile-tags">{coach.sessionFormats.map((format) => <span key={format}>{format === "live" ? t("coachLiveSession") : t("coachVodReview")}</span>)}</div></div>
                   <strong className="coach-session-rate">{money.format(coach.hourlyRate)}<small> / {t("coachHourlyRate")}</small></strong>
+                  <CoachingSessionFormats formats={coach.sessionFormats} value={sessionFormat} onChange={setSelectedFormat} />
                 </div>
               )}
             </section>
 
-            <section className="coach-profile-panel coach-session-details">
-              <div className="coach-profile-section-title"><Clock3 size={18} /><h2>{translateText(language, "Plan your session", "Chuẩn bị buổi học")}</h2></div>
-              {mode === "coaching" && <fieldset className="coach-session-formats"><legend>{translateText(language, "Session format", "Hình thức học")}</legend>{coach.sessionFormats.map(format => <button type="button" key={format} aria-pressed={sessionFormat === format} onClick={() => setSessionFormat(format)}>{format === "live" ? (translateText(language, "Live session", "Học trực tiếp")) : (translateText(language, "VOD review", "Phân tích replay"))}</button>)}</fieldset>}
-              <p className="coach-session-helper">{translateText(language, "Demo availability: choose your preferred time. This does not confirm a session.", "Lịch mẫu: chọn thời gian mong muốn. Buổi học chưa được xác nhận tự động.")}</p>
-              <div className="coach-session-fields">
-                <label><span>{translateText(language, "Preferred date", "Ngày mong muốn")}</span><input type="date" value={date} min={new Date().toISOString().slice(0, 10)} onChange={event => { setDate(event.target.value); setBookingError(""); }} /></label>
-                <label><span>{translateText(language, "Start time", "Giờ bắt đầu")}</span><select value={time} onChange={event => setTime(event.target.value)}>{["10:00", "14:00", "18:00", "20:00"].map(slot => <option key={slot}>{slot}</option>)}</select></label>
-                <label className="coach-session-wide"><span>{translateText(language, "Time zone", "Múi giờ")}</span><select value={timeZone} onChange={event => setTimeZone(event.target.value)}><option value="Asia/Bangkok">Vietnam / Bangkok (UTC+7)</option><option value="Europe/London">London</option><option value="Europe/Paris">Paris</option><option value="America/New_York">New York</option><option value="America/Los_Angeles">Los Angeles</option></select></label>
-                <label className="coach-session-wide"><span>{translateText(language, "Session goals", "Mục tiêu buổi học")}</span><textarea value={goals} onChange={event => setGoals(event.target.value)} maxLength={600} placeholder={translateText(language, "e.g. Improve laning, macro decisions or champion mastery…", "Ví dụ: cải thiện đi đường, macro, chọn tướng…")} /></label>
-                {mode === "coaching" && sessionFormat === "vod" && <label className="coach-session-wide"><span>{translateText(language, "Replay link (optional)", "Link replay (tùy chọn)")}</span><input type="url" value={replayUrl} onChange={event => setReplayUrl(event.target.value)} placeholder="https://…" maxLength={500} /></label>}
-              </div>
-              <div className="coach-session-outcomes"><h3>{translateText(language, "What you will work on", "Bạn nhận được gì?")}</h3><ul><li>{translateText(language, "Review decisions and identify priority mistakes.", "Phân tích các quyết định và lỗi cần ưu tiên.")}</li><li>{translateText(language, "Guidance tailored to your role and goals.", "Hướng dẫn theo vai trò và mục tiêu của bạn.")}</li><li>{translateText(language, "A practice plan and notes to guide your next games.", "Kế hoạch luyện tập và ghi chú sau buổi học.")}</li></ul></div>
-            </section>
-
+            {coach.game === "league-of-legends" && <CoachTopChampions key={coach.slug} slug={coach.slug} />}
+            <CoachGameplay key={coach.slug} coach={coach} initialHistory={initialHistory} />
             <section className="coach-profile-panel coach-profile-stats coach-profile-stats-four">
               <div><span className="coach-stat-icon"><Check size={18} /></span><strong>{metrics.completedOrders.toLocaleString()}</strong><small>{t("coachCompletedOrders")}</small></div>
               <div><span className="coach-stat-icon"><Star size={18} /></span><strong>{Math.round(reputation[0].width)}%</strong><small>{translateText(language, "Five-star reviews", "Đánh giá 5 sao")}</small></div>
@@ -170,11 +183,9 @@ export function CoachProfile({ coach }: { coach: Coach }) {
               <div><span className="coach-stat-icon"><Clock3 size={18} /></span><strong>{metrics.since}</strong><small>{t("coachMemberSince")}</small></div>
             </section>
 
-            <CoachGameplay coach={coach} />
-
             <section className="coach-profile-panel coach-profile-about">
               <div className="coach-profile-section-title"><GraduationCap size={18} /><h2>{t("aboutCoach")}</h2></div>
-              <p>{t(coach.bioKey)}</p>
+              <p>{coach.bioOverride || t(coach.bioKey)}</p>
               <CoachAttributes coach={coach} />
             </section>
 
@@ -207,9 +218,7 @@ export function CoachProfile({ coach }: { coach: Coach }) {
             </label>
             <p className="coach-session-helper">{translateText(language, "Save 5% on 3+ games/hours · 10% on 5+", "3+ trận/giờ giảm 5% · 5+ giảm 10%")}</p>
             {discount > 0 && <div className="coach-discount-summary"><span>{money.format(subtotal)}</span><strong>−{Math.round(discountRate * 100)}% · {money.format(discount)}</strong></div>}
-            {date && <p className="coach-session-helper">{date} · {time} · {timeZone}</p>}
             <div className="coach-estimate"><span>{t("coachOrderTotal")}</span><strong>{money.format(total)}</strong></div>
-            {bookingError && <p className="coach-booking-error" role="alert">{bookingError}</p>}
             <button type="button" className="button coach-book-button" onClick={bookSession}>{mode === "duo" ? t("coachBookDuo") : t("coachBookCoach")} <ArrowUpRight size={16} /></button>
           </aside>
         </div>

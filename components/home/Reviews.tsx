@@ -1,4 +1,5 @@
 "use client";
+import { publicRequest } from "@/services/public";
 
 import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -90,7 +91,7 @@ export function Reviews() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/reviews?limit=50")
+    publicRequest("/api/reviews?limit=50")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && Array.isArray(data.items)) {

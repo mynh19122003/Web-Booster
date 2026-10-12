@@ -175,3 +175,4 @@ export const lolChampionImageKeys: Record<string, number> = {
   "Zyra": 143
 };
 export const lolImageVersion = '16.20.1';
+

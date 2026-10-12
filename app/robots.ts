@@ -1,7 +1,9 @@
-import { siteUrl } from "@/lib/seo";
-export default function robots() {
+import type { MetadataRoute } from "next";
+import { siteUrl, siteIndexable } from "@/lib/seo";
+export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", allow: "/", disallow: ["/admin", "/api/"] },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    // Let crawlers read noindex on private and pre-launch pages.
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/"] },
+    sitemap: siteIndexable ? `${siteUrl}/sitemap.xml` : undefined,
   };
 }

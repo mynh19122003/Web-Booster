@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
+import { loginDestination } from "@/lib/auth-redirect";
 
 export const runtime = "nodejs";
 
@@ -27,5 +28,6 @@ export async function GET(request: Request) {
   const options = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: 600 };
   response.cookies.set("ascend_oauth_state", state, options);
   response.cookies.set("ascend_oauth_verifier", verifier, options);
+  response.cookies.set("ascend_oauth_next", loginDestination("customer", new URL(request.url).searchParams.get("next")), options);
   return response;
 }

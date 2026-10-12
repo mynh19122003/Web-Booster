@@ -8,6 +8,10 @@ export default defineConfig([
     ".next/**",
     "playwright-report/**",
     "test-results/**",
+    ".data/**",
+    ".playwright-cli/**",
+    "output/**",
+    "outputs/**",
     "next-env.d.ts",
   ]),
 ]);

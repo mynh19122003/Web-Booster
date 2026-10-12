@@ -72,3 +72,4 @@ export const categoryKeys: Record<string, string> = {
   challenges: "categoryChallenges", "battle-pass": "categoryBattlePass", honor: "categoryHonor", clash: "categoryClash",
   arena: "categoryArena", "double-up": "categoryDoubleUp", "set-pass": "categorySetPass", "ranked-wins": "categoryRankedWins", unrated: "categoryUnrated",
 };
+

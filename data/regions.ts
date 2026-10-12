@@ -17,6 +17,11 @@ export const valorantRegions: readonly RegionOption[] = [
   { code: "KR", name: "Korea", flag: "/images/flags/kr.svg" },
   { code: "BR", name: "Brazil", flag: "/images/flags/us.svg" },
   { code: "LATAM", name: "Latin America", flag: "/images/flags/es.svg" },
+  { code: "EUW", name: "Europe West", flag: "/images/flags/eu.svg" },
+  { code: "EUNE", name: "Europe Nordic & East", flag: "/images/flags/eu.svg" },
+  { code: "OCE", name: "Oceania", flag: "/images/flags/au.svg" },
+  { code: "CN", name: "China", flag: "/images/flags/cn.svg" },
+  { code: "SEA", name: "Southeast Asia", flag: "/images/flags/sg.svg" },
 ];
 
 export const tftRegions: readonly RegionOption[] = [
@@ -25,6 +30,7 @@ export const tftRegions: readonly RegionOption[] = [
   { code: "NA", name: "North America", flag: "/images/flags/us.svg" },
   { code: "OCE", name: "Oceania", flag: "/images/flags/au.svg" },
   { code: "KR", name: "Korea", flag: "/images/flags/kr.svg" },
+  { code: "CN", name: "China", flag: "/images/flags/cn.svg" },
   { code: "SEA", name: "Southeast Asia", flag: "/images/flags/sg.svg" },
 ];
 

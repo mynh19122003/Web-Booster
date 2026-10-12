@@ -6,7 +6,7 @@ import { translateText } from "@/lib/i18n";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/store/useCart";
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Coins, Globe, Mail, ShieldCheck, ShoppingCart, Sparkles, Users, Zap } from "lucide-react";
@@ -22,7 +22,7 @@ import { useStore } from "@/store/useStore";
 
 export function BoostRoyalAccountView({ account }: { account: ShopAccount }) {
   const { language } = useLanguage();
-  const s = useStore();
+  const set = useStore(state => state.set);
   const router = useRouter();
   const searchParams = useSearchParams();
   const game = account.game === "league-of-legends" ? "League of Legends" : account.game === "valorant" ? "VALORANT" : "Teamfight Tactics";
@@ -33,8 +33,8 @@ export function BoostRoyalAccountView({ account }: { account: ShopAccount }) {
   const rankIcon = account.rank === "Unranked" ? null : coachRankCardIconPath(account.game, account.rank);
   const titleRank = `${account.rank}${account.division ? ` ${account.division}` : ""}`;
 
-  const buyAccount = (addOnly = false) => {
-    s.set({
+  const buyAccount = useCallback((addOnly = false) => {
+    set({
       game: account.game,
       product: "accounts",
       service: "account-purchase",
@@ -64,20 +64,20 @@ export function BoostRoyalAccountView({ account }: { account: ShopAccount }) {
     const href = `/checkout?${params}`;
     useCart.getState().add(href, addOnly);
     if (!addOnly) router.push(href);
-  };
+  }, [account, titleRank, set, router]);
 
   useEffect(() => {
     if (searchParams.get("buy") === "1") {
       buyAccount();
     }
-  }, [searchParams]);
+  }, [searchParams, buyAccount]);
 
   const currencyOne = account.game === "valorant" ? "RADIANITE" : account.game === "teamfight-tactics" ? "REALM CRYSTALS" : "BLUE ESSENCE";
   const currencyOneVal = account.game === "valorant" ? "120" : account.game === "teamfight-tactics" ? "800" : account.essence.toLocaleString();
   const currencyTwo = account.game === "valorant" ? "VALORANT POINTS" : "RIOT POINTS";
   const gainNote = account.game === "valorant" ? `~${account.lpGain}+ RR Gain` : account.game === "teamfight-tactics" ? "Top 4 Rate 65%+" : `~${account.lpGain}+ LP Gain`;
 
-  return <main className="br-account-page" id="main">
+  return <div className="br-account-page">
     <div className="br-account-wrap">
       <Link className="br-back" href={`/games/${account.game}?category=accounts`}><ArrowLeft size={15} /> {translateText(language, "Back to Catalog", "Quay lại danh mục")}</Link>
       <div className="br-account-layout">
@@ -113,5 +113,5 @@ export function BoostRoyalAccountView({ account }: { account: ShopAccount }) {
         </aside>
       </div>
     </div>
-  </main>;
+  </div>;
 }

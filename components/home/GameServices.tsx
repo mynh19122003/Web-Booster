@@ -2,6 +2,8 @@
 import { translateText } from "@/lib/i18n";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "motion/react";
+import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
 import { games } from "@/data/games";
@@ -72,6 +74,7 @@ function preparePreview(card: HTMLElement) {
   if (video) video.preload = "auto";
 }
 export function GameServices() {
+  const { card } = useInteractionMotion();
   const { language, t } = useLanguage();
   const track = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -155,9 +158,10 @@ export function GameServices() {
         </div>
         <div className="game-track" ref={track}>
           {games.map((g, i) => (
-            <article
+            <motion.article
+              {...card}
               key={g.slug}
-              className="game-card group relative border border-white/10 bg-white/[0.03] shadow-none transition-all duration-300 hover:bg-white/[0.05] hover:border-amber-500/40 hover:shadow-[0_0_25px_rgba(255,159,60,0.2)] hover:-translate-y-1 rounded-xl overflow-hidden"
+              className="game-card group relative border border-white/10 bg-white/[0.03] shadow-none hover:bg-white/[0.05] hover:border-amber-500/40 hover:shadow-[0_0_25px_rgba(255,159,60,0.2)] rounded-xl overflow-hidden"
               style={{ "--game-color": g.color } as React.CSSProperties}
               data-opening={opening === g.slug}
               aria-busy={opening === g.slug}
@@ -265,7 +269,7 @@ export function GameServices() {
                   </Link>
                 ))}
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
         <div className="service-foot">

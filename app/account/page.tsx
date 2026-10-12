@@ -1,5 +1,6 @@
 import { UiText } from "@/components/ui/UiText";
 import type { Metadata } from "next";
+import { privateRobots } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,6 +21,7 @@ import {
 
 export const metadata: Metadata = {
   title: "League of Legends Account #109084",
+  robots: privateRobots,
   description: "View the rank, champion pool, skins and seller details for League of Legends account #109084.",
 };
 
@@ -43,7 +45,7 @@ function RankCard({ rank, label, image, tone }: { rank: string; label: string; i
 
 export default function AccountPage() {
   return (
-    <main className="account-detail" id="main">
+    <div className="account-detail">
       <div className="account-detail-wrap">
         <div className="account-breadcrumbs"><Link href="/services"><ArrowLeft size={15} /><UiText english={"Browse services"} /></Link><span>/</span><span><UiText english={"League of Legends accounts"} /></span><span>/</span><strong>#109084</strong></div>
 
@@ -102,6 +104,6 @@ export default function AccountPage() {
           </aside>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

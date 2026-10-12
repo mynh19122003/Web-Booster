@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-).replace(/\/$/, "");
+import { siteUrl } from "@/lib/site-url";
+import { canIndexSite } from "@/lib/indexing";
+export { siteUrl } from "@/lib/site-url";
+export const siteIndexable = canIndexSite(siteUrl, process.env.SITE_INDEXABLE, process.env.VERCEL_ENV);
+export const privateRobots: Metadata["robots"] = { index: false, follow: false };
 export function metadata(
   title: string,
   description: string,
@@ -10,7 +12,7 @@ export function metadata(
   return {
     title,
     description,
-    robots: { index: true, follow: true },
+    robots: { index: siteIndexable, follow: true },
     alternates: { canonical: path },
     openGraph: {
       title,

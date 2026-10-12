@@ -40,9 +40,9 @@ disabled; USD remains available. Prices are illustrative service estimates.
 
 ## Production SEO
 
-Set `NEXT_PUBLIC_SITE_URL` to the site's actual HTTPS origin before deployment,
-then rebuild. Without this variable canonical, sitemap and structured-data URLs
-use `http://localhost:3000` for local development. Pages include titles,
-descriptions, canonical URLs, social previews and breadcrumb structured data.
-Admin is noindex and excluded from sitemap; robots excludes admin and API paths.
-Submit the deployed sitemap to Search Console after verifying the actual domain.
+Set `NEXT_PUBLIC_SITE_URL` to the site's actual HTTPS origin and enable
+`SITE_INDEXABLE=true` only when launching production, then rebuild. Local and
+unconfigured sites are noindex with an empty sitemap; Vercel previews cannot
+enable indexing. Private pages, demo account listings and the unfinished booster
+roster stay noindex. Robots allows crawling their noindex directives and blocks
+API routes. See [SEO.md](SEO.md) for the full launch checklist and language scope.

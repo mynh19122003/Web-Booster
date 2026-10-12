@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { articles } from "@/data/articles";
 import { PageIntro } from "@/components/ui/PageIntro";
-import { metadata } from "@/lib/seo";
+import { metadata, siteUrl } from "@/lib/seo";
+import { serializeJsonLd } from "@/lib/json-ld";
+export const dynamicParams = false;
 export function generateStaticParams() {
   return articles.map((a) => ({ slug: a.slug }));
 }
@@ -12,11 +14,13 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const a = articles.find((a) => a.slug === slug);
-  return metadata(
-    a?.title ?? "Article not found",
-    a?.body[0] ?? "",
+  if (!a) notFound();
+  const result = metadata(
+    a.title,
+    a.body[0],
     `/blog/${slug}`,
   );
+  return { ...result, openGraph: { ...result.openGraph, type: "article" as const } };
 }
 export default async function Page({
   params,
@@ -39,6 +43,17 @@ export default async function Page({
           <p key={p}>{p}</p>
         ))}
       </article>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: a.title,
+        description: a.body[0],
+        articleSection: a.category,
+        inLanguage: "en",
+        url: `${siteUrl}/blog/${slug}`,
+        mainEntityOfPage: `${siteUrl}/blog/${slug}`,
+        publisher: { "@id": `${siteUrl}/#organization` },
+      }) }} />
     </>
   );
 }

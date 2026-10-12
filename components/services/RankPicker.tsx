@@ -10,9 +10,11 @@ import type { CSSProperties } from "react";
 import { gameRanks, rankLevelsFor } from "@/lib/service-options";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { apexConfig, apexRankAtLp, apexStartLp, isApexRank } from "@/lib/apex-ranks";
-import { APEX_PRICE_BANDS } from "@/lib/rank-pricing";
+import { APEX_PRICE_BANDS, rankPriceFactor } from "@/lib/rank-pricing";
 import { useMoney } from "@/components/ui/Currency";
 import { NumberInput } from "@/components/ui/NumberInput";
+import { GameIdentity } from "@/components/ui/GameIdentity";
+import { rankPromotionPosterFor } from "@/data/rank-promotion-videos";
 
 const tierGlowColors: Record<string, { glow: string; text: string }> = {
   Iron: { glow: "rgba(161, 161, 170, 0.22)", text: "text-zinc-400" },
@@ -40,6 +42,7 @@ export function RankPicker({
   lp = 0,
   minLp = 0,
   maxLp = 1500,
+  region = "NA",
 }: {
   game: string;
   label: string;
@@ -50,6 +53,7 @@ export function RankPicker({
   lp?: number;
   minLp?: number;
   maxLp?: number;
+  region?: string;
 }) {
   const { t, language } = useLanguage();
   const money = useMoney();
@@ -58,7 +62,6 @@ export function RankPicker({
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const reduced = useReducedMotion();
-
   // Close on Escape key press
   useEffect(() => {
     if (!open) return;
@@ -88,9 +91,12 @@ export function RankPicker({
   const levels = rankLevelsFor(game);
   const selected = levels[value];
   const apex = apexConfig(game);
+  function selectRank(next: number, points: number) {
+    onChange(next, points);
+  }
   function changeLp(next: number) {
     const points = Math.max(minLp, Math.min(maxLp, next));
-    onChange(apexRankAtLp(game, points), points);
+    selectRank(apexRankAtLp(game, points), points);
   }
   const draftSelected = levels[draft] ?? selected;
   const tiers = gameRanks[game];
@@ -113,17 +119,13 @@ export function RankPicker({
         </span>
 
         {/* 2. PROMINENT, CRISP RANK EMBLEM (w-28 h-28 with centered tier radial glow) */}
-        <div className="relative w-28 h-28 my-auto flex items-center justify-center select-none">
+        <div className="rank-presentation-stage relative w-full h-40 my-auto flex items-center justify-center select-none">
           <div
-            className="absolute inset-0 rounded-full blur-2xl pointer-events-none transition-all duration-500 scale-125"
-            style={{
-              background: `radial-gradient(circle, ${tierTheme.glow} 0%, transparent 70%)`,
-            }}
+            className="absolute w-28 h-28 rounded-full blur-2xl pointer-events-none transition-all duration-500 scale-125"
+            style={{ background: `radial-gradient(circle, ${tierTheme.glow} 0%, transparent 70%)` }}
             aria-hidden="true"
           />
-          <div className="relative z-10 w-28 h-28 rank-hero-emblem flex items-center justify-center">
-            <RankEmblem game={game} tier={selected.tier} src={selected.icon} />
-          </div>
+          <RankHero game={game} tier={selected.tier} src={selected.icon} />
         </div>
 
         {/* Centered Rank Title and Change Button */}
@@ -164,6 +166,9 @@ export function RankPicker({
               <div className="apex-lp-track">
                 <input type="range" min={minLp} max={maxLp} step={1} value={lp}
                   aria-label={`${label}: ${t("leaguePoints")}`} aria-valuetext={`${selected.tier}, ${lp} LP`}
+                  onPointerDown={event => {
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
                   onChange={(event) => changeLp(Number(event.target.value))} />
                 <div className="apex-lp-ticks" aria-hidden="true">
                   {[apex.grandmaster, apex.challenger].filter((point) => point > minLp && point < maxLp).map((point) => (
@@ -186,11 +191,11 @@ export function RankPicker({
                 {APEX_PRICE_BANDS.map((band) => (
                   <div key={band.tier} className="apex-lp-band" data-active={selected.tier === band.tier}>
                     <strong>{band.tier}</strong><span>{band.from}–{band.to} LP</span>
-                    <span>{money.format(band.usdPerLp)} / LP</span>
+                    <span>{money.format(band.usdPerLp * rankPriceFactor(region), 3)} / LP</span>
                   </div>
                 ))}
               </div>
-              <p className="apex-lp-note">{translateText(language, "Base rates. Server adjustments apply to the final price.", "Đơn giá cơ bản. Giá cuối áp dụng điều chỉnh server.")}</p>
+              <p className="apex-lp-note">{region} · {translateText(language, "Rates per LP for your server. Each part of the climb uses its own rate.", "Đơn giá mỗi LP theo server đã chọn. Mỗi khoảng LP dùng mức giá tương ứng.")}</p>
             </div>
           )}
         </div>
@@ -217,13 +222,7 @@ export function RankPicker({
               {/* Header with Title and Close Button */}
               <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/[0.08]">
                 <div>
-                  <span className="text-[10px] font-heading font-bold tracking-widest uppercase text-[#FF9F3C] block mb-0.5">
-                    {game === "valorant"
-                      ? "VALORANT"
-                      : game === "teamfight-tactics"
-                        ? "TFT"
-                        : "LEAGUE OF LEGENDS"}
-                  </span>
+                  <GameIdentity game={game} />
                   <h4 className="text-base font-heading font-bold uppercase tracking-wide text-white">
                     {t("selectRank", { label })}
                   </h4>
@@ -265,7 +264,7 @@ export function RankPicker({
                       whileHover={reduced || !candidates.length ? undefined : { scale: 1.04, y: -2 }}
                       whileTap={reduced || !candidates.length ? undefined : { scale: 0.97 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={active ? { borderColor: glow, boxShadow: `0 0 20px ${glow}` } : undefined}
+                      style={{ "--rank-tier-glow": glow } as CSSProperties}
                       className={`rank-tier-btn group isolate relative flex flex-col items-center justify-center py-4 px-2 rounded-2xl border transition-colors duration-300 cursor-pointer ${
                         active
                           ? "border-[#FF9F3C] bg-white/[0.05] shadow-[0_0_15px_rgba(255,159,60,0.2)]"
@@ -300,12 +299,12 @@ export function RankPicker({
 
               {/* 3. DEDICATED DIVISION SELECTOR (IV, III, II, I) */}
               {divisions.length > 1 && (
-                <div className="pt-4 border-t border-white/[0.08]">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                <div className="rank-division-section">
+                  <div className="rank-division-heading">
+                    <span className="rank-division-label">
                       {t("selectDivision")}
                     </span>
-                    <span className="text-xs text-zinc-400">
+                    <span className="rank-division-tier">
                       {t("tier")}: <strong className="text-white font-medium">{draftSelected.tier}</strong>
                     </span>
                   </div>
@@ -317,11 +316,7 @@ export function RankPicker({
                         aria-label={`${label}: ${rank.label}`}
                         aria-pressed={draft === rank.index}
                         disabled={rank.index < min || rank.index > max}
-                        className={`h-10 rounded-lg text-sm font-bold transition-all flex items-center justify-center cursor-pointer ${
-                          draft === rank.index
-                            ? "bg-black/60 text-[#FF9F3C] border border-[#FF9F3C] shadow-[0_0_15px_rgba(255,159,60,0.25)]"
-                            : "bg-black/40 border border-white/10 text-white hover:border-[#FF9F3C]/50 hover:bg-black/60"
-                        } disabled:opacity-20 disabled:cursor-not-allowed`}
+                        className="rank-division-option"
                         onClick={() => {
                           setDraft(rank.index);
                         }}
@@ -339,10 +334,10 @@ export function RankPicker({
                 disabled={draft < min || draft > max}
                 onClick={() => {
                   const points = isApexRank(game, draft) ? Math.max(minLp, Math.min(maxLp, draft === value ? lp : apexStartLp(game, draft))) : 0;
-                  onChange(isApexRank(game, draft) ? apexRankAtLp(game, points) : draft, points);
+                  selectRank(isApexRank(game, draft) ? apexRankAtLp(game, points) : draft, points);
                   setOpen(false);
                 }}
-                className="w-full mt-6 h-12 rounded-xl bg-gradient-to-r from-[#FF9F3C] via-[#F59E0B] to-[#D97706] text-black font-extrabold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,159,60,0.35)] hover:shadow-[0_0_30px_rgba(255,159,60,0.5)] hover:brightness-110 active:scale-[0.99] transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="rank-confirm-button"
               >
                 {t("confirmSelection")}
               </button>
@@ -352,6 +347,14 @@ export function RankPicker({
         )}
     </fieldset>
   );
+}
+
+function RankHero({ game, tier, src }: { game: string; tier: string; src: string }) {
+  const poster = rankPromotionPosterFor(game, tier);
+  return <div className="relative z-10 w-28 h-28 rank-hero-emblem flex items-center justify-center">
+    {poster ? <Image className="rank-promotion-artwork" src={poster} alt="" width={480} height={480} loading="eager" unoptimized />
+      : <RankEmblem game={game} tier={tier} src={src} />}
+  </div>;
 }
 
 // League client emblems include a large transparent canvas; fit the visible crest.

@@ -1,6 +1,7 @@
 "use client";
 import { useLanguage } from "./LanguageProvider";
-export function UiText({ english }: { english: string }) {
-  const { text } = useLanguage();
-  return text(english);
+import { translateText } from "@/lib/i18n";
+export function UiText({ english, vietnamese }: { english: string; vietnamese?: string }) {
+  const { text, language } = useLanguage();
+  return vietnamese ? translateText(language, english, vietnamese) : text(english);
 }

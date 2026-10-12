@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
 import { ProfileSettings } from "@/components/account/ProfileSettings";
-export const metadata: Metadata = { title: "Profile settings", description: "Manage your ASCEND account profile and contact details." };
-export default function ProfilePage() { return <main className="section profile-settings-page" id="main"><ProfileSettings /></main>; }
+import { privateRobots } from "@/lib/seo";
+export const metadata: Metadata = { title: "Profile settings", description: "Manage your ASCEND account profile and contact details.", robots: privateRobots };
+export default function ProfilePage() { return <div className="section profile-settings-page"><ProfileSettings /></div>; }

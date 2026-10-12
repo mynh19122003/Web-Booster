@@ -4,7 +4,7 @@ import { FAQ } from "@/components/home/FAQ";
 import { metadata as makeMetadata } from "@/lib/seo";
 export const metadata = makeMetadata(
   "Help center",
-  "Find answers and prepare a support request.",
+  "Find answers, send a support request, and chat with our team.",
   "/support",
 );
 export default function Page() {
