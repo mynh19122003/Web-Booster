@@ -9,7 +9,7 @@ export const layoutMessages = {
     ourPros: "Our pros",
     reviews: "Reviews",
     insights: "Insights",
-    careers: "Careers",
+    careers: "BECOME OUR BOOSTER",
     acceptedPayments: "Accepted payments",
     acceptedPaymentMethods: "Accepted payment methods",
     playerDashboard: "PLAYER DASHBOARD",
