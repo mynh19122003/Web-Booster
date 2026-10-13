@@ -1,4 +1,10 @@
-import type { RiotMatch, RiotRank } from "@/lib/riot-types";
+import type { MatchHistory, RiotMatch, RiotRank } from "@/lib/riot-types";
+
+/** Prefer the main ranked queue, then a real alternative queue; never replace an API error with Unranked. */
+export function playerRank(history: MatchHistory, tft: boolean): RiotRank | null {
+  if (history.status !== "ready" || history.rankError) return null;
+  return history.ranks?.find(rank => rank.queue === rankQueueFor(tft ? "ranked" : "solo", tft)) ?? history.ranks?.[0] ?? null;
+}
 
 export const lolMatchFilters = [
   { id: "solo", label: "Ranked Solo", queues: [420] }, { id: "flex", label: "Ranked Flex", queues: [440] },

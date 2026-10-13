@@ -6,6 +6,7 @@ import { Maximize2, MessageCircle, X } from "lucide-react";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { translateText } from "@/lib/i18n";
 import { UserBoosterChat } from "@/components/user/UserBoosterChat";
+import { UserChatBadge } from "@/components/user/UserChatNotifications";
 
 export function BoosterChat({ compact = false, initialRequestId = "" }: { compact?: boolean; initialRequestId?: string }) {
   return <UserBoosterChat compact={compact} initialRequestId={initialRequestId} />;
@@ -33,6 +34,6 @@ export function ChatLauncher() {
         <button ref={close} type="button" className="icon-button" aria-label={copy("Close chat", "Đóng chat")} onClick={() => { setOpen(false); trigger.current?.focus(); }}><X size={18} /></button>
       </header><BoosterChat compact />
     </section>}
-    <button ref={trigger} className="booster-chat-launcher" type="button" aria-expanded={open} aria-label={copy("Chat with our team", "Chat với đội ngũ hỗ trợ")} onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <MessageCircle size={22} />}</button>
+    <button ref={trigger} className="booster-chat-launcher" type="button" aria-expanded={open} aria-label={copy("Chat with our team", "Chat với đội ngũ hỗ trợ")} onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <MessageCircle size={22} />}<UserChatBadge /></button>
   </div>;
 }

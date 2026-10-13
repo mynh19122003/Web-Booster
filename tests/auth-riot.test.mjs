@@ -40,6 +40,15 @@ const riot = load("lib/riot-api.ts");
 const historyApi = load("app/api/employee/riot/history/route.ts");
 const riotId = load("lib/riot-id.ts");
 const riotDisplay = load("lib/riot-display.ts");
+
+test("employee profile rank uses the main queue and hides stale rank after a Riot failure", () => {
+  const solo = { queue: "RANKED_SOLO_5x5", tier: "GOLD", division: "II", leaguePoints: 36, wins: 24, losses: 16 };
+  const flex = { ...solo, queue: "RANKED_FLEX_SR", tier: "DIAMOND" };
+  assert.deepEqual(riotDisplay.playerRank({ status: "ready", matches: [], ranks: [flex, solo] }, false), solo);
+  assert.equal(riotDisplay.rankWinRate(solo), 60);
+  assert.equal(riotDisplay.playerRank({ status: "ready", matches: [], ranks: [] }, false), null);
+  assert.equal(riotDisplay.playerRank({ status: "ready", matches: [], ranks: [solo], rankError: "key-rejected" }, false), null);
+});
 const employee = db.createUser("Employee", "staff@example.test", "test-password");
 const customer = db.createUser("Customer", "user@example.test", "test-password");
 db.authDatabase().prepare("UPDATE users SET role = 'employee' WHERE id = ?").run(employee.id);
@@ -50,6 +59,46 @@ let calls = [];
 let respond = () => Response.json({ ok: true });
 globalThis.fetch = async (url, options) => { calls.push({ url: String(url), options, at: Date.now() }); return respond(String(url), options); };
 const signIn = session => { jar.clear(); if (session) jar.set("ascend_session", session.token); };
+
+test("chat retries persist once and request access is checked before accepting a client ID", async () => {
+  const chat = load("lib/chat-db.ts");
+  const requestsApi = load("app/api/requests/[id]/route.ts");
+  const request = chat.createRequest(customer, "Chat delivery test", "Valorant", "Initial message");
+  const context = { params: Promise.resolve({ id: request.id }) };
+  const clientId = "12345678-1234-1234-1234-123456789abc";
+  const post = (text, id = clientId) => new Request(`http://localhost:3000/api/requests/${request.id}`, { method: "POST", headers: { origin: "http://localhost:3000", "Content-Type": "application/json" }, body: JSON.stringify({ text, clientId: id }) });
+  signIn(customerSession);
+  assert.equal((await requestsApi.POST(post("Delivered once"), context)).status, 201);
+  assert.equal((await requestsApi.POST(post("Delivered once"), context)).status, 201);
+  assert.equal(chat.requestMessages(request.id).filter(message => message.text === "Delivered once").length, 1);
+  assert.equal((await requestsApi.POST(post("Invalid key", "not-a-uuid"), context)).status, 400);
+  signIn(employeeSession);
+  assert.equal((await requestsApi.POST(post("Unassigned reply"), context)).status, 409);
+  signIn(null);
+  assert.equal((await requestsApi.POST(post("Expired session"), context)).status, 401);
+});
+
+test("API read receipts are scoped to the assigned employee and never clear newer incoming messages", async () => {
+  const chat = load("lib/chat-db.ts");
+  const unread = load("app/api/requests/unread/route.ts");
+  const read = load("app/api/requests/[id]/read/route.ts");
+  const staff = { ...employee, role: "employee" };
+  const request = chat.createRequest(customer, "Unread test", "Valorant", "Initial incoming");
+  const context = { params: Promise.resolve({ id: request.id }) };
+  const receipt = (messageId, origin = "http://localhost:3000") => new Request(`http://localhost:3000/api/requests/${request.id}/read`, { method: "POST", headers: { origin, "Content-Type": "application/json" }, body: JSON.stringify({ messageId }) });
+  const first = chat.requestMessages(request.id).at(-1).id;
+  signIn(employeeSession);
+  assert.equal((await read.POST(receipt(first), context)).status, 403);
+  assert.equal(chat.updateRequest(staff, request.id, "claim"), true);
+  assert.equal((await (await unread.GET()).json()).unread.byRequest[request.id], 1);
+  assert.equal((await read.POST(receipt(first, "https://foreign.test"), context)).status, 403);
+  assert.equal((await read.POST(receipt(first), context)).status, 200);
+  chat.sendRequestMessage(customer, request.id, "New incoming");
+  assert.equal((await read.POST(receipt(first), context)).status, 200);
+  assert.equal((await (await unread.GET()).json()).unread.byRequest[request.id], 1);
+  signIn(null);
+  assert.equal((await unread.GET()).status, 401);
+});
 
 test("customer avatar persists across profile edits and password changes preserve only the active session", async () => {
   const profileApi = load("app/api/profile/route.ts");
@@ -160,14 +209,14 @@ test("checkout keeps encrypted specifications private and restricts access to th
     signIn(otherCustomerSession);
     assert.equal((await get()).status, 404);
     signIn(employeeSession);
-    assert.equal((await (await get()).json()).orderDetails, null);
+    assert.equal((await get()).status, 403);
     assert.equal((await thread.PATCH(mutation(request.id, "PATCH", { action: "claim" }), context(request.id))).status, 200);
     const employeeView = await (await get()).json();
     assert.equal(employeeView.orderDetails.riotAccount.riotPass, order.riotAccount.riotPass);
     assert.equal(employeeView.orderDetails.flashSlot, "F");
     assert.equal(employeeView.orderDetails.orderNumber, orderNumber);
     signIn(otherEmployeeSession);
-    assert.equal((await (await get()).json()).orderDetails, null);
+    assert.equal((await get()).status, 403);
     assert.equal((await thread.POST(mutation(request.id, "POST", { text: "Forbidden reply" }), context(request.id))).status, 409);
     signIn(employeeSession);
     assert.equal((await thread.POST(mutation(request.id, "POST", { text: "Ready to start" }), context(request.id))).status, 201);
@@ -179,7 +228,7 @@ test("checkout keeps encrypted specifications private and restricts access to th
     signIn(customerSession);
     assert.equal((await thread.PATCH(mutation(request.id, "PATCH", { action: "reopen" }), context(request.id))).status, 200);
     signIn(employeeSession);
-    assert.equal((await (await get()).json()).orderDetails, null);
+    assert.equal((await get()).status, 403);
     signIn(customerSession);
     const duo = await checkout.POST(post({ ...order, submissionId: "bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb", service: "duo-boost", queue: "Duo", riotAccount: null }));
     assert.equal(duo.status, 201);
@@ -481,6 +530,53 @@ test("invalid Riot key is surfaced by Name#Tag lookup without exposing credentia
   assert.equal(response.headers.get("retry-after"), "0");
   assert.deepEqual(await response.json(), { error: "key-rejected", retryAfter: 0 });
   assert.equal(calls.length, 1);
+});
+
+test("preview employee Riot lookup authenticates fixed accounts, fetches fresh ranks and is disabled in API mode", async () => {
+  const originalMode = process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE;
+  signIn(null); calls = []; globalThis.riotState.requests = []; globalThis.riotState.blockedUntil = 0;
+  const account = { id: "emp-luna", email: "luna@ascend.demo", password: "Ascend@123" };
+  const input = { riotId: "Fresh Player#KR1", game: "lol", platform: "kr", employee: account };
+  let points = 25;
+  respond = url => Response.json(url.includes("/by-riot-id/") ? { gameName: "Fresh Player", tagLine: "KR1", puuid: "fresh-profile-player" }
+    : url.includes("/region/by-game/") ? { region: "KR" }
+    : url.includes("/summoners/") ? { puuid: "fresh-profile-player" }
+    : url.includes("/league/") ? [{ queueType: "RANKED_SOLO_5x5", tier: "GOLD", rank: "II", leaguePoints: points, wins: 24, losses: 16 }]
+    : []);
+  try {
+    process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE = "mock";
+    assert.equal((await historyApi.POST(historyRequest({ ...input, employee: { ...account, password: "wrong" } }))).status, 401);
+    assert.equal((await historyApi.POST(historyRequest(input, "https://evil.test"))).status, 403);
+    assert.equal(calls.length, 0);
+    let response = await historyApi.POST(historyRequest(input));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).ranks[0].leaguePoints, 25);
+    const proxied = new Request("http://localhost:3000/api/employee/riot/history", { method: "POST", headers: { origin: "http://127.0.0.1:3102", host: "127.0.0.1:3102", "Content-Type": "application/json" }, body: JSON.stringify(input) });
+    assert.equal((await historyApi.POST(proxied)).status, 200);
+    points = 78;
+    response = await historyApi.POST(historyRequest(input));
+    assert.equal((await response.json()).ranks[0].leaguePoints, 78);
+    globalThis.riotState.requests = [];
+    response = await historyApi.POST(historyRequest({ ...input, publishProfile: true, slug: "someone-elses-coach" }));
+    assert.equal(response.status, 200);
+    const profileStore = load("lib/coach-riot-profile.ts");
+    assert.equal(profileStore.coachRiotProfile("luna").employeeId, "emp-luna");
+    assert.equal(profileStore.coachRiotProfile("someone-elses-coach"), null);
+    const publicCoach = load("lib/coach-profile-db.ts").getCoachWithOverride("luna");
+    assert.equal(publicCoach.peakRank, "Gold");
+    assert.equal(publicCoach.server, "KR");
+    assert.equal(publicCoach.riotProfile.history.ranks[0].leaguePoints, 78);
+    assert.equal(publicCoach.riotProfile.history.ranks[0].wins, 24);
+    const count = calls.length;
+    process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE = "api";
+    assert.equal((await historyApi.POST(historyRequest(input))).status, 401);
+    assert.equal(calls.length, count);
+  } finally {
+    db.authDatabase().prepare("DELETE FROM coach_riot_profiles WHERE slug='luna'").run();
+    if (originalMode === undefined) delete process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE;
+    else process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE = originalMode;
+    signIn(employeeSession);
+  }
 });
 
 test("20 matches are paced within the request budget and subsequent reads reuse the full result", async () => {

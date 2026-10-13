@@ -1,3 +1,5 @@
+import type { CoachingSession } from "@/types/workflow";
+
 export type RiotAccountDetails = {
   riotUsername: string;
   riotPass: string;
@@ -20,6 +22,7 @@ export type OrderRequestDetails = {
 
 export type OrderRequestInput = Omit<OrderRequestDetails, "orderNumber"> & {
   submissionId: string;
+  coaching?: CoachingSession;
 };
 
 export function requiresRiotCredentials(service: string, queue: string) {

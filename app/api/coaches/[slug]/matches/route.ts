@@ -7,6 +7,7 @@ export async function GET(request: Request, context: { params: Promise<{ slug: s
   const coach = getCoachWithOverride((await context.params).slug);
   if (!coach) return NextResponse.json({ error: "not-found" }, { status: 404 });
   const headers = { "Cache-Control": "no-store" };
+  if (coach.riotProfile) return NextResponse.json(coach.riotProfile.history, { headers });
   if (coach.game === "valorant") return NextResponse.json({ status: "unsupported", matches: [] }, { headers });
   const account = coachRiotAccount(coach.slug);
   if (!account) return NextResponse.json({ status: "unlinked", matches: [] }, { headers });

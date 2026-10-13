@@ -7,6 +7,9 @@ import {
 } from "@/lib/workflow/store";
 import { workflowFixtures } from "@/mocks/workflow";
 import { employeeDemo } from "@/lib/workflow/demo";
+import employeeAccounts from "@/mocks/employee-accounts.json";
+import { publicMockMode } from "@/lib/public-data-source";
+import { connectMockOrderFlow, mockOrderCommand, mockWorkflowFallback, stopMockOrderFlow } from "@/services/mock-order-flow";
 import { can } from "@/services/admin";
 import { useAdminStore } from "@/lib/admin/store";
 import type { Permission } from "@/types/admin";
@@ -108,6 +111,9 @@ function publicOrder(o: Order): AvailableOrder {
     options,
     createdAt,
     difficulty,
+    amount,
+    paymentStatus,
+    coaching,
   } = o;
   return {
     id,
@@ -122,6 +128,9 @@ function publicOrder(o: Order): AvailableOrder {
     options,
     createdAt,
     difficulty,
+    amount,
+    paymentStatus,
+    coaching,
   };
 }
 function log(
@@ -163,8 +172,14 @@ export function initializeWorkflow() {
       /* Corrupt mock identity requires login again. */
     }
     await store.persist.rehydrate();
-    if (!store.getState().initialized)
-      store.setState({ ...workflowFixtures(), initialized: true });
+    const cached = store.getState();
+    if (!cached.initialized || !cached.orders.length || !cached.employees.length) {
+      const fixture = publicMockMode ? await mockWorkflowFallback() : workflowFixtures();
+      if (!isWorkflowSnapshot(fixture)) throw new Error("Dữ liệu đơn hàng không hợp lệ.");
+      // Fill missing collections only; retain saved claims, history and employee settings.
+      const preserved = Object.fromEntries(Object.entries(cached).filter(([, value]) => Array.isArray(value) && value.length));
+      store.setState({ ...fixture, ...preserved, initialized: true });
+    }
     // Add the new demo to older saved projections without resetting claims.
     const saved = store.getState();
     const fixtures = workflowFixtures();
@@ -185,6 +200,12 @@ export function initializeWorkflow() {
 }
 export function useWorkflowReady() {
   const ready = store((s) => s.ready);
+  const employeeId = store(s => s.employeeId);
+  useEffect(() => {
+    if (!ready || !publicMockMode || !employeeAccounts.some(account => account.id === employeeId)) return;
+    void connectMockOrderFlow().catch(() => { /* Saved local orders remain visible; mutations require reconnect. */ });
+    return () => stopMockOrderFlow();
+  }, [ready, employeeId]);
   useEffect(() => {
     void initializeWorkflow();
     const sync = (event: StorageEvent) => {
@@ -207,11 +228,25 @@ export function useWorkflowReady() {
   return ready;
 }
 export const employeeAuthMockService = {
-  async loginDemo(email: string, password: string) {
-    if (email.trim().toLowerCase() !== employeeDemo.email || password !== employeeDemo.password)
-      throw new Error("Email hoặc mật khẩu demo không đúng.");
+  async connectAccount(user: { id: string; name: string; email: string; role: string }) {
+    const response = await fetch("/api/auth/me", { cache: "no-store" });
+    const session = await response.json();
+    if (!response.ok || session.user?.role !== "employee" || session.user.id !== user.id) throw new Error("Phiên đăng nhập nhân viên không hợp lệ.");
     await initializeWorkflow();
-    await employeeAuthMockService.login(employeeDemo.id);
+    const s = store.getState();
+    const existing = s.employees.find(e => e.id === user.id);
+    if (!existing) {
+      const template = s.employees[0];
+      if (!template) throw new Error("Chưa thể tải không gian nhân viên.");
+      store.setState({ employees: [...s.employees, { ...template, id: user.id, name: user.name, completedOrders: 0, online: false, currentIp: "", lastIp: "", riotId: "", verified: false, clientOpen: false }] });
+    }
+    await employeeAuthMockService.login(existing?.id ?? user.id);
+  },
+  async loginDemo(email: string, password: string) {
+    const account = employeeAccounts.find(account => account.email === email.trim().toLowerCase() && account.password === password);
+    if (!account) throw new Error("Email hoặc mật khẩu không đúng.");
+    await initializeWorkflow();
+    await employeeAuthMockService.login(account.id);
     // Employee demo must not retain a previous admin identity in this tab.
     useAdminStore.setState({ user: null });
   },
@@ -274,6 +309,7 @@ export const employeeAuthMockService = {
     });
   },
   logout() {
+    stopMockOrderFlow();
     const id = store.getState().employeeSessionId;
     sessionStorage.removeItem("ascend-employee-identity");
     store.setState((s) => ({
@@ -304,6 +340,19 @@ export const orderMockService: EmployeeOrderService = {
     );
   },
   async claimOrder(id) {
+    if (publicMockMode && employeeAccounts.some(account => account.id === store.getState().employeeId)) {
+      const e = employee();
+      try {
+        const result = await mockOrderCommand("workflow:claim", { id });
+        store.setState(s => ({ activities: log(s, "Nhận đơn", `${e.name} phụ trách đơn; trò chuyện được mở.`, e.name, id, e.id) }));
+        return result.order!;
+      } catch (error) {
+        const code = error instanceof Error ? error.message : "connection";
+        const messages: Record<string, string> = { ORDER_ALREADY_CLAIMED: "Đơn hàng vừa được nhân viên khác nhận.", ORDER_LIMIT: "Bạn đã đạt giới hạn đơn hàng đang thực hiện.", FORBIDDEN: "Bạn chưa đủ điều kiện nhận đơn này." };
+        if (code in messages) throw new WorkflowError(code as "ORDER_ALREADY_CLAIMED" | "ORDER_LIMIT" | "FORBIDDEN", messages[code]);
+        throw new Error("Chưa kết nối được đơn hàng. Vui lòng thử lại.");
+      }
+    }
     // Web Locks serialize competing tabs. Re-read the shared state inside the lock.
     const claim = async () => {
       const identity = {
@@ -416,6 +465,7 @@ export const orderMockService: EmployeeOrderService = {
       throw new Error("Chỉ cập nhật đơn đang thực hiện của bạn.");
     if (!Number.isFinite(progress) || progress < o.progress || progress > 100)
       throw new Error("Tiến độ phải tăng và nằm trong khoảng 0–100%.");
+    if (publicMockMode && employeeAccounts.some(account => account.id === e.id)) await mockOrderCommand("workflow:update", { id, action: "progress", progress });
     patchOrder(
       id,
       { progress },
@@ -429,6 +479,7 @@ export const orderMockService: EmployeeOrderService = {
     const o = order(id);
     if (o.employeeId !== e.id || o.status !== "IN_PROGRESS")
       throw new Error("Chỉ hoàn tất đơn đang thực hiện của bạn.");
+    if (publicMockMode && employeeAccounts.some(account => account.id === e.id)) await mockOrderCommand("workflow:update", { id, action: "complete" });
     patchOrder(
       id,
       { status: "PENDING_REVIEW", progress: 100 },

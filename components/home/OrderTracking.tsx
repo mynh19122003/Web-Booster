@@ -1,4 +1,5 @@
 "use client";
+import { chatOrderLabel } from "@/lib/chat-presentation";
 import { UiText } from "@/components/ui/UiText";
 
 import { translateText } from "@/lib/i18n";
@@ -91,7 +92,7 @@ export function OrderTracking() {
             <span>
               <span className="status-dot" /> {activeRequest ? (translateText(language, "Order: {value0}", "Đơn hàng: {value0}", {value0: activeRequest.status})) : (complete ? t("orderComplete") : t("orderLive"))}
             </span>
-            <span className="demo-head-actions"><span className="demo-tag">{activeRequest ? `#${activeRequest.id}` : t("orderNumber", { id: "AS-5821" })}</span><button type="button" className="tracking-demo-toggle" onClick={() => setPaused((value) => !value)} aria-label={paused ? (translateText(language, "Resume demo", "Tiếp tục mô phỏng")) : (translateText(language, "Pause demo", "Tạm dừng mô phỏng"))} aria-pressed={paused}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? (translateText(language, "Resume", "Tiếp tục")) : (translateText(language, "Pause", "Tạm dừng"))}</button></span>
+            <span className="demo-head-actions"><span className="demo-tag">{activeRequest ? `#${chatOrderLabel(activeRequest.id)}` : t("orderNumber", { id: "AS-5821" })}</span><button type="button" className="tracking-demo-toggle" onClick={() => setPaused((value) => !value)} aria-label={paused ? (translateText(language, "Resume progress", "Tiếp tục")) : (translateText(language, "Pause progress", "Tạm dừng"))} aria-pressed={paused}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? (translateText(language, "Resume", "Tiếp tục")) : (translateText(language, "Pause", "Tạm dừng"))}</button></span>
           </div>
           {activeRequest && (
             <div className="p-3 my-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-zinc-300 flex items-center justify-between">

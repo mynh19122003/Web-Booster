@@ -18,8 +18,10 @@ import {
   X,
   UserRound,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 import { DashboardMenu } from "@/components/account/DashboardMenu";
+import { UserChatBadge } from "@/components/user/UserChatNotifications";
 import { CartIcon } from "@/components/account/Cart";
 import { StatusToggle } from "@/components/employee/StatusToggle";
 import { DashboardLanguage } from "@/components/account/DashboardLanguage";
@@ -282,6 +284,7 @@ export function Navbar() {
         {/* Action buttons */}
         <div className="flex h-9 items-center gap-2 sm:gap-4 justify-self-end shrink-0">
           {sessionLoaded && user?.role !== "employee" && <CartIcon />}
+          {user && user.role !== "employee" && <Link href="/messages" className="user-chat-nav" aria-label={translateText(languageCode, "Messages", "Tin nhắn")}><MessageCircle size={20} /><UserChatBadge /></Link>}
           <button
             ref={searchButtonRef}
             className={`w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all shrink-0 ${user?.role === "employee" ? "max-sm:hidden" : ""}`}
@@ -483,6 +486,7 @@ export function Navbar() {
                   onClick={async () => {
                     await publicRequest("/api/auth/logout", { method: "POST" });
                     setUser(null);
+                    window.dispatchEvent(new Event("ascend-profile-updated"));
                     setUserMenu(false);
                     router.replace("/");
                     router.refresh();

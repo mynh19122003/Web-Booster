@@ -37,6 +37,10 @@ function database() {
       UNIQUE(customer_id, submission_id)
     );
   `);
+  const messageColumns = db.prepare("PRAGMA table_info(support_messages)").all() as { name: string }[];
+  if (!messageColumns.some(column => column.name === "client_id")) db.exec("ALTER TABLE support_messages ADD COLUMN client_id TEXT");
+  db.exec("CREATE UNIQUE INDEX IF NOT EXISTS messages_client_id ON support_messages(request_id, sender_id, client_id) WHERE client_id IS NOT NULL");
+  db.exec("CREATE TABLE IF NOT EXISTS support_message_reads (user_id TEXT NOT NULL REFERENCES users(id), request_id TEXT NOT NULL REFERENCES customer_requests(id) ON DELETE CASCADE, last_rowid INTEGER NOT NULL, PRIMARY KEY(user_id, request_id))");
   return db;
 }
 
@@ -64,6 +68,25 @@ export function requestMessages(id: string) {
     m.sender_role AS senderRole, m.text, m.created_at AS createdAt
     FROM support_messages m JOIN users u ON u.id = m.sender_id
     WHERE m.request_id = ? ORDER BY m.created_at, m.rowid`).all(id) as SupportMessage[];
+}
+
+export function requestUnreadCounts(user: AuthUser) {
+  const rows = database().prepare(`SELECT m.request_id AS id, COUNT(*) AS count FROM support_messages m
+    JOIN customer_requests r ON r.id = m.request_id
+    LEFT JOIN support_message_reads seen ON seen.request_id = r.id AND seen.user_id = ?
+    WHERE ${user.role === "employee" ? "r.employee_id" : "r.customer_id"} = ? AND m.sender_id != ? AND m.rowid > COALESCE(seen.last_rowid, 0)
+    GROUP BY m.request_id`).all(user.id, user.id, user.id) as { id: string; count: number }[];
+  return { total: rows.reduce((total, row) => total + row.count, 0), byRequest: Object.fromEntries(rows.map(row => [row.id, row.count])) };
+}
+
+export function markRequestRead(user: AuthUser, id: string, messageId: string) {
+  const db = database();
+  const request = getRequest(user, id);
+  if (!request || (user.role === "employee" && request.employeeId !== user.id)) return "forbidden" as const;
+  const message = db.prepare("SELECT rowid AS position FROM support_messages WHERE request_id = ? AND id = ?").get(id, messageId) as { position: number } | undefined;
+  if (!message) return "invalid-request" as const;
+  db.prepare("INSERT INTO support_message_reads VALUES (?, ?, ?) ON CONFLICT(user_id,request_id) DO UPDATE SET last_rowid = MAX(last_rowid, excluded.last_rowid)").run(user.id, id, message.position);
+  return requestUnreadCounts(user);
 }
 
 export function createRequest(user: AuthUser, subject: string, game: string, text: string) {
@@ -112,7 +135,7 @@ export function employeeOrderDetails(user: AuthUser, id: string): OrderRequestDe
   return row ? decryptOrderDetails(id, row.encrypted) : null;
 }
 
-export function sendRequestMessage(user: AuthUser, id: string, text: string) {
+export function sendRequestMessage(user: AuthUser, id: string, text: string, clientId?: string) {
   const db = database();
   db.exec("BEGIN IMMEDIATE");
   try {
@@ -121,9 +144,12 @@ export function sendRequestMessage(user: AuthUser, id: string, text: string) {
     if (request.status === "resolved" || (user.role === "employee" && request.employeeId !== user.id)) {
       db.exec("ROLLBACK"); return "not-assigned" as const;
     }
+    if (clientId && db.prepare("SELECT id FROM support_messages WHERE request_id = ? AND sender_id = ? AND client_id = ?").get(id, user.id, clientId)) {
+      db.exec("COMMIT"); return "sent" as const;
+    }
     const now = Date.now();
-    db.prepare("INSERT INTO support_messages (id, request_id, sender_id, sender_role, text, created_at) VALUES (?, ?, ?, ?, ?, ?)")
-      .run(randomUUID(), id, user.id, user.role === "employee" ? "employee" : "customer", text, now);
+    db.prepare("INSERT INTO support_messages (id, request_id, sender_id, sender_role, text, created_at, client_id) VALUES (?, ?, ?, ?, ?, ?, ?)")
+      .run(randomUUID(), id, user.id, user.role === "employee" ? "employee" : "customer", text, now, clientId ?? null);
     db.prepare("UPDATE customer_requests SET updated_at = ? WHERE id = ?").run(now, id);
     db.exec("COMMIT");
     return "sent" as const;

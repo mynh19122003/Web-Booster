@@ -1,6 +1,6 @@
 "use client";
-import { SupportInbox } from "@/components/account/SupportInbox";
+import { MessengerChat } from "@/components/account/MessengerChat";
 
 export function UserBoosterChat({ compact = false, initialRequestId = "" }: { compact?: boolean; initialRequestId?: string }) {
-  return <SupportInbox direct compact={compact} initialRequestId={initialRequestId} />;
+  return <MessengerChat compact={compact} initialRequestId={initialRequestId} />;
 }

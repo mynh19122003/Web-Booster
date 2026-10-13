@@ -18,6 +18,15 @@ export const orderStatuses = [
   "REFUNDED",
 ] as const;
 export type OrderStatus = (typeof orderStatuses)[number];
+export type CoachingSession = {
+  coachId: string;
+  coachName: string;
+  quantity: number;
+  sessionFormat: "live" | "vod";
+  date?: string;
+  time?: string;
+  timeZone?: string;
+};
 export const statusLabels: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
   OPEN: "Chờ nhân viên nhận",
@@ -31,6 +40,8 @@ export const statusLabels: Record<OrderStatus, string> = {
   REFUNDED: "Đã hoàn tiền",
 };
 export interface Order extends Omit<PreviousOrder, "status"> {
+  paymentStatus?: "PAID";
+  coaching?: CoachingSession;
   status: OrderStatus;
   updatedAt: string;
   startedAt?: string;
@@ -56,6 +67,9 @@ export type AvailableOrder = Pick<
   | "options"
   | "createdAt"
   | "difficulty"
+  | "amount"
+  | "paymentStatus"
+  | "coaching"
 >;
 export interface Employee extends Omit<StaffCandidate, "maxActiveOrders"> {
   role: "EMPLOYEE";

@@ -20,6 +20,20 @@ npm run build
 npm start
 ```
 
+### Realtime chat
+
+`npm run dev` and `npm start` use `server.mjs`, which serves Next.js and Socket.IO on the same port. `/messages` uses a Messenger-style UI with conversation search, grouped bubbles, emoji selection and connection status. Start with `npm run dev -- --hostname 127.0.0.1 --port 3100` to use a different local port.
+
+The default `NEXT_PUBLIC_PUBLIC_DATA_SOURCE=mock` provides five fictional conversations, including Minh Anh ↔ Sofia. Shared preview messages are stored in `.data/chat-preview.sqlite` and delivered through Socket.IO without automatic replies. Employee chat at `/employee/chat` shows only assigned conversations. The demo employee signs in with `sofia@ascend.demo` / `Ascend@123`.
+
+For the two-port preview, user port 3101 and employee port 3102 both connect to Socket.IO on port 3101. Outside this local setup, set `NEXT_PUBLIC_CHAT_SOCKET_URL` for both frontends and `CHAT_ALLOWED_ORIGINS` on the socket server. In `api` mode, sessions use the existing cookie-backed request endpoints; employee membership is rechecked on joins and sends, and broadcasts target the current participants.
+
+Mock order flow reads saved browser data first. Empty public/workflow storage loads initial fixtures from `/api/mock/public` and `/api/mock/workflow`; these routes are disabled in API mode. Browser projections remain in `ascend-public-mock-v1` and `ascend-order-flow-v1`. Because the two ports have separate localStorage origins, Socket.IO coordinates their shared mock orders in `.data/chat-preview.sqlite` and updates each local projection. Checkout creates an unassigned `OPEN` order, and an eligible employee claims it atomically before chat is enabled. The order and conversation use the same ID and `employeeId`; progress and reconnects preserve that assignment. Account passwords and payment details are excluded from these projections.
+
+Mock employee sign-ins use `Ascend@123`: `sofia@ascend.demo`, `nova@ascend.demo`, `zen@ascend.demo`, `luna@ascend.demo`, and `zero@ascend.demo`. Luna is a coach, and the other accounts handle boosting according to their game eligibility and active-order limits. Zero can receive Valorant orders. `/employee/orders/[id]` uses the same Socket.IO transcript as `/employee/chat` and `/messages`.
+
+Chat requires a persistent Node server that supports WebSocket upgrades. For production, run `npm run build` followed by `npm start`, and set `CHAT_ORIGIN` to the public HTTPS origin when using a reverse proxy. The Vercel deployment instructions below cover the frontend only; Vercel serverless hosting does not run this custom Socket.IO server. Run `node --test tests/chat-socket.test.mjs tests/public-mock.test.mjs` to verify delivery, demo room isolation, reconnect history and session validation.
+
 ## Architecture
 
 - `app/`: server-rendered pages, metadata, robots, sitemap, and static route generation.

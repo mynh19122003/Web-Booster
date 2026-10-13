@@ -1,4 +1,4 @@
-import { EmployeeLogin } from "@/components/workflow/EmployeePages";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 export default function Page() {
-  return <EmployeeLogin />;
+  return <AuthPanel initialMode="login" googleConfigured={false} audience="employee" returnTo="/employee" />;
 }

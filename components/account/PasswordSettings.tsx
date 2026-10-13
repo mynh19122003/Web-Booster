@@ -19,6 +19,6 @@ export function PasswordSettings({ values, onChange, disabled }: { values: Passw
       ] as const).map(([key, label, autocomplete]) => <label key={key}><span>{label}{changing ? " *" : ""}</span><input type={visible ? "text" : "password"} autoComplete={autocomplete} required={changing} minLength={8} maxLength={128} aria-invalid={key === "confirmPassword" && mismatch} aria-describedby={key === "confirmPassword" && mismatch ? errorId : undefined} value={values[key]} onChange={event => onChange({ ...values, [key]: event.target.value })} /></label>)}
     </fieldset>
     {mismatch && <p id={errorId} className="profile-settings-notice" role="alert">{text("The new passwords do not match.", "Mật khẩu mới và xác nhận chưa khớp.")}</p>}
-    <small className="profile-password-hint">{publicMockMode ? text("Preview only. Passwords are not saved or changed.", "Bản xem thử. Mật khẩu không được lưu hoặc thay đổi.") : text("8–128 characters. Other devices will be signed out after you change your password.", "Từ 8–128 ký tự. Các thiết bị khác sẽ đăng xuất sau khi đổi mật khẩu.")}</small>
+    <small className="profile-password-hint">{publicMockMode ? text("Passwords are not saved or changed.", "Mật khẩu không được lưu hoặc thay đổi.") : text("8–128 characters. Other devices will be signed out after you change your password.", "Từ 8–128 ký tự. Các thiết bị khác sẽ đăng xuất sau khi đổi mật khẩu.")}</small>
   </section>;
 }

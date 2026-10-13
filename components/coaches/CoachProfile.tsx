@@ -22,18 +22,25 @@ import { CoachTopChampions } from "@/components/coaches/CoachTopChampions";
 import { DuoPackageGrid } from "@/components/coaches/DuoPackageGrid";
 import { CoachingSessionFormats } from "@/components/coaches/CoachingSessionFormats";
 import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
-import type { MatchHistory } from "@/lib/riot-types";
+import type { MatchHistory, RiotRank } from "@/lib/riot-types";
+import { playerRank, rankWinRate } from "@/lib/riot-display";
 import { CoachDataLoading } from "./CoachDataLoading";
 
-export function CoachProfile({ coach: initialCoach, canEdit = false, initialHistory = null }: { coach: Coach; canEdit?: boolean; initialHistory?: MatchHistory | null }) {
-  const [coach, setCoach] = useState(initialCoach);
+type EmployeeView = { specialization: string; games: string[]; completedOrders: number; riotId: string; riotRank?: RiotRank | null; avatarInitials?: string; showGameplay: boolean };
+export function CoachProfile({ coach: initialCoach, canEdit = false, initialHistory = null, employeeView }: { coach: Coach; canEdit?: boolean; initialHistory?: MatchHistory | null; employeeView?: EmployeeView }) {
+  const [profile, setCoach] = useState(initialCoach);
+  const coach = employeeView ? initialCoach : profile;
   const { language, t } = useLanguage();
   const money = useMoney();
   const modeIndicatorId = useId();
   const router = useRouter();
   const [online, setOnline] = useState(coach.online);
-  const [profileLoading, setProfileLoading] = useState(true);
+  const displayOnline = employeeView ? coach.online : online;
+  const riotRank = employeeView?.riotRank ?? (coach.riotProfile ? playerRank(coach.riotProfile.history, coach.game === "teamfight-tactics") : null);
+  const displayedRank = !employeeView && riotRank && !["MASTER", "GRANDMASTER", "CHALLENGER"].includes(riotRank.tier) ? `${coach.peakRank} ${riotRank.division}` : coach.peakRank;
+  const [profileLoading, setProfileLoading] = useState(!employeeView);
   useEffect(() => {
+    if (employeeView) return;
     const abort = new AbortController();
     let pending = false;
     async function refresh() {
@@ -58,7 +65,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => { unsubscribe(); abort.abort(); clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
-  }, [coach.slug, router]);
+  }, [coach.slug, router, employeeView]);
   const savedBooking = useStore(state => state.coachBooking);
   const previous = savedBooking?.coachId === coach.slug ? savedBooking : null;
   const [selectedFormat, setSelectedFormat] = useState<"live" | "vod">(previous?.sessionFormat ?? coach.sessionFormats[0]);
@@ -84,6 +91,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
   }
 
   function bookSession() {
+    if (employeeView) return;
     const packageName = mode === "duo" ? `${selectedOffer.startRank} → ${selectedOffer.targetRank} Duo` : `${quantity}h Coaching Session`;
     set({
       game: coach.game,
@@ -123,23 +131,22 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
     <div className="coach-profile-page">
       <div className="container">
         {profileLoading && <CoachDataLoading label={translateText(language, "Loading coach profile…", "Đang tải hồ sơ coach…")} />}
-        <Link className="coach-back-link" href={"/coaches?game=" + coach.game}><ArrowLeft size={16} />{t("coachBackToList")}</Link>
-        <p className="coach-demo-note">{translateText(language, "Profile details, availability, coaching statistics and reviews use demo data. Match history comes from the linked Riot account.", "Hồ sơ, lịch rảnh, thống kê coaching và đánh giá là dữ liệu mẫu. Lịch sử trận đấu lấy từ tài khoản Riot đã liên kết.")}</p>
+        <Link className="coach-back-link" href={employeeView ? "/employee" : "/coaches?game=" + coach.game}><ArrowLeft size={16} />{employeeView ? translateText(language, "Employee workspace", "Khu vực nhân viên") : t("coachBackToList")}</Link>
         <section className="coach-profile-hero" style={{ "--coach-accent": coach.accent } as React.CSSProperties}>
           <div className="coach-profile-identity">
             <div className="coach-profile-avatar-wrap">
-              <Image className="coach-profile-avatar" src={coach.avatar || ("/images/coaches/" + coach.slug + ".svg")} alt={coach.name} width={132} height={132} unoptimized={Boolean(coach.avatar?.startsWith("data:"))} />
-              <span className={"coach-profile-online-dot " + (online ? "is-online" : "")} />
+              {employeeView?.avatarInitials ? <span className="coach-profile-avatar employee-profile-initials">{employeeView.avatarInitials}</span> : <Image className="coach-profile-avatar" src={coach.avatar || ("/images/coaches/" + coach.slug + ".svg")} alt={coach.name} width={132} height={132} unoptimized={Boolean(coach.avatar?.startsWith("data:"))} />}
+              <span className={"coach-profile-online-dot " + (displayOnline ? "is-online" : "")} />
             </div>
             <div className="coach-profile-intro">
               <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                <span className="coach-verified"><ShieldCheck size={14} />{t("verifiedCoach")}</span>
+                <span className="coach-verified"><ShieldCheck size={14} />{employeeView ? employeeView.specialization : t("verifiedCoach")}</span>
                 {coach.isMvp && <span className="coach-mvp-badge">{t("mvpCoach")}</span>}
               </div>
               <h1>{coach.name}</h1>
               <p className="coach-profile-game"><Image src={coachGameLogoPath(coach.game)} alt="" width={23} height={23} />{coach.gameName}<span>· {coach.server}</span></p>
               <div className="coach-profile-rank-rating">
-                <div className="coach-profile-peak"><Image src={coachRankCardIconPath(coach.game, coach.peakRank)} alt="" width={48} height={48} /><span>{t("coachPeakRank")}<strong>{coach.peakRank}</strong></span></div>
+                <div className="coach-profile-peak">{(employeeView && !riotRank) || coach.peakRank === "—" || coach.peakRank === "Unranked" ? <Trophy size={48} /> : <Image src={coachRankCardIconPath(coach.game, riotRank?.tier ?? coach.peakRank)} alt="" width={48} height={48} />}<span>{employeeView || coach.riotProfile ? translateText(language, "Current rank", "Rank hiện tại") : t("coachPeakRank")}<strong>{displayedRank}</strong></span></div>
                 <span className="coach-profile-divider" />
                 <div className="coach-profile-rating"><Star size={17} fill="currentColor" /><strong>{coach.rating.toFixed(2)}</strong><span>({coach.reviewCount} {t("coachReviews")})</span></div>
               </div>
@@ -147,16 +154,16 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             </div>
           </div>
           <div className="coach-profile-hero-side">
-            <div className={"coach-profile-presence " + (online ? "is-online" : "is-offline")}><i className={online ? "is-online" : ""} />{online ? t("coachOnline") : t("coachOffline")}</div>
-            {canEdit && <Link className="coach-profile-edit-link" href={`/employee/coaches/${coach.slug}/edit`}><Pencil size={15} />{translateText(language, "Edit profile", "Chỉnh sửa hồ sơ")}</Link>}
-            <a className="coach-profile-hero-cta" href="#coach-booking">{t("coachLearnFrom")} <ArrowUpRight size={16} /></a>
+            <div className={"coach-profile-presence " + (displayOnline ? "is-online" : "is-offline")}><i className={displayOnline ? "is-online" : ""} />{displayOnline ? t("coachOnline") : t("coachOffline")}</div>
+            {canEdit && !employeeView && <Link className="coach-profile-edit-link" href={`/employee/coaches/${coach.slug}/edit`}><Pencil size={15} />{translateText(language, "Edit profile", "Chỉnh sửa hồ sơ")}</Link>}
+            {!employeeView && <a className="coach-profile-hero-cta" href="#coach-booking">{t("coachLearnFrom")} <ArrowUpRight size={16} /></a>}
           </div>
-          <div className="coach-profile-hero-copy"><strong>{t("coachBuyWithCoach")}</strong></div>
+          <div className="coach-profile-hero-copy"><strong>{employeeView ? employeeView.games.join(" · ") : t("coachBuyWithCoach")}</strong></div>
         </section>
 
         <div className="coach-profile-layout">
           <div className="coach-profile-main">
-            <section className="coach-profile-panel coach-offers-panel">
+            {!employeeView && <section className="coach-profile-panel coach-offers-panel">
               <div className="coach-profile-section-heading"><div><p className="eyebrow">{t("coachDuoPackages")}</p><h2>{t("coachBuyWithCoach")}</h2></div><span>{coach.gameName}</span></div>
               <div className="coach-offer-mode" role="tablist" aria-label={t("coachDuoPackages")}>
                 <button type="button" role="tab" aria-selected={mode === "duo"} className={mode === "duo" ? "is-active" : ""} onClick={() => setMode("duo")}>{mode === "duo" && <ActiveIndicator id={modeIndicatorId} />}<Swords size={16} /><span>{t("coachPlayTogether")}</span></button>
@@ -172,20 +179,25 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
                   <CoachingSessionFormats formats={coach.sessionFormats} value={sessionFormat} onChange={setSelectedFormat} />
                 </div>
               )}
-            </section>
+            </section>}
 
-            {coach.game === "league-of-legends" && <CoachTopChampions key={coach.slug} slug={coach.slug} />}
-            <CoachGameplay key={coach.slug} coach={coach} initialHistory={initialHistory} />
-            <section className="coach-profile-panel coach-profile-stats coach-profile-stats-four">
+            {(!employeeView || employeeView.showGameplay) && <>{!employeeView && !coach.riotProfile && coach.game === "league-of-legends" && <CoachTopChampions key={coach.slug} slug={coach.slug} />}<CoachGameplay key={`${coach.slug}:${coach.riotProfile?.history.updatedAt}`} coach={coach} initialHistory={coach.riotProfile?.history ?? initialHistory} managed={Boolean(employeeView || coach.riotProfile)} /></>}
+            {employeeView || coach.riotProfile ? <section className="coach-profile-panel coach-profile-stats coach-profile-stats-four">
+              <div><strong>{riotRank?.leaguePoints ?? "—"}</strong><small>LP</small></div>
+              <div><strong>{riotRank?.wins ?? "—"}</strong><small>{translateText(language, "Ranked wins", "Thắng xếp hạng")}</small></div>
+              <div><strong>{riotRank?.losses ?? "—"}</strong><small>{translateText(language, "Ranked losses", "Thua xếp hạng")}</small></div>
+              <div><strong>{riotRank ? `${rankWinRate(riotRank)}%` : "—"}</strong><small>{translateText(language, "Win rate", "Tỷ lệ thắng")}</small></div>
+            </section> : <section className="coach-profile-panel coach-profile-stats coach-profile-stats-four">
               <div><span className="coach-stat-icon"><Check size={18} /></span><strong>{metrics.completedOrders.toLocaleString()}</strong><small>{t("coachCompletedOrders")}</small></div>
               <div><span className="coach-stat-icon"><Star size={18} /></span><strong>{Math.round(reputation[0].width)}%</strong><small>{translateText(language, "Five-star reviews", "Đánh giá 5 sao")}</small></div>
               <div><span className="coach-stat-icon"><Swords size={18} /></span><strong>{metrics.gamesWon.toLocaleString()}</strong><small>{t("coachGamesWon")}</small></div>
               <div><span className="coach-stat-icon"><Clock3 size={18} /></span><strong>{metrics.since}</strong><small>{t("coachMemberSince")}</small></div>
-            </section>
+            </section>}
 
             <section className="coach-profile-panel coach-profile-about">
               <div className="coach-profile-section-title"><GraduationCap size={18} /><h2>{t("aboutCoach")}</h2></div>
               <p>{coach.bioOverride || t(coach.bioKey)}</p>
+              {employeeView && <p>Riot ID: {employeeView.riotId || "—"}</p>}
               <CoachAttributes coach={coach} />
             </section>
 
@@ -197,18 +209,18 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
               </div>
             </section>
 
-            <section className="coach-profile-panel">
+            {!employeeView && !coach.riotProfile && <section className="coach-profile-panel">
               <div className="coach-profile-section-title"><Trophy size={18} /><div><h2>{t("coachRankHistory")}</h2><small>{t("coachCompetitiveProgress")}</small></div></div>
               <div className="coach-rank-history">{rankHistory.map((step) => <div className="coach-rank-history-item" key={step.rank}><Image src={coachRankCardIconPath(coach.game, step.rank)} alt="" width={44} height={44} /><div><strong>{step.rank}</strong><span><i style={{ width: step.winRate + "%" }} /></span><small>{step.wins}W · {step.losses}L</small></div><small>{step.winRate}%</small></div>)}</div>
-            </section>
+            </section>}
 
             <section className="coach-profile-panel">
               <div className="coach-profile-section-title"><Users size={18} /><div><h2>{t("coachClientFeedback")}</h2><small>{t("coachRatingsFromVerified")}</small></div></div>
-              <div className="coach-feedback-grid">{feedback.map((review) => <article className="coach-feedback-card" key={review.initials}><span className="coach-feedback-stars">★★★★★</span><p>“{translateText(language,review.en,review.vi)}”</p><div><span>{review.initials}</span><div><strong>{review.name}</strong><small>{translateText(language, "Demo review", "Đánh giá mẫu")}</small></div><Check size={14} /></div></article>)}</div>
+              <div className="coach-feedback-grid">{feedback.map((review) => <article className="coach-feedback-card" key={review.initials}><span className="coach-feedback-stars">★★★★★</span><p>“{translateText(language,review.en,review.vi)}”</p><div><span>{review.initials}</span><div><strong>{review.name}</strong><small>{translateText(language, "Review", "Đánh giá")}</small></div><Check size={14} /></div></article>)}</div>
             </section>
           </div>
 
-          <aside className="coach-booking-panel" id="coach-booking">
+          {!employeeView && <aside className="coach-booking-panel" id="coach-booking">
             <div className="coach-booking-heading"><div><p className="eyebrow">{t("coachSelectedPackage")}</p><strong>{mode === "duo" ? `${t("coachPlayTogether")} · ${selectedOffer.startRank}` : t("coachCoachingOptions")}</strong></div><span className="coach-booking-mark"><Clock3 size={20} /></span></div>
             <p className="coach-booking-description">{mode === "duo" ? `${selectedOffer.startRank} → ${selectedOffer.targetRank}` : coach.gameName + " · " + coach.roles.join(" · ")}</p>
             <strong className="coach-booking-rate">{money.format(unitPrice)} <small>/ {mode === "duo" ? t("coachNumberGames").toLowerCase() : t("coachHourlyRate")}</small></strong>
@@ -220,7 +232,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             {discount > 0 && <div className="coach-discount-summary"><span>{money.format(subtotal)}</span><strong>−{Math.round(discountRate * 100)}% · {money.format(discount)}</strong></div>}
             <div className="coach-estimate"><span>{t("coachOrderTotal")}</span><strong>{money.format(total)}</strong></div>
             <button type="button" className="button coach-book-button" onClick={bookSession}>{mode === "duo" ? t("coachBookDuo") : t("coachBookCoach")} <ArrowUpRight size={16} /></button>
-          </aside>
+          </aside>}
         </div>
       </div>
     </div>

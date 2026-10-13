@@ -66,11 +66,11 @@ export function WalletCheckout() {
         ? serviceCopyFor(language, boostService.slug as ServiceSlug).name
         : "";
   const needsQuote = boost && searchParams.get("quote") === "true";
-  const fulfillmentOrder = boost && !searchParams.get("account") && !needsQuote;
+  const fulfillmentOrder = (boost || coaching) && !searchParams.get("account") && !needsQuote;
   const needsRiotAccount =
     fulfillmentOrder &&
     requiresRiotCredentials(
-      boostService?.slug ?? "",
+      coaching ? "coaching" : boostService?.slug ?? "",
       searchParams.get("queue") ?? "",
     );
   const [riotAccount, setRiotAccount] = useState<RiotAccountDetails>({
@@ -255,10 +255,10 @@ export function WalletCheckout() {
           };
         const order: OrderRequestInput = {
           submissionId: submission.current.id,
-          service: boostService!.slug,
+          service: coaching ? "coaching" : boostService!.slug,
           currentRank: searchParams.get("from") ?? "",
           targetRank: searchParams.get("to") ?? "",
-          region: searchParams.get("region") ?? "",
+          region: searchParams.get("region") ?? (coaching ? coach!.server : ""),
           queue: searchParams.get("queue") ?? "",
           role: searchParams.get("role") ?? "",
           championPool: searchParams.get("champions") ?? "",
@@ -266,13 +266,18 @@ export function WalletCheckout() {
             boostGame?.slug === "league-of-legends"
               ? flashSlot
               : "no-preference",
-          customerNotes,
+          customerNotes: customerNotes || (coaching && booking?.coachId === coach!.slug ? booking.goals ?? "" : ""),
+          ...(coaching ? { coaching: {
+            coachId: coach!.slug, coachName: coach!.name, quantity,
+            sessionFormat: searchParams.get("format") === "vod" ? "vod" as const : "live" as const,
+            ...(booking?.coachId === coach!.slug ? { date: booking.date, time: booking.time, timeZone: booking.timeZone } : {}),
+          } } : {}),
           riotAccount: needsRiotAccount ? riotAccount : null,
         };
         const response = await publicRequest("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ game: boostGame!.slug, order }),
+          body: JSON.stringify({ game: coaching ? coach!.game : boostGame!.slug, amount, order }),
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error ?? "connection");
@@ -385,8 +390,8 @@ export function WalletCheckout() {
           <small>
             {translateText(
               language,
-              "MOCK PAYMENT COMPLETE",
-              "THANH TOÁN MÔ PHỎNG HOÀN TẤT",
+              "REQUEST COMPLETE",
+              "YÊU CẦU HOÀN TẤT",
             )}
           </small>
           <h2>
@@ -454,7 +459,7 @@ export function WalletCheckout() {
           </div>
           <div className="wallet-success-actions">
           {requestId && <Link href={`/messages?request=${encodeURIComponent(requestId)}`}>
-            {translateText(language, "Chat with your booster", "Chat với booster của bạn")}
+            {coaching ? translateText(language, "Chat with your coach", "Chat với coach của bạn") : translateText(language, "Chat with your booster", "Chat với booster của bạn")}
           </Link>}
             <Link href="/cart">
               {translateText(language, "View cart", "Xem giỏ hàng")}
@@ -505,8 +510,8 @@ export function WalletCheckout() {
             <Check size={15} />{" "}
             {translateText(
               language,
-              "Checkout preview · No real payment will be taken",
-              "Bản xem trước thanh toán · Không thu tiền thật",
+              "No payment will be taken",
+              "Không thu tiền",
             )}
           </div>
           <section className="wallet-checkout-card">
@@ -725,7 +730,7 @@ export function WalletCheckout() {
                       "Tùy chọn đơn hàng",
                     )}
                   </legend>
-                  {boostGame?.slug === "league-of-legends" && (
+                  {!coaching && boostGame?.slug === "league-of-legends" && (
                     <label>
                       <span>
                         {translateText(language, "Flash slot", "Phím Tốc biến")}
@@ -982,8 +987,8 @@ export function WalletCheckout() {
               <small>
                 {translateText(
                   language,
-                  "Coach and availability use demo data; this is not a confirmed booking.",
-                  "Coach và lịch học dùng dữ liệu mẫu; chưa xác nhận đặt lịch.",
+                  "Your session is awaiting confirmation.",
+                  "Buổi học đang chờ xác nhận.",
                 )}
               </small>
             </div>

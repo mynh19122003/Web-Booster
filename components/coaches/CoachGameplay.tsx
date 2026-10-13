@@ -10,12 +10,13 @@ import type { MatchHistory } from "@/lib/riot-types";
 import { RiotProfileHistory } from "@/components/coaches/RiotProfileHistory";
 import { CoachDataLoading } from "./CoachDataLoading";
 
-export function CoachGameplay({ coach, initialHistory = null }: { coach: Coach; initialHistory?: MatchHistory | null }) {
+export function CoachGameplay({ coach, initialHistory = null, managed = false }: { coach: Coach; initialHistory?: MatchHistory | null; managed?: boolean }) {
   const { language } = useLanguage();
   const text = (en: string, vi: string) => translateText(language, en, vi);
   const [history, setHistory] = useState<MatchHistory | null>(initialHistory);
   const [loading, setLoading] = useState(!initialHistory);
   useEffect(() => {
+    if (managed) return;
     const abort = new AbortController();
     let pending = false;
     function refresh() {
@@ -39,7 +40,7 @@ export function CoachGameplay({ coach, initialHistory = null }: { coach: Coach; 
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => { abort.abort(); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
-  }, [coach.slug]);
+  }, [coach.slug, managed]);
 
   return <div className="riot-profile-workspace">
     <div className="riot-workspace-heading">

@@ -5,6 +5,7 @@ import { mockMessages } from "./messages";
 import type { WorkflowState } from "@/lib/workflow/store";
 import type { OrderStatus, Order } from "@/types/workflow";
 import { employeeDemo } from "@/lib/workflow/demo";
+import chatPreview from "./chat-preview.json";
 
 const statuses: Record<string, OrderStatus> = {
   PENDING: "PENDING_PAYMENT",
@@ -80,6 +81,19 @@ export function workflowFixtures(): Omit<
     startedAt: undefined,
   });
   const disputed = orders.find((o) => o.status === "DISPUTED")!;
+  orders.push({
+    ...structuredClone(orders.find(o => o.id === "ASC-1047")!),
+    id: "ASC-COACH-1056",
+    customer: { id: chatPreview.customer.id, name: chatPreview.customer.name, email: chatPreview.customer.email, country: "VN", timezone: "Asia/Ho_Chi_Minh" },
+    game: "League of Legends", service: "Coaching", region: "EUW",
+    currentRank: "Gold IV", targetRank: "Cải thiện kỹ năng",
+    status: "OPEN", paymentStatus: "PAID", amount: 24, reward: 120000,
+    employeeId: undefined, startedAt: undefined, progress: 0,
+    createdAt: ago(5), updatedAt: ago(5), estimatedDuration: "1 giờ", refundedAmount: 0,
+    options: ["Coach Luna", "Live session", "1 giờ"],
+    instructions: "Phân tích replay và cải thiện kỹ năng đi đường Mid.",
+    coaching: { coachId: "luna", coachName: "Luna", quantity: 1, sessionFormat: "live" },
+  });
   disputed.complaintStatus = "OPEN";
   return {
     orders,

@@ -1,9 +1,9 @@
-import { WorkflowChat } from "@/components/workflow/WorkflowChat";
+import { EmployeeSocketChat } from "@/components/employee/EmployeeSocketChat";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ conversation?: string }>;
+  searchParams: Promise<{ request?: string }>;
 }) {
-  const { conversation } = await searchParams;
-  return <WorkflowChat mode="employee" initialConversation={conversation} />;
+  const { request } = await searchParams;
+  return <EmployeeSocketChat initialRequestId={request} />;
 }

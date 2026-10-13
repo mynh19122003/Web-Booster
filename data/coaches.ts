@@ -19,6 +19,7 @@ export type Coach = {
   accent: string;
   bioOverride?: string;
   avatar?: string;
+  riotProfile?: import("@/lib/coach-riot-profile").CoachRiotProfile;
 };
 
 export const coaches: Coach[] = [

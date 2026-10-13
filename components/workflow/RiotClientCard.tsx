@@ -121,7 +121,7 @@ export function RiotClientCard({ order }: { order: AvailableOrder }) {
         <p>Mở Riot Client để bắt đầu xử lý đơn hàng.</p>
         <Facts
           items={[
-            ["Riot ID mock", employee?.riotId ?? "MockPlayer#VN2"],
+            ["Riot ID", employee?.riotId ?? "MockPlayer#VN2"],
             ["Region", order.region],
             ["Game", order.game],
             ["Quyền thao tác", ready ? "Ready" : "Locked"],
@@ -130,7 +130,7 @@ export function RiotClientCard({ order }: { order: AvailableOrder }) {
           ]}
         />
         <small>
-          Riot ID là tên hiển thị mock, không phải thông tin đăng nhập. Ready
+          Riot ID là tên hiển thị, không phải thông tin đăng nhập. Ready
           chỉ thể hiện điều kiện của đơn.
         </small>
         {!ready && (

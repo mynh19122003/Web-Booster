@@ -6,7 +6,6 @@ import { ArrowRight, Gamepad2 } from "lucide-react";
 import { useWorkflow } from "@/lib/workflow/store";
 import {
   orderService,
-  employeeAuthService,
   isActive,
   employeeActiveOrders as workload,
   WorkflowError,
@@ -30,74 +29,9 @@ import {
   date,
 } from "./Shared";
 import type { AvailableOrder } from "@/types/workflow";
-import { WorkflowChat } from "./WorkflowChat";
+import { EmployeeSocketChat } from "@/components/employee/EmployeeSocketChat";
 import { RiotClientCard } from "./RiotClientCard";
-import { employeeDemo } from "@/lib/workflow/demo";
 
-export function EmployeeLogin() {
-  const employees = useWorkflow((s) => s.employees);
-  const router = useRouter();
-  const [id, setId] = useState<string>(employeeDemo.id);
-  const [error, setError] = useState("");
-  return (
-    <div className="wf-login">
-      <Panel title="Chào mừng trở lại">
-        <span className="ap-eyebrow">ASCEND · NHÂN VIÊN</span>
-        <h1>Không gian làm việc của bạn.</h1>
-        <p>Chọn tài khoản nhân viên để tiếp tục.</p>
-        <form
-          onSubmit={async (event) => {
-            event.preventDefault();
-            try {
-              if (id === employeeDemo.id) await employeeAuthService.loginDemo(employeeDemo.email, employeeDemo.password);
-              else await employeeAuthService.login(id);
-              router.push("/employee");
-            } catch (e) {
-              setError((e as Error).message);
-            }
-          }}
-        >
-          <Field label="Tài khoản">
-            <select value={id} onChange={(e) => setId(e.target.value)}>
-              {employees.map((e) => (
-                <option
-                  key={e.id}
-                  value={e.id}
-                  disabled={e.status !== "ACTIVE"}
-                >
-                  {e.name} ·{" "}
-                  {e.type === "COACH"
-                    ? "Huấn luyện viên"
-                    : "Chuyên viên nâng hạng"}
-                </option>
-              ))}
-            </select>
-          </Field>
-          {error && (
-            <p className="ap-error" role="alert">
-              {error}
-            </p>
-          )}
-          <button className="ap-button primary full">
-            Đăng nhập <ArrowRight size={16} />
-          </button>
-        </form>
-        <Link href="/admin/login">Trang quản trị ↗</Link>
-        {process.env.NODE_ENV === "development" && (
-          <button
-            className="ap-button"
-            onClick={async () => {
-              await employeeAuthService.prepareRiotFixture();
-              setId("emp-riot-poc");
-            }}
-          >
-            Chuẩn bị nhân viên Riot PoC (Development)
-          </button>
-        )}
-      </Panel>
-    </div>
-  );
-}
 export function EmployeeDashboard() {
   const s = useWorkflow();
   const e = s.employees.find((e) => e.id === s.employeeId)!;
@@ -301,12 +235,16 @@ export function EmployeeOrders({
                   : "Nâng hạng"}
             </p>
             <div className="wf-rank">
-              {o.currentRank}
-              <ArrowRight size={20} />
-              <strong>{o.targetRank}</strong>
+              {o.coaching ? <><span>{o.coaching.coachName || "Coaching"}</span><strong>{o.coaching.quantity} giờ</strong></> : <>{o.currentRank}<ArrowRight size={20} /><strong>{o.targetRank}</strong></>}
             </div>
             <Facts
               items={[
+                ...(o.service === "Coaching" ? [
+                  ["Thanh toán", o.paymentStatus === "PAID" ? "Đã thanh toán" : "—"],
+                  ["Số tiền", new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(o.amount)],
+                  ["Coach đã chọn", o.coaching?.coachName || "—"],
+                  ["Hình thức", o.coaching?.sessionFormat === "vod" ? "VOD review" : "Live session"],
+                ] as [string, string][] : []),
                 ["Khu vực", o.region],
                 ["Thời gian dự kiến", o.estimatedDuration],
                 ["Hoa hồng", money(o.reward)],
@@ -378,7 +316,7 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
       <PageHeader
         eyebrow="CHI TIẾT ĐƠN HÀNG"
         title={`#${id}`}
-        description={`${projected.game} · ${projected.currentRank} → ${projected.targetRank}`}
+        description={projected.coaching ? `${projected.game} · ${projected.coaching.coachName} · ${projected.coaching.quantity} giờ` : `${projected.game} · ${projected.currentRank} → ${projected.targetRank}`}
       >
         <Badge status={projected.status} />
       </PageHeader>
@@ -388,6 +326,13 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
             <Facts
               items={[
                 ["Dịch vụ", projected.service],
+                ...(projected.service === "Coaching" ? [
+                  ["Thanh toán", projected.paymentStatus === "PAID" ? "Đã thanh toán" : "—"],
+                  ["Số tiền", new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(projected.amount)],
+                  ["Coach đã chọn", projected.coaching?.coachName || "—"],
+                  ["Hình thức", projected.coaching?.sessionFormat === "vod" ? "VOD review" : "Live session"],
+                  ["Lịch học", projected.coaching?.date ? `${projected.coaching.date} ${projected.coaching.time ?? ""} ${projected.coaching.timeZone ?? ""}`.trim() : "Chưa chốt lịch"],
+                ] as [string, string][] : []),
                 ["Khu vực", projected.region],
                 ["Dự kiến", projected.estimatedDuration],
                 ["Hoa hồng", money(projected.reward)],
@@ -426,7 +371,7 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
                   {conversation && (
                     <Link
                       className="ap-button"
-                      href={`/employee/chat?conversation=${conversation.id}`}
+                      href={`/employee/chat?request=${encodeURIComponent(id)}`}
                     >
                       Mở trò chuyện ↗
                     </Link>
@@ -467,10 +412,7 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
           )}
           {conversation && (
             <Panel title="Trao đổi với khách hàng">
-              <WorkflowChat
-                mode="employee"
-                fixedConversation={conversation.id}
-              />
+              <EmployeeSocketChat key={id} compact initialRequestId={id} />
             </Panel>
           )}
         </div>

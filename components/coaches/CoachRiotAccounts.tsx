@@ -216,7 +216,7 @@ export function CoachRiotAccounts({ selectedSlug, editMode = false }: { selected
             : translateText(language, "Loading…", "Đang tải…")}
         </p>
       )}
-      {coaches && <p className="coach-workspace-scope">{scope === "demo" ? translateText(language, "Demo workspace · Manage sample coach profiles", "Không gian demo · Quản lý các hồ sơ coach mẫu") : scope === "admin" ? translateText(language, "Administrator · Manage and assign coach profiles", "Quản trị viên · Quản lý và gán hồ sơ coach") : translateText(language, "My coach profile · Only you can edit your profile", "Hồ sơ coach của tôi · Bạn quản lý hồ sơ riêng của mình")}</p>}
+      {coaches && <p className="coach-workspace-scope">{scope === "demo" ? translateText(language, "Coach workspace · Manage coach profiles", "Không gian coach · Quản lý hồ sơ coach") : scope === "admin" ? translateText(language, "Administrator · Manage and assign coach profiles", "Quản trị viên · Quản lý và gán hồ sơ coach") : translateText(language, "My coach profile · Only you can edit your profile", "Hồ sơ coach của tôi · Bạn quản lý hồ sơ riêng của mình")}</p>}
       {scope === "admin" && !editMode && <CoachAssignment key={revision} onAssigned={() => setRevision(r => r + 1)} />}
       {coaches?.length === 0 && scope === "own" && !editMode && <CoachWorkspaceSetup name={name} onCreated={() => setRevision(r => r + 1)} />}
       {coaches?.filter(coach => !selectedSlug || coach.slug === selectedSlug).map(coach => <Connection key={coach.slug} coach={coach} scope={scope} editMode={editMode} />)}

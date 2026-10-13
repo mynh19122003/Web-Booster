@@ -6,8 +6,8 @@ type PageCopy = { eyebrow: string; title: string; description: string };
 const english = {
   about: { eyebrow: "ABOUT ASCEND", title: "A concept for your next level", description: "An independent gaming-services concept exploring a clearer way to plan a competitive climb." },
   careers: { eyebrow: "CAREERS AT ASCEND", title: "Bring your best game", description: "We welcome skilled players and thoughtful coaches. Tell us who you are and where you excel." },
-  support: { eyebrow: "WE’RE IN YOUR CORNER", title: "A little guidance", description: "Start with our answers below, or draft a question using the demonstration form." },
-  contact: { eyebrow: "CONTACT", title: "We’re here to help", description: "Support-channel information for the current ASCEND preview." },
+  support: { eyebrow: "WE’RE IN YOUR CORNER", title: "A little guidance", description: "Start with our answers below, or draft a question using the form." },
+  contact: { eyebrow: "CONTACT", title: "We’re here to help", description: "Support-channel information for ASCEND." },
   boosters: { eyebrow: "THE ASCEND ROSTER", title: "Talent meets ambition", description: "Meet our concept roster. These original profiles illustrate the future player selection experience." },
   reviews: { eyebrow: "COMMUNITY FIRST", title: "The player perspective", description: "Fictional stories that show the kind of thoughtful experience we aim to build. These are not verified customer reviews." },
   services: { eyebrow: "FIND YOUR NEXT STEP", title: "Gaming services", description: "Choose your game and the support that fits your next goal." },
@@ -20,9 +20,9 @@ const translations: Partial<Record<LanguageCode, Partial<Record<PageCopyKey, Pag
   vi: {
     about: { eyebrow: "VỀ ASCEND", title: "Ý tưởng cho cấp độ tiếp theo", description: "Mô hình dịch vụ trò chơi độc lập hướng đến cách lập kế hoạch leo hạng rõ ràng hơn." },
     careers: { eyebrow: "TUYỂN DỤNG TẠI ASCEND", title: "Thể hiện khả năng của bạn", description: "Chúng tôi chào đón người chơi giỏi và huấn luyện viên tận tâm. Hãy giới thiệu bản thân và thế mạnh của bạn." },
-    support: { eyebrow: "LUÔN ĐỒNG HÀNH CÙNG BẠN", title: "Hướng dẫn dành cho bạn", description: "Xem câu trả lời bên dưới hoặc soạn câu hỏi bằng biểu mẫu minh họa." },
-    contact: { eyebrow: "LIÊN HỆ", title: "Chúng tôi sẵn sàng hỗ trợ", description: "Thông tin kênh hỗ trợ cho bản xem trước ASCEND hiện tại." },
-    boosters: { eyebrow: "ĐỘI NGŨ ASCEND", title: "Tài năng gặp tham vọng", description: "Gặp đội ngũ mẫu của chúng tôi. Các hồ sơ minh họa trải nghiệm lựa chọn người chơi trong tương lai." },
+    support: { eyebrow: "LUÔN ĐỒNG HÀNH CÙNG BẠN", title: "Hướng dẫn dành cho bạn", description: "Xem câu trả lời bên dưới hoặc soạn câu hỏi bằng biểu mẫu." },
+    contact: { eyebrow: "LIÊN HỆ", title: "Chúng tôi sẵn sàng hỗ trợ", description: "Thông tin kênh hỗ trợ của ASCEND." },
+    boosters: { eyebrow: "ĐỘI NGŨ ASCEND", title: "Tài năng gặp tham vọng", description: "Tìm hiểu đội ngũ booster và chọn người chơi phù hợp với mục tiêu của bạn." },
     reviews: { eyebrow: "CỘNG ĐỒNG LÀ TRÊN HẾT", title: "Góc nhìn người chơi", description: "Những câu chuyện hư cấu minh họa trải nghiệm chúng tôi hướng đến. Đây không phải đánh giá đã xác minh." },
     services: { eyebrow: "TÌM BƯỚC TIẾP THEO", title: "Dịch vụ trò chơi", description: "Chọn trò chơi và hình thức hỗ trợ phù hợp với mục tiêu tiếp theo của bạn." },
     blog: { eyebrow: "GÓC NHÌN / CẨM NANG", title: "Chơi có mục tiêu", description: "Những ý tưởng nhỏ cho hành trình tốt hơn. Bài viết về tập trung, luyện tập và phối hợp đội nhóm." },

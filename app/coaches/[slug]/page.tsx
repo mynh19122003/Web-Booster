@@ -9,7 +9,7 @@ import { canManageCoach } from "@/lib/coach-ownership";
 import { publicMockMode } from "@/lib/public-data-source";
 import { mockCoaches } from "@/mocks/public";
 
-const findCoach = (slug: string) => publicMockMode ? mockCoaches.find(coach => coach.slug === slug) : getCoachWithOverride(slug);
+const findCoach = (slug: string) => getCoachWithOverride(slug);
 
 export const dynamic = "force-dynamic";
 

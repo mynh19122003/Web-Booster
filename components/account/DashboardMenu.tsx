@@ -6,6 +6,7 @@ import { useState } from "react";
 import { MessagesSquare, Bell, Users, Rocket, ChevronRight, ArrowLeft, Bookmark } from "lucide-react";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { useStore } from "@/store/useStore";
+import { UserChatBadge } from "@/components/user/UserChatNotifications";
 
 export function DashboardMenu({ close, employee = false }: { email: string; close: () => void; employee?: boolean }) {
   const { language } = useLanguage();
@@ -28,7 +29,7 @@ export function DashboardMenu({ close, employee = false }: { email: string; clos
       {employee && <Link href="/employee" className="dashboard-menu-row" onClick={close}><MessagesSquare size={20} /><span>{translateText(language, "Employee workspace", "Khu vực nhân viên")}</span><ChevronRight size={16} /></Link>}
       {items.map(({ id, label, icon: Icon }) => id === "coaches" ?
         <Link key={id} href="/coaches" className="dashboard-menu-row" onClick={close}><Icon size={20} /><span>{label}</span><ChevronRight size={16} /></Link> : id === "messages" ?
-        <Link key={id} href="/messages" className="dashboard-menu-row" onClick={close}><Icon size={20} /><span>{label}</span><ChevronRight size={16} /></Link> :
+        <Link key={id} href="/messages" className="dashboard-menu-row" onClick={close}><Icon size={20} /><span>{label}</span><UserChatBadge /><ChevronRight size={16} /></Link> :
         <button key={id} type="button" className="dashboard-menu-row" aria-expanded={section === id} aria-controls="dashboard-section" onClick={() => setSection(section === id ? null : id)}><Icon size={20} /><span>{label}</span><ChevronRight size={16} /></button>)}
     </nav>
     {current && <section id="dashboard-section" className="dashboard-section" aria-label={current.label}>

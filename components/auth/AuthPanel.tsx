@@ -12,6 +12,9 @@ import { useLanguage } from "@/components/ui/LanguageProvider";
 import type { MessageKey } from "@/lib/i18n";
 import { translateText } from "@/lib/i18n";
 import { loginDestination } from "@/lib/auth-redirect";
+import { employeeAuthService } from "@/services/workflow-adapter";
+import employeeAccounts from "@/mocks/employee-accounts.json";
+import { publicMockMode } from "@/lib/public-data-source";
 
 type Mode = "login" | "register";
 
@@ -44,13 +47,19 @@ export function AuthPanel({ initialMode, googleConfigured, error, returnTo = "/"
       return;
     }
     try {
-      const response = await publicRequest(`/api/auth/${mode}`, {
+      const demoEmployee = publicMockMode && employeeAccounts.some(account => account.email === String(payload.email).trim().toLowerCase());
+      const response = await (employee && !demoEmployee ? fetch : publicRequest)(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload, next: returnTo }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || t("unableSignIn"));
+      if (employee && result.user?.role !== "employee") throw new Error(copy("This account does not have employee access.", "Tài khoản này chưa được cấp quyền nhân viên."));
+      if (result.user?.role === "employee") {
+        if (publicMockMode && employeeAccounts.some(account => account.id === result.user.id)) await employeeAuthService.loginDemo(String(payload.email), String(payload.password));
+        else await employeeAuthService.connectAccount(result.user);
+      }
       router.replace(result.redirectTo || loginDestination(result.user?.role, returnTo));
       router.refresh();
     } catch (caught) {

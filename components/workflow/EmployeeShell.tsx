@@ -18,9 +18,11 @@ import {
   ShieldCheck,
   UserRound,
   Bell,
+  GraduationCap,
 } from "lucide-react";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { useWorkflow } from "@/lib/workflow/store";
+import { useEmployeeChatNotifications } from "@/components/employee/useEmployeeChatNotifications";
 import {
   useWorkflowReady,
   employeeAuthService,
@@ -34,6 +36,7 @@ const nav = [
   ["/employee/orders/active", "Đơn đang thực hiện", "ĐƠN HÀNG", Package],
   ["/employee/orders/history", "Lịch sử đơn", "ĐƠN HÀNG", Package],
   ["/employee/chat", "Tin nhắn", "LIÊN LẠC", MessageSquare],
+  ["/employee/professional-profile", "Hồ sơ chuyên môn", "BOOSTER / COACH", GraduationCap],
   ["/employee/profile", "Hồ sơ", "TÀI KHOẢN", UserRound],
   ["/employee/security", "Bảo mật", "TÀI KHOẢN", ShieldCheck],
 ] as const;
@@ -51,9 +54,16 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
     s.sessions.some(
       (x) => x.id === s.employeeSessionId && x.status === "ACTIVE",
     );
+  const unreadChats = useEmployeeChatNotifications(e?.id, Boolean(ready && valid && path !== "/employee/login"));
   useEffect(() => {
-    if (ready && !valid && path !== "/employee/login")
-      router.replace("/employee/login");
+    if (!ready || valid || path === "/employee/login") return;
+    let active = true;
+    void fetch("/api/auth/me", { cache: "no-store" }).then(response => response.json()).then(async data => {
+      if (!active) return;
+      if (data.user?.role === "employee") await employeeAuthService.connectAccount(data.user);
+      else router.replace("/employee/login");
+    }).catch(() => { if (active) router.replace("/employee/login"); });
+    return () => { active = false; };
   }, [ready, valid, path, router]);
   useEffect(() => {
     if (notice) {
@@ -99,6 +109,7 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
                 >
                   <Icon size={18} />
                   <span>{label}</span>
+                  {href === "/employee/chat" && unreadChats > 0 && <b key={unreadChats} className="employee-chat-unread" role="status" aria-label={`${unreadChats} tin nhắn chưa đọc`}>{unreadChats > 99 ? "99+" : unreadChats}</b>}
                 </Link>
               </div>
             ))}
@@ -159,7 +170,8 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
               <button
                 className="ap-icon-button"
                 aria-label="Đăng xuất"
-                onClick={() => {
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
                   employeeAuthService.logout();
                   router.push("/employee/login");
                 }}

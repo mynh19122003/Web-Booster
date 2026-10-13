@@ -12,6 +12,7 @@ export async function GET(_request: Request, context: Context) {
   const { id } = await context.params;
   const request = getRequest(user, id);
   if (!request) return authError("not-found", 404);
+  if (user.role === "employee" && request.employeeId !== user.id) return authError("forbidden", 403);
   let orderDetails;
   try { if (user.role === "employee") orderDetails = employeeOrderDetails(user, id); }
   catch { return authError("credentials-unavailable", 503); }
@@ -23,11 +24,12 @@ export async function POST(request: Request, context: Context) {
   const user = await currentUser();
   if (!user) return authError("unauthorized", 401);
   const { id } = await context.params;
-  let body: { text?: unknown };
+  let body: { text?: unknown; clientId?: unknown };
   try { body = await request.json(); } catch { return authError("invalid-request", 400); }
   const text = typeof body?.text === "string" ? body.text.trim() : "";
   if (!text || text.length > 2000) return authError("invalid-request", 400);
-  const result = sendRequestMessage(user, id, text);
+  if (body.clientId !== undefined && (typeof body.clientId !== "string" || !/^[a-f0-9-]{36}$/.test(body.clientId))) return authError("invalid-request", 400);
+  const result = sendRequestMessage(user, id, text, body.clientId as string | undefined);
   if (result === "not-found") return authError("not-found", 404);
   if (result !== "sent") return authError("not-assigned", 409);
   return NextResponse.json({ messages: requestMessages(id) }, { status: 201 });

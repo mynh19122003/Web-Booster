@@ -4,6 +4,7 @@ import "./globals.css";
 import "./glass.css";
 import "./layout-alignment.css";
 import "./support-chat.css";
+import "./messenger-chat.css";
 import "./riot-matches.css";
 import "./employee-riot.css";
 import "./order-workspace.css";

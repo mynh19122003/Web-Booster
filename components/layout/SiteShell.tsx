@@ -12,6 +12,7 @@ import { LanguageProvider } from "@/components/ui/LanguageProvider";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { Suspense } from "react";
 import { ChatLauncher } from "@/components/account/BoosterChat";
+import { UserChatNotifications } from "@/components/user/UserChatNotifications";
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const isAuthRoute = path === "/login" || path.startsWith("/login/") || path === "/register" || path.startsWith("/register/");
@@ -21,6 +22,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   if (isAdminRoute || isEmployeeRoute) return <main id="main">{children}</main>;
   return (
     <LanguageProvider>
+      <UserChatNotifications>
       <div data-public-site="" style={{ minHeight: "100vh" }}>
         <SkipLink />
         <CurrencyProvider />
@@ -35,6 +37,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <Suspense fallback={null}><Dialogs /></Suspense>
         </>}
       </div>
+      </UserChatNotifications>
     </LanguageProvider>
   );
 }
