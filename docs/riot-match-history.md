@@ -1,5 +1,7 @@
 # Coach match history
 
+> Historical implementation note: SQLite references below describe the former backend. Riot links and history snapshots now use in-memory mock state and reset on server restart.
+
 The server reads `RIOT_API_KEY` from `.env` or `.env.local` locally or your hosting provider's secret environment variables in production. Never prefix it with `NEXT_PUBLIC_` or commit the key. Restart the server after changing it. `.env.local` is ignored by Git.
 
 An API key does not identify a coach. Sign in as an employee, open `/employee/coaches`, and enter each coach's own Riot ID (`Name#Tag`) and platform. The server verifies Account V1 and the game's Summoner endpoint before saving the PUUID to SQLite. These are staff-managed links, not proof of Riot account ownership. Only publish a coach's account with their consent.

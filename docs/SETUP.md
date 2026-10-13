@@ -14,11 +14,10 @@ Run `npm install` then `npm run dev` with Node.js 22 or newer.
   deletion confirmation and JSON export.
 
 Applications and service requests use browser localStorage and remain local to
-the submitting browser. Account registration and password login use SQLite in
-`.data/auth.sqlite` (Node.js 22.5+); the database path can be changed with
-`AUTH_DATABASE_PATH`. Passwords are scrypt-hashed and sessions are stored as
-token hashes with HTTP-only cookies. This local setup is not a substitute for
-production operations/security review, backups, or a managed database. Admin is
+the submitting browser. Account registration and password login use server-side
+mock data that resets when the server restarts. Passwords are scrypt-hashed and
+sessions are stored as token hashes in memory with HTTP-only cookies. This preview
+setup is not suitable for production accounts or durable orders. Admin is
 not protected by account authentication, and email delivery/payment integration
 is not connected.
 

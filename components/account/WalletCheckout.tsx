@@ -18,6 +18,7 @@ import {
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { useMoney } from "@/components/ui/Currency";
 import type { Coach } from "@/data/coaches";
+import { subscribeCoachProfileUpdates } from "@/lib/coach-profile-events";
 import { coachOffers, coachPricing } from "@/data/coach-profile";
 import { useStore } from "@/store/useStore";
 import { useCart } from "@/store/useCart";
@@ -110,19 +111,23 @@ export function WalletCheckout() {
   useEffect(() => {
     if (!coaching) return;
     const abort = new AbortController();
-    publicRequest(`/api/coaches/${encodeURIComponent(coachId)}`, {
-      signal: abort.signal,
-      cache: "no-store",
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (!abort.signal.aborted)
-          setCoachData({ slug: coachId, coach: data?.coach ?? null });
-      })
-      .catch(() => {
+    let pending = false;
+    async function refresh() {
+      if (document.hidden || pending) return;
+      pending = true;
+      try {
+        const response = await publicRequest(`/api/coaches/${encodeURIComponent(coachId)}`, { signal: abort.signal, cache: "no-store" });
+        const data = response.ok ? await response.json() : null;
+        if (!abort.signal.aborted) setCoachData({ slug: coachId, coach: data?.coach ?? null });
+      } catch {
         if (!abort.signal.aborted) setCoachData({ slug: coachId, coach: null });
-      });
-    return () => abort.abort();
+      } finally { pending = false; }
+    }
+    void refresh();
+    const timer = setInterval(refresh, 15000);
+    const unsubscribe = subscribeCoachProfileUpdates(() => { void refresh(); });
+    window.addEventListener("focus", refresh);
+    return () => { abort.abort(); clearInterval(timer); unsubscribe(); window.removeEventListener("focus", refresh); };
   }, [coaching, coachId]);
   const booking = useStore((state) => state.coachBooking);
   const completePayment = useOrders((state) => state.completePayment);
@@ -243,6 +248,22 @@ export function WalletCheckout() {
       setPaymentResult("error");
       return;
     }
+    if (coaching) {
+      try {
+        const response = await publicRequest(`/api/coaches/${encodeURIComponent(coachId)}`, { cache: "no-store" });
+        const latest = response.ok ? (await response.json()).coach as Coach | undefined : undefined;
+        if (!latest?.online) {
+          setCoachData({ slug: coachId, coach: latest ?? null });
+          setCheckoutError("coach-offline");
+          setPaymentResult("error");
+          return;
+        }
+      } catch {
+        setCheckoutError("connection");
+        setPaymentResult("error");
+        return;
+      }
+    }
     submitting.current = true;
     setPaymentBusy(true);
     let orderNumber: string | undefined;
@@ -256,10 +277,10 @@ export function WalletCheckout() {
         const order: OrderRequestInput = {
           submissionId: submission.current.id,
           service: coaching ? "coaching" : boostService!.slug,
-          currentRank: searchParams.get("from") ?? "",
-          targetRank: searchParams.get("to") ?? "",
+          currentRank: coaching ? coach!.peakRank : searchParams.get("from") ?? "",
+          targetRank: coaching ? "Coaching session" : searchParams.get("to") ?? "",
           region: searchParams.get("region") ?? (coaching ? coach!.server : ""),
-          queue: searchParams.get("queue") ?? "",
+          queue: coaching ? "Coaching" : searchParams.get("queue") ?? "",
           role: searchParams.get("role") ?? "",
           championPool: searchParams.get("champions") ?? "",
           flashSlot:
@@ -343,6 +364,12 @@ export function WalletCheckout() {
         </Link>
       </div>
     );
+  if (coaching && coach && !coach.online && paymentResult !== "success")
+    return <div className="wallet-checkout-page" role="status">
+      <h1>{translateText(language, "Coach is offline", "Coach đang offline")}</h1>
+      <p>{translateText(language, "Booking is unavailable until this coach comes back online.", "Bạn chưa thể đặt lịch cho đến khi coach online trở lại.")}</p>
+      <Link className="button" href={`/coaches/${encodeURIComponent(coach.slug)}`}>{translateText(language, "View coach profile", "Xem hồ sơ coach")}</Link>
+    </div>;
   if (
     boost &&
     (!boostGame ||
@@ -1048,7 +1075,7 @@ export function WalletCheckout() {
               type="submit"
               form="checkout-contact-form"
               className="wallet-pay-now"
-              disabled={paymentBusy || !checkoutValid}
+              disabled={paymentBusy || !checkoutValid || (coaching && !coach?.online)}
               aria-busy={paymentBusy}
             >
               <LockKeyhole size={16} />{" "}
@@ -1068,7 +1095,9 @@ export function WalletCheckout() {
           )}
           {paymentResult === "error" && (
             <p role="alert" className="wallet-payment-notice">
-              {checkoutError === "unauthorized"
+              {checkoutError === "coach-offline"
+                ? translateText(language, "This coach is offline. Booking is unavailable.", "Coach đang offline nên bạn chưa thể đặt lịch.")
+                : checkoutError === "unauthorized"
                 ? translateText(
                     language,
                     "Please sign in before submitting your order.",

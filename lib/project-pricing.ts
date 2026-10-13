@@ -1,6 +1,7 @@
 import snapshot from "@/data/pricing/project-prices.json";
 import { rankPriceFactor } from "@/lib/rank-pricing";
 import { calculateDuoPrice, type DuoPriceResult, type DuoQueueType } from "@/lib/pricing/duo-pricing-matrix";
+import { calculateValorantDuoPrice } from "@/lib/pricing/valorant-duo-pricing";
 export const projectPackages = snapshot.packages;
 export const smurfPackages = snapshot.smurfs;
 export const roundUsd = (value: number) =>
@@ -44,10 +45,13 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
   );
   const missing = { price: 0, quoteRequired: true, minHours: 0, maxHours: 0 };
   if (!Number.isInteger(quantity) || quantity < 1) return missing;
-  if (game === "league-of-legends" && product === "games") {
+  const quantityLimit: Record<string, number> = { wins: 20, "ranked-wins": 20, placements: 5, normals: 30, unrated: 30, arena: 20, clash: 5, challenges: 10 };
+  if (quantityLimit[product] && quantity > quantityLimit[product]) return missing;
+  if (["league-of-legends", "valorant"].includes(game) && product === "games") {
     if (queue !== "Duo") return missing;
     try {
-      const duoPricing = calculateDuoPrice({ rank, server: region, gameCount: quantity,
+      const calculate = game === "valorant" ? calculateValorantDuoPrice : calculateDuoPrice;
+      const duoPricing = calculate({ rank, server: region, gameCount: quantity,
         currency: "USD", queueType: input.duoQueueType ?? "ranked" });
       return { price: duoPricing.finalPrice, quoteRequired: false, minHours: 0, maxHours: 0, duoPricing };
     } catch (error) {
@@ -57,7 +61,7 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
   }
   const ranked = ["wins", "ranked-wins", "placements"].includes(product);
   if (
-    ranked &&
+    ranked && !(game === "teamfight-tactics" && product === "placements" && queue === "Double Up") &&
     queue !==
       (game === "league-of-legends"
         ? "Solo"
@@ -66,9 +70,8 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
           : "Ranked")
   )
     return missing;
-  if (product === "ranked-wins" && winType !== "top4") return missing;
-  // Only configurations actually quoted in the workbook receive an automatic price.
-  // Different quantities/champions/modes stay in the request-a-quote flow.
+  if (product === "ranked-wins" && !["top4", "first"].includes(winType)) return missing;
+  // Preserve exact workbook quotes before applying the project's per-unit pricing.
   const p = matches.find((p) => {
     if (ranked) {
       const division =
@@ -120,17 +123,50 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
     if (product === "normals")
       return p.quantity === quantity && queue === "Normal Draft";
     if (product === "unrated")
-      return p.quantity === quantity && queue === "Unrated";
+      return p.quantity === quantity && ["Unrated", "Swiftplay"].includes(queue);
     if (product === "arena") return p.quantity === quantity;
     return false;
   });
-  if (!p) return missing;
-  const [min, max] = p.completionTime.split("-").map(Number),
-    days = p.completionTimeUnit === "days" ? 24 : 1;
+  let selected = p;
+  let scale = 1;
+  if (!selected) {
+    if (ranked) {
+      // Rank rows define the unit/package rate for the entire tier, including every division.
+      selected = matches.find(row => row.kind === "Theo rank" && row.currentTier === tierFor(rank));
+      if (product === "wins" && detail && Number.parseInt(detail) !== (game === "valorant" ? 22 : 19)) return missing;
+      if (product === "placements" && quantity > 5) return missing;
+      if (selected?.quantity) scale = quantity / selected.quantity;
+      else return missing;
+    } else if (["normals", "unrated", "arena", "clash"].includes(product)) {
+      if ((product === "normals" && queue !== "Normal Draft") || (product === "unrated" && !["Unrated", "Swiftplay"].includes(queue))) return missing;
+      selected = matches.find(row => product !== "clash" || row.currentTier === clashTier);
+      if (!selected?.quantity) return missing;
+      scale = quantity / selected.quantity;
+      if (product === "clash") {
+        if (!Number.isInteger(clashBoosters) || clashBoosters < 1 || clashBoosters > 5 || !selected.boosterCount) return missing;
+        scale *= clashBoosters / selected.boosterCount;
+      }
+    } else if (game === "valorant" && product === "challenges" && detail.trim().toLowerCase() === "daily") {
+      selected = matches.find(row => row.currentTier === "Daily");
+      if (!selected?.quantity) return missing;
+      scale = quantity / selected.quantity;
+    } else if (["battle-pass", "set-pass"].includes(product)) {
+      if (!Number.isInteger(start) || !Number.isInteger(goal) || start < 0 || goal <= start || goal > 100) return missing;
+      selected = matches.find(row => typeof row.currentLevel === "number" && typeof row.desiredLevel === "number" && row.desiredLevel > row.currentLevel);
+      if (!selected || selected.currentLevel === null || selected.desiredLevel === null) return missing;
+      // Commercial project policy: prorate the workbook's package by purchased levels.
+      scale = (goal - start) / (selected.desiredLevel - selected.currentLevel);
+    } else return missing;
+  }
+  if (!selected || !Number.isFinite(scale) || scale <= 0) return missing;
+  // TFT Strict Wins: verified +35% on the source calculator, applied to project base prices.
+  const packagePrice = selected.naUsd * scale * (product === "ranked-wins" && winType === "first" ? 1.35 : 1);
+  const [min, max] = selected.completionTime.split("-").map(Number),
+    days = selected.completionTimeUnit === "days" ? 24 : 1;
   return {
-    price: serverPrice(p.naUsd, region),
+    price: serverPrice(packagePrice, region),
     quoteRequired: false,
-    minHours: min * days,
-    maxHours: max * days,
+    minHours: Math.max(1, Math.ceil(min * days * scale)),
+    maxHours: Math.max(1, Math.ceil(max * days * scale)),
   };
 }

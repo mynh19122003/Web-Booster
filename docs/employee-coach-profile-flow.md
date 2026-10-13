@@ -1,5 +1,7 @@
 # Employee — Luồng cập nhật Coach Profile
 
+> Ghi chú lịch sử: các mục SQLite bên dưới mô tả backend cũ. Bản preview hiện dùng mock state trong bộ nhớ và reset khi khởi động lại server; xem README.
+
 > Luồng hiện tại, quyền sở hữu tài khoản và trạng thái nhận coaching được mô tả tại [coach-account-ownership.md](./coach-account-ownership.md). Nội dung bên dưới là bản thiết kế ban đầu.
 
 **Ngày:** 10/10/2026  

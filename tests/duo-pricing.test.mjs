@@ -117,3 +117,89 @@ test("apex LP prices split exactly across 500 and 1000 with the same server fact
     }
   }
 });
+
+test("category prices update with quantity and server using the project's existing package rates", () => {
+  const base = { queue: "Solo", rank: "Silver IV" };
+  assert.equal(category({ ...base, product: "wins", quantity: 5 }).price, 14.95);
+  assert.equal(category({ ...base, product: "wins", quantity: 5, region: "KR" }).price, 17.94);
+  assert.equal(category({ ...base, product: "wins", quantity: 5, region: "EUW" }).price, 12.71);
+  assert.equal(category({ ...base, product: "placements", rank: "Unranked", quantity: 2 }).price, 7.2);
+  assert.equal(category({ ...base, product: "placements", rank: "Unranked", quantity: 2, region: "KR" }).price, 8.64);
+  assert.equal(category({ product: "arena", queue: "Arena", quantity: 1 }).price, 3.33);
+  assert.equal(category({ product: "arena", queue: "Arena", quantity: 5 }).price, 16.65);
+  assert.equal(category({ product: "clash", queue: "Clash", quantity: 2, clashTier: "Tier III", clashBoosters: 2 }).price, 26.5);
+  assert.equal(category({ product: "clash", queue: "Clash", quantity: 4, clashTier: "Tier III", clashBoosters: 3 }).price, 79.49);
+  assert.equal(category({ product: "battle-pass", queue: "Solo", start: 0, goal: 100, region: "KR" }).price, 179.88);
+  assert.equal(category({ product: "battle-pass", queue: "Solo", start: 20, goal: 25 }).price, 7.5);
+});
+
+test("all supported match quantities have finite quotes and invalid progression never becomes free", () => {
+  for (const product of ["wins", "placements", "arena", "clash"]) {
+    for (const region of ["NA", "KR", "EUW", "VN"]) {
+      const max = product === "placements" || product === "clash" ? 5 : 20;
+      for (let quantity = 1; quantity <= max; quantity++) {
+        const result = category({ product, region, queue: product === "arena" ? "Arena" : product === "clash" ? "Clash" : "Solo", rank: product === "placements" ? "Unranked" : "Silver IV", quantity, clashTier: "Tier III", clashBoosters: 2 });
+        assert.equal(result.quoteRequired, false, `${product}/${region}/${quantity}`);
+        assert.ok(Number.isFinite(result.price) && result.price > 0);
+      }
+    }
+  }
+  for (const [start, goal] of [[10,10],[20,10],[-1,10],[0,101],[NaN,10]]) assert.equal(category({product:"battle-pass",start,goal}).quoteRequired,true);
+  assert.equal(category({product:"placements",queue:"Solo",quantity:6}).quoteRequired,true);
+});
+
+test("Valorant and TFT quantities, divisions, regions and pass levels use their own project rates", () => {
+  assert.equal(category({game:"valorant",product:"wins",queue:"Competitive",rank:"Silver 2",quantity:3,region:"NA"}).price,8.97);
+  assert.equal(category({game:"valorant",product:"placements",queue:"Competitive",rank:"Unranked",quantity:2,region:"KR"}).price,7.68);
+  assert.equal(category({game:"valorant",product:"unrated",queue:"Unrated",quantity:10,region:"EU"}).price,37.38);
+  assert.equal(category({game:"valorant",product:"challenges",queue:"Competitive",detail:"Daily",quantity:2,region:"NA"}).price,10);
+  assert.equal(category({game:"valorant",product:"battle-pass",start:10,goal:20,region:"NA"}).price,78.99);
+  assert.equal(category({game:"teamfight-tactics",product:"set-pass",start:10,goal:30,region:"VN"}).price,54.38);
+  for (const [game, product, queue, max] of [["valorant","wins","Competitive",20],["valorant","placements","Competitive",5],["valorant","unrated","Unrated",30],["teamfight-tactics","ranked-wins","Ranked",20],["teamfight-tactics","placements","Ranked",5]]) {
+    for (const region of ["NA","KR","EU","VN"]) for (let quantity=1; quantity<=max; quantity++) {
+      const result=category({game,product,queue,quantity,region,rank:game==="valorant"?"Silver 3":"Silver II"});
+      assert.equal(result.quoteRequired,false,`${game}/${product}/${quantity}/${region}`);
+      assert.ok(result.price>0 && Number.isFinite(result.price));
+    }
+  }
+});
+
+test("TFT first-place surcharge updates totals and unsupported Valorant duo ranks do not use LoL rates", () => {
+  const base={game:"teamfight-tactics",product:"ranked-wins",queue:"Ranked",rank:"Silver II",quantity:5,region:"NA"};
+  assert.equal(category(base).price,19.95);
+  assert.equal(category({...base,winType:"first"}).price,26.93);
+  assert.equal(category({...base,winType:"first",region:"KR"}).price,32.32);
+  assert.equal(category({game:"valorant",product:"games",queue:"Duo",rank:"Radiant"}).quoteRequired,true);
+  assert.equal(category({game:"valorant",product:"challenges",detail:"unknown",quantity:2}).quoteRequired,true);
+});
+
+test("new Valorant duo source rates follow project quantity discounts, server and currency policies", () => {
+  const val=load("lib/pricing/valorant-duo-pricing.ts").calculateValorantDuoPrice;
+  const input={rank:"Silver 2",server:"NA",gameCount:5,currency:"USD",queueType:"ranked"};
+  assert.equal(val(input).basePricePerGame,5.99);
+  assert.equal(val(input).finalPrice,26.95);
+  assert.equal(val({...input,rank:"Diamond 3",gameCount:1}).finalPrice,8.99);
+  assert.equal(val({...input,rank:"Ascendant 1",queueType:"high_elo",gameCount:1}).finalPrice,10.99);
+  assert.equal(val({...input,rank:"Immortal 2",queueType:"high_elo",gameCount:1}).finalPrice,12.99);
+  assert.equal(val({...input,queueType:"normal",rank:"Normal",gameCount:1}).finalPrice,2.99);
+  const euro=val({...input,currency:"EUR",usdPerEur:1.1});
+  assert.equal(euro.finalPrice,24.5);
+  assert.equal(Number((euro.totalRawPrice-euro.discountAmount).toFixed(2)),euro.finalPrice);
+  for(const rank of ["Iron 1","Silver 3","Diamond 2","Ascendant 3","Immortal 1"]) for(const region of ["NA","KR","EU","AP"]) for(const quantity of [1,3,5,10,20]) {
+    const result=category({game:"valorant",rank,product:"games",queue:"Duo",region,quantity});
+    assert.equal(result.quoteRequired,false);
+    assert.ok(result.price>0);
+  }
+  assert.throws(()=>val({...input,rank:"Silver IV"}),RangeError);
+});
+
+test("Swiftplay uses the user-approved Unrated rate and TFT Double Up placements retain project rank rates", () => {
+  for(const region of ["NA","KR","EU","AP"]) for(let quantity=1;quantity<=30;quantity++) {
+    const input={game:"valorant",product:"unrated",region,quantity};
+    assert.deepEqual(category({...input,queue:"Swiftplay"}),category({...input,queue:"Unrated"}));
+  }
+  for(const rank of ["Unranked","Silver II","Gold I","Diamond IV","Master"]) for(let quantity=1;quantity<=5;quantity++) {
+    const input={game:"teamfight-tactics",product:"placements",rank,quantity,region:"NA"};
+    assert.deepEqual(category({...input,queue:"Double Up"}),category({...input,queue:"Ranked"}));
+  }
+});

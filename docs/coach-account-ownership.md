@@ -1,5 +1,7 @@
 # Coach accounts and availability
 
+> Historical implementation note: SQLite and CLI instructions below describe the former backend. The current preview uses in-memory mock state and resets on server restart; see the README.
+
 Employees enter `/employee/coaches` from their workspace. Each ordinary employee can create one private coach draft, edit their own information, connect their own Riot account, and publish/unpublish the profile. New profiles start offline with no reviews or MVP badge. Public profiles appear in `/coaches` and game coaching directories.
 
 The Online/Offline switch means **accepting coaching sessions**, not browser connection presence. It saves immediately, disables while pending, and retains the last confirmed value on failure. Public directories and profiles refresh every 15 seconds while visible, and immediately on focus/visibility changes. Turning a draft online does not publish it.

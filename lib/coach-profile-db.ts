@@ -1,4 +1,4 @@
-import { authDatabase } from "@/lib/auth-db";
+import { mockState } from "@/lib/mock-state";
 import type { Coach } from "@/data/coaches";
 import { coachBase, coachPublished, publicCoachBases } from "@/lib/coach-ownership";
 import { applyCoachRiotProfile } from "@/lib/coach-riot-profile";
@@ -51,26 +51,6 @@ export type CoachProfileInput = {
   roles?: string[] | null;
 };
 
-function database() {
-  const db = authDatabase();
-  db.exec(`CREATE TABLE IF NOT EXISTS coach_profiles (
-    slug TEXT PRIMARY KEY,
-    online INTEGER,
-    hourly_rate REAL,
-    is_mvp INTEGER,
-    bio_override TEXT,
-    session_live INTEGER,
-    session_vod INTEGER,
-    avatar TEXT,
-    rating REAL,
-    review_count INTEGER,
-    languages TEXT,
-    roles TEXT,
-    updated_at INTEGER NOT NULL
-  )`);
-  return db;
-}
-
 function toOverride(row: CoachProfileRow): CoachProfileOverride {
   let languages: string[] | null = null;
   let roles: string[] | null = null;
@@ -98,12 +78,12 @@ function toOverride(row: CoachProfileRow): CoachProfileOverride {
 }
 
 export function coachProfileOverride(slug: string): CoachProfileOverride | null {
-  const row = database().prepare("SELECT * FROM coach_profiles WHERE slug = ?").get(slug) as CoachProfileRow | undefined;
+  const row = mockState.coachProfiles.get(slug) as CoachProfileRow | undefined;
   return row ? toOverride(row) : null;
 }
 
 export function allCoachProfileOverrides(): Record<string, CoachProfileOverride> {
-  const rows = database().prepare("SELECT * FROM coach_profiles").all() as CoachProfileRow[];
+  const rows = [...mockState.coachProfiles.values()] as CoachProfileRow[];
   const map: Record<string, CoachProfileOverride> = {};
   for (const row of rows) {
     map[row.slug] = toOverride(row);
@@ -126,34 +106,15 @@ export function saveCoachProfile(slug: string, input: CoachProfileInput): CoachP
   const roles = input.roles !== undefined ? (input.roles ? JSON.stringify(input.roles) : null) : (existing?.roles ? JSON.stringify(existing.roles) : null);
   const updatedAt = Date.now();
 
-  database().prepare(`
-    INSERT INTO coach_profiles (
-      slug, online, hourly_rate, is_mvp, bio_override, session_live, session_vod,
-      avatar, rating, review_count, languages, roles, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(slug) DO UPDATE SET
-      online = excluded.online,
-      hourly_rate = excluded.hourly_rate,
-      is_mvp = excluded.is_mvp,
-      bio_override = excluded.bio_override,
-      session_live = excluded.session_live,
-      session_vod = excluded.session_vod,
-      avatar = excluded.avatar,
-      rating = excluded.rating,
-      review_count = excluded.review_count,
-      languages = excluded.languages,
-      roles = excluded.roles,
-      updated_at = excluded.updated_at
-  `).run(
-    slug, online, hourlyRate, isMvp, bioOverride, sessionLive, sessionVod,
-    avatar, rating, reviewCount, languages, roles, updatedAt
-  );
+  mockState.coachProfiles.set(slug, { slug, online, hourly_rate: hourlyRate, is_mvp: isMvp,
+    bio_override: bioOverride, session_live: sessionLive, session_vod: sessionVod,
+    avatar, rating, review_count: reviewCount, languages, roles, updated_at: updatedAt } satisfies CoachProfileRow);
 
   return coachProfileOverride(slug)!;
 }
 
 export function resetCoachProfile(slug: string): void {
-  database().prepare("DELETE FROM coach_profiles WHERE slug = ?").run(slug);
+  mockState.coachProfiles.delete(slug);
 }
 
 export function applyCoachOverride(coach: Coach, override?: CoachProfileOverride | null): Coach {

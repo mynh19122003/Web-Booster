@@ -23,6 +23,7 @@ import {
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { useWorkflow } from "@/lib/workflow/store";
 import { useEmployeeChatNotifications } from "@/components/employee/useEmployeeChatNotifications";
+import { EmployeeAvailabilityToggle } from "@/components/employee/EmployeeAvailabilityToggle";
 import {
   useWorkflowReady,
   employeeAuthService,
@@ -143,6 +144,7 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
               </strong>
             </div>
             <div className="ap-topbar-right">
+              <EmployeeAvailabilityToggle compact />
               <span className="wf-capacity">
                 {workload(e.id)} / {e.maxActiveOrders} đơn
               </span>

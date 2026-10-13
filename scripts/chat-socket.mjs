@@ -1,11 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { Server } from "socket.io";
-import { join } from "node:path";
 import preview from "../mocks/chat-preview.json" with { type: "json" };
 import employeeAccounts from "../mocks/employee-accounts.json" with { type: "json" };
 import { createDemoChatStore } from "./demo-chat-store.mjs";
 
-export function attachChatSocketServer(httpServer, { origin, mock = false, fetchImpl = fetch, allowedOrigins = [], workflowSeed, demoDatabasePath = join(process.cwd(), ".data", "chat-preview.sqlite") }) {
+export function attachChatSocketServer(httpServer, { origin, mock = false, fetchImpl = fetch, allowedOrigins = [], workflowSeed, demoDatabasePath = "preview" }) {
   const sessions = new Map();
   let sharedStore;
   const store = () => sharedStore ??= createDemoChatStore(demoDatabasePath);
@@ -36,7 +35,7 @@ export function attachChatSocketServer(httpServer, { origin, mock = false, fetch
       const response = await fetchImpl(`${origin}/api/coaches`, { signal: AbortSignal.timeout(5000) });
       if (!response.ok) return;
       const data = await response.json();
-      const revision = JSON.stringify((data.coaches ?? []).map(coach => [coach.slug, coach.riotProfile?.history?.updatedAt ?? 0]));
+      const revision = JSON.stringify((data.coaches ?? []).map(coach => [coach.slug, coach.online, coach.riotProfile?.history?.updatedAt ?? 0]));
       if (revision !== coachRevision) { coachRevision = revision; io.to("public-coaches").emit("coach:changed"); }
     } catch { /* Recheck on the next tick; retain the last successful public snapshot. */ }
     finally { checkingCoaches = false; }

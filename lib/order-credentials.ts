@@ -1,7 +1,8 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import type { OrderRequestDetails } from "@/lib/order-request-types";
+
+const keyState = globalThis as typeof globalThis & { ascendPreviewOrderKey?: Buffer };
+const previewKey = keyState.ascendPreviewOrderKey ??= randomBytes(32);
 
 function encryptionKey() {
   const configured = process.env.ORDER_CREDENTIALS_KEY;
@@ -10,23 +11,7 @@ function encryptionKey() {
       throw new Error("credentials-unavailable");
     return Buffer.from(configured, "hex");
   }
-  if (process.env.NODE_ENV === "production")
-    throw new Error("credentials-unavailable");
-  // Local development only. Keep this file with the database across restarts.
-  const directory = dirname(
-    process.env.AUTH_DATABASE_PATH ||
-      join(process.cwd(), ".data", "auth.sqlite"),
-  );
-  const path = join(directory, "order-credentials.key");
-  mkdirSync(directory, { recursive: true });
-  try {
-    writeFileSync(path, randomBytes(32), { flag: "wx", mode: 0o600 });
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-  }
-  const key = readFileSync(path);
-  if (key.length !== 32) throw new Error("credentials-unavailable");
-  return key;
+  return previewKey;
 }
 
 export function encryptOrderDetails(

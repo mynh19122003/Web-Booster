@@ -1,5 +1,7 @@
 # Checkout account details and employee workspace
 
+> Historical implementation note: SQLite and key-file details below describe the former backend. The current preview keeps orders and its encryption key in server memory, resetting on restart; see the README.
+
 The checkout preview submits service fulfillment requests to SQLite through `POST /api/checkout`. Payment remains a local mock: this endpoint does not charge customers or verify payment. Account purchases and standalone coaching retain their existing checkout flow. Boost requests require a signed-in customer. Solo services collect a Riot ID, login username and password below the billing fields. Duo/coaching services do not collect login credentials. League of Legends orders also allow a Flash slot preference, and all fulfillment requests allow private customer notes.
 
 Credentials and fulfillment specifications are encrypted together with AES-256-GCM. The request ID is authenticated as additional data. Neither the chat transcript nor the local orders/cart stores contain credentials or private customer notes. Submission IDs make retries from the same checkout instance idempotent; the server order number also appears in the local mock receipt. Confirmation links directly to the order conversation.

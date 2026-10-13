@@ -1,5 +1,5 @@
 "use client";
-import { translateText } from "@/lib/i18n";
+import { translate, translateText, type LanguageCode, type MessageKey } from "@/lib/i18n";
 
 import { LanguageFlag } from "./LanguageFlag";
 import { ChevronDown, Search, Check } from "lucide-react";
@@ -8,8 +8,10 @@ import { intlLocales } from "@/lib/i18n";
 import { internationalPhone, phoneCountries, phoneCountryForLanguage } from "@/lib/phone-countries";
 import { useLanguage } from "./LanguageProvider";
 
-export function PhoneNumberField({ value, onChange, countries = phoneCountries }: { value?: string; onChange?: (value: string) => void; countries?: typeof phoneCountries } = {}) {
-  const { language, t } = useLanguage();
+export function PhoneNumberField({ value, onChange, countries = phoneCountries, languageOverride }: { value?: string; onChange?: (value: string) => void; countries?: typeof phoneCountries; languageOverride?: LanguageCode } = {}) {
+  const { language: activeLanguage } = useLanguage();
+  const language = languageOverride ?? activeLanguage;
+  const t = (key: MessageKey) => translate(language, key);
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);

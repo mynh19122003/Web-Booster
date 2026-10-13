@@ -11,7 +11,7 @@ const documents = {
       {
         title: "Information this website handles",
         paragraphs: [
-          "If you create an account, the site stores your name, email address, a scrypt password hash (not your plain-text password), and session records in a local SQLite database operated with this project. Session cookies are HTTP-only; the database stores a hash of each session token. The local session expires after 30 days.",
+          "This preview keeps account details, password hashes, and session records in server memory while it runs. Session cookies are HTTP-only and expire after 30 days. Restarting the server clears preview accounts and sessions.",
           "If Google sign-in is configured by the operator, Google supplies a verified email address, display name, and account subject identifier for sign-in. Google sign-in is not available until the operator configures it.",
           "Saved service requests and recruitment applications in this website are kept in the browser's local storage on the device and browser where they were submitted. The support form only validates in the browser and does not send a message.",
         ],
@@ -20,7 +20,7 @@ const documents = {
         title: "Use, storage, and sharing",
         paragraphs: [
           "Information is used to provide the account and keep its sign-in session. The operator may also receive routine technical logs from the hosting environment. This project does not include advertising or analytics integrations. No payment processor is connected.",
-          "Account records remain in the operator's SQLite database until the operator removes them. This website does not currently provide a self-service account deletion control. Local plans and applications can be removed by clearing this site's browser storage. Do not enter sensitive or real customer information in this preview.",
+          "Preview account records are cleared when the server restarts. Local plans and applications can be removed by clearing this site's browser storage. Do not enter sensitive or real customer information in this preview.",
           "When Google sign-in is enabled, authentication requests are handled by Google and are subject to Google's own privacy terms. The site does not request or store game account passwords.",
         ],
       },

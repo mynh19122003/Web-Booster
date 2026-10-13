@@ -8,8 +8,6 @@
     "start": "node server.mjs --production",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "employee:grant": "node scripts/grant-employee.mjs",
-    "coach:access": "node scripts/coach-access.mjs",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
     "test:auth-riot": "node --test tests/auth-riot.test.mjs",

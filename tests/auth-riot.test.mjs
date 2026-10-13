@@ -1,15 +1,12 @@
 import assert from "node:assert/strict";
 import { test, after } from "node:test";
 import { createRequire } from "node:module";
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
-import { resolve, join } from "node:path";
-import { tmpdir } from "node:os";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import ts from "typescript";
 
-// Run real handlers and SQLite with isolated cookies and mocked upstream HTTP.
+// Run real handlers with mock state, isolated cookies, and mocked upstream HTTP.
 const root = resolve(import.meta.dirname, "..");
-const temporary = mkdtempSync(join(tmpdir(), "ascend-auth-riot-"));
-process.env.AUTH_DATABASE_PATH = join(temporary, "auth.sqlite");
 process.env.RIOT_API_KEY = "test-key";
 process.env.RIOT_RSO_CLIENT_ID = "test-client";
 process.env.RIOT_RSO_CLIENT_SECRET = "test-client-secret";
@@ -31,6 +28,7 @@ function load(relative) {
   return loadedModule.exports;
 }
 const db = load("lib/auth-db.ts");
+const state = load("lib/mock-state.ts").mockState;
 const redirects = load("lib/auth-redirect.ts");
 const catalog = load("lib/riot-catalog.ts");
 const login = load("app/api/auth/login/route.ts");
@@ -51,7 +49,7 @@ test("employee profile rank uses the main queue and hides stale rank after a Rio
 });
 const employee = db.createUser("Employee", "staff@example.test", "test-password");
 const customer = db.createUser("Customer", "user@example.test", "test-password");
-db.authDatabase().prepare("UPDATE users SET role = 'employee' WHERE id = ?").run(employee.id);
+state.users.get(employee.id).role = "employee";
 const employeeSession = db.createSession(employee.id);
 const customerSession = db.createSession(customer.id);
 const originalFetch = globalThis.fetch;
@@ -155,7 +153,7 @@ test("checkout keeps encrypted specifications private and restricts access to th
   process.env.ORDER_CREDENTIALS_KEY = "11".repeat(32);
   const otherCustomer = db.createUser("Other customer", "other-customer@example.test", "test-password");
   const otherEmployee = db.createUser("Other employee", "other-employee@example.test", "test-password");
-  db.authDatabase().prepare("UPDATE users SET role = 'employee' WHERE id = ?").run(otherEmployee.id);
+  state.users.get(otherEmployee.id).role = "employee";
   const otherCustomerSession = db.createSession(otherCustomer.id);
   const otherEmployeeSession = db.createSession(otherEmployee.id);
   const order = {
@@ -191,9 +189,9 @@ test("checkout keeps encrypted specifications private and restricts access to th
     const repeated = await (await checkout.POST(post())).json();
     assert.equal(repeated.request.id, request.id);
     assert.equal(repeated.orderNumber, orderNumber);
-    const rows = db.authDatabase().prepare("SELECT encrypted_details FROM request_order_details WHERE customer_id = ? AND submission_id = ?").all(customer.id, order.submissionId);
+    const rows = [...state.orderDetails.values()].filter(row => row.customerId === customer.id && row.submissionId === order.submissionId);
     assert.equal(rows.length, 1);
-    const encrypted = rows[0].encrypted_details;
+    const encrypted = rows[0].encrypted;
     for (const secret of [order.riotAccount.riotUsername, order.riotAccount.riotPass, order.customerNotes, order.championPool]) assert.ok(!encrypted.includes(secret));
     assert.equal(decryptOrderDetails(request.id, encrypted).riotAccount.riotPass, order.riotAccount.riotPass);
     assert.throws(() => decryptOrderDetails("wrong-request", encrypted));
@@ -239,28 +237,68 @@ test("checkout keeps encrypted specifications private and restricts access to th
   }
 });
 
-test("production checkout fails closed without a valid encryption key and rolls back the request", async () => {
+test("preview checkout uses an in-memory encryption key when none is configured", async () => {
   const checkout = load("app/api/checkout/route.ts");
   const previousKey = process.env.ORDER_CREDENTIALS_KEY;
   const previousEnvironment = process.env.NODE_ENV;
   process.env.NODE_ENV = "production";
   signIn(customerSession);
-  const before = db.authDatabase().prepare("SELECT COUNT(*) AS count FROM customer_requests").get().count;
+  const before = state.requests.size;
   const order = { submissionId: "cccccccc-cccc-4ccc-cccc-cccccccccccc", service: "rank-boost", currentRank: "Silver IV", targetRank: "Gold IV",
     region: "VN", queue: "Solo", role: "Mid", championPool: "", flashSlot: "D", customerNotes: "",
     riotAccount: { riotUsername: "riot-user", riotPass: "riot-password", riotIdTag: "Player#VN1" } };
   try {
-    for (const key of [undefined, "invalid-key"]) {
-      if (key === undefined) delete process.env.ORDER_CREDENTIALS_KEY; else process.env.ORDER_CREDENTIALS_KEY = key;
-      const response = await checkout.POST(new Request("http://localhost:3000/api/checkout", { method: "POST",
-        headers: { origin: "http://localhost:3000", "Content-Type": "application/json" }, body: JSON.stringify({ game: "league-of-legends", order }) }));
-      assert.equal(response.status, 503);
-      assert.deepEqual(await response.json(), { error: "credentials-unavailable" });
-      assert.equal(db.authDatabase().prepare("SELECT COUNT(*) AS count FROM customer_requests").get().count, before);
-    }
+    delete process.env.ORDER_CREDENTIALS_KEY;
+    const response = await checkout.POST(new Request("http://localhost:3000/api/checkout", { method: "POST",
+      headers: { origin: "http://localhost:3000", "Content-Type": "application/json" }, body: JSON.stringify({ game: "league-of-legends", order }) }));
+    assert.equal(response.status, 201);
+    assert.equal(state.requests.size, before + 1);
   } finally {
     if (previousKey === undefined) delete process.env.ORDER_CREDENTIALS_KEY; else process.env.ORDER_CREDENTIALS_KEY = previousKey;
     if (previousEnvironment === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = previousEnvironment;
+    signIn(null);
+  }
+});
+
+test("offline coach is visible to customers and coaching checkout cannot create an order", async () => {
+  const checkout = load("app/api/checkout/route.ts");
+  const presence = load("app/api/mock/coach-presence/route.ts");
+  const profiles = load("lib/coach-profile-db.ts");
+  const publicProfile = load("app/api/coaches/[slug]/route.ts");
+  const previous = profiles.coachProfileOverride("luna");
+  const previousKey = process.env.ORDER_CREDENTIALS_KEY;
+  const body = {
+    submissionId: "dddddddd-dddd-4ddd-dddd-dddddddddddd", service: "coaching",
+    currentRank: "Challenger", targetRank: "Coaching session", region: "EUW", queue: "Coaching",
+    role: "", championPool: "", flashSlot: "no-preference", customerNotes: "", riotAccount: null,
+    coaching: { coachId: "luna", coachName: "Luna", quantity: 1, sessionFormat: "live" },
+  };
+  const request = () => new Request("http://localhost:3000/api/checkout", {
+    method: "POST", headers: { origin: "http://localhost:3000", "Content-Type": "application/json" },
+    body: JSON.stringify({ game: "league-of-legends", order: body }),
+  });
+  const toggle = (password, isOnline) => new Request("http://localhost:3000/api/mock/coach-presence", {
+    method: "PATCH", headers: { origin: "http://localhost:3000", "Content-Type": "application/json" },
+    body: JSON.stringify({ employeeId: "emp-luna", password, isOnline }),
+  });
+  try {
+    process.env.ORDER_CREDENTIALS_KEY = "11".repeat(32);
+    signIn(customerSession);
+    assert.equal((await presence.PATCH(toggle("wrong-password", false))).status, 400);
+    assert.equal((await presence.PATCH(toggle("Ascend@123", false))).status, 200);
+    assert.equal((await (await publicProfile.GET(new Request("http://localhost:3000/api/coaches/luna"), { params: Promise.resolve({ slug: "luna" }) })).json()).coach.online, false);
+    const before = state.requests.size;
+    const blocked = await checkout.POST(request());
+    assert.equal(blocked.status, 409);
+    assert.deepEqual(await blocked.json(), { error: "coach-offline" });
+    assert.equal(state.requests.size, before);
+    assert.equal((await presence.PATCH(toggle("Ascend@123", true))).status, 200);
+    assert.equal((await checkout.POST(request())).status, 201);
+  } finally {
+    if (previous) profiles.saveCoachProfile("luna", { online: previous.online });
+    else profiles.resetCoachProfile("luna");
+    if (previousKey === undefined) delete process.env.ORDER_CREDENTIALS_KEY;
+    else process.env.ORDER_CREDENTIALS_KEY = previousKey;
     signIn(null);
   }
 });
@@ -287,25 +325,22 @@ test("employee header status enforces session, origin and persists coach availab
       assert.equal(profiles.getCoachWithOverride(coach.slug).online, isOnline);
       assert.equal((await (await status.GET()).json()).isOnline, isOnline);
     }
-    db.authDatabase().prepare("DELETE FROM employee_coaches WHERE user_id = ?").run(employee.id);
+    state.employeeCoaches.delete(employee.id);
     assert.equal((await status.PATCH(request({ isOnline: false, slug: coach.slug }))).status, 200);
     assert.equal((await (await status.GET()).json()).isOnline, false);
     assert.equal(profiles.getCoachWithOverride(coach.slug).online, true);
   } finally {
     if (previous) profiles.saveCoachProfile(coach.slug, previous);
     else profiles.resetCoachProfile(coach.slug);
-    db.authDatabase().prepare("DELETE FROM coach_access WHERE user_id = ?").run(employee.id);
-    db.authDatabase().prepare("DELETE FROM employee_coaches WHERE user_id = ?").run(employee.id);
-    db.authDatabase().prepare("DELETE FROM employee_presence WHERE user_id = ?").run(employee.id);
+    state.coachAccess.delete(employee.id);
+    state.employeeCoaches.delete(employee.id);
+    state.presence.delete(employee.id);
     signIn(null);
   }
 });
 const query = values => new Request(`http://localhost:3000/api/employee/riot?${new URLSearchParams(values)}`);
 after(() => {
   globalThis.fetch = originalFetch;
-  globalThis.ascendAuthDatabase?.close();
-  globalThis.ascendAuthDatabase = undefined;
-  rmSync(temporary, { recursive: true });
 });
 
 test("database role controls login from either login form and overrides employee next", async () => {
@@ -333,7 +368,7 @@ test("Google OAuth uses database role and preserves customer return paths", asyn
   for (const role of ["employee", "customer"]) {
     const subject = `google-${role}`;
     const user = db.createGoogleUser("Google Test", `${subject}@example.test`, subject);
-    db.authDatabase().prepare("UPDATE users SET role = ? WHERE id = ?").run(role, user.id);
+    state.users.get(user.id).role = role;
     jar.clear(); jar.set("ascend_oauth_state", "valid-state"); jar.set("ascend_oauth_verifier", "test-verifier"); jar.set("ascend_oauth_next", "/checkout");
     respond = url => Response.json(url.includes("/token") ? { access_token: "test-google-token" } : { sub: subject, email: `${subject}@example.test`, email_verified: true });
     const response = await callback.GET(new Request("http://localhost:3000/api/auth/google/callback?code=test-code&state=valid-state"));
@@ -473,7 +508,7 @@ test("Name#Tag lookup resolves active server, shows own LoL matches and does not
   signIn(employeeSession); calls = []; globalThis.riotState.requests = [];
   const coachAccounts = load("lib/coach-riot-db.ts");
   coachAccounts.coachRiotAccount("luna");
-  const countBefore = db.authDatabase().prepare("SELECT count(*) AS total FROM coach_riot_accounts").get().total;
+  const countBefore = state.coachRiotAccounts.size;
   respond = url => Response.json(url.includes("/by-riot-id/") ? { gameName: "BLG Lucyiu", tagLine: "BLG", puuid: "lookup-lol-player" }
     : url.includes("/region/by-game/") ? { region: "VN2" }
     : url.includes("/summoners/") ? { puuid: "lookup-lol-player" }
@@ -500,7 +535,7 @@ test("Name#Tag lookup resolves active server, shows own LoL matches and does not
   assert.ok(calls.some(call => call.url.endsWith("/ids?start=0&count=20")));
   assert.ok(!JSON.stringify(body).includes("lookup-lol-player"));
   assert.ok(!JSON.stringify(body).includes("test-key"));
-  assert.equal(db.authDatabase().prepare("SELECT count(*) AS total FROM coach_riot_accounts").get().total, countBefore);
+  assert.equal(state.coachRiotAccounts.size, countBefore);
 });
 
 test("TFT Name#Tag lookup renders placement and a separate request returns empty history", async () => {
@@ -572,7 +607,7 @@ test("preview employee Riot lookup authenticates fixed accounts, fetches fresh r
     assert.equal((await historyApi.POST(historyRequest(input))).status, 401);
     assert.equal(calls.length, count);
   } finally {
-    db.authDatabase().prepare("DELETE FROM coach_riot_profiles WHERE slug='luna'").run();
+    state.coachRiotProfiles.delete("luna");
     if (originalMode === undefined) delete process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE;
     else process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE = originalMode;
     signIn(employeeSession);
@@ -619,7 +654,7 @@ test("mode filters use queue IDs and rank selection uses the appropriate queue",
 test("coach link saves a single Name#Tag only after successful verification", async () => {
   signIn(employeeSession); calls = []; globalThis.riotState.requests = [];
   load("lib/coach-ownership.ts").coachAccess({ ...employee, role: "employee" });
-  db.authDatabase().prepare("INSERT INTO coach_access VALUES (?, 'demo') ON CONFLICT(user_id) DO UPDATE SET scope='demo'").run(employee.id);
+  state.coachAccess.set(employee.id, "demo");
   const coachApi = load("app/api/employee/coaches/route.ts");
   const request = body => new Request("http://localhost:3000/api/employee/coaches", { method: "PATCH", headers: { Origin: "http://localhost:3000" }, body: JSON.stringify(body) });
   assert.equal((await coachApi.PATCH(request({ slug: "luna", riotId: "Name#Tag#extra", platform: "vn2" }))).status, 400);
@@ -645,7 +680,7 @@ test("employee ownership protects profiles, avatars, Riot links and draft visibi
   const matchApi = load("app/api/coaches/[slug]/matches/route.ts");
   const owner = db.createUser("Owner", "owner@example.test", "test-password");
   const other = db.createUser("Other", "other@example.test", "test-password");
-  for (const user of [owner,other]) db.authDatabase().prepare("UPDATE users SET role='employee' WHERE id=?").run(user.id);
+  for (const user of [owner, other]) state.users.get(user.id).role = "employee";
   const ownerSession = db.createSession(owner.id), otherSession = db.createSession(other.id);
   const request = (body, method = "PATCH", origin = "http://localhost:3000") => new Request("http://localhost:3000/api/employee/coaches", { method, headers: { Origin: origin }, body: JSON.stringify(body) });
   const input = { name:"Owner Coach", game:"league-of-legends", server:"VN", peakRank:"Master", hourlyRate:20, languages:["Tiếng Việt"], roles:["Mid"], bio:"Coach introduction" };
@@ -716,8 +751,8 @@ test("employee ownership protects profiles, avatars, Riot links and draft visibi
 test("admin assigns one employee per coach and demo cannot edit an assigned sample", async () => {
   const admin = db.createUser("Admin", "admin@example.test", "test-password");
   const recipient = db.createUser("Recipient", "recipient@example.test", "test-password");
-  for (const user of [admin,recipient]) db.authDatabase().prepare("UPDATE users SET role='employee' WHERE id=?").run(user.id);
-  db.authDatabase().prepare("INSERT INTO coach_access VALUES (?, 'admin')").run(admin.id);
+  for (const user of [admin, recipient]) state.users.get(user.id).role = "employee";
+  state.coachAccess.set(admin.id, "admin");
   const assignments = load("app/api/employee/coaches/assignment/route.ts");
   const profiles = load("app/api/employee/coaches/[slug]/profile/route.ts");
   const request = body => new Request("http://localhost:3000/api/employee/coaches/assignment",{method:"PATCH",headers:{Origin:"http://localhost:3000"},body:JSON.stringify(body)});
@@ -854,7 +889,7 @@ test("coach champion statistics aggregate 30 ranked games, return top five and p
     assert.equal((await statsApi.GET(request())).status, 404);
     ownership.setCoachPublished("luna", true);
     const snapshotKey = load("lib/riot-history-db.ts").riotHistoryKey(account, false);
-    db.authDatabase().prepare("UPDATE riot_champion_stats SET summary=? WHERE account_key=?").run(JSON.stringify({ ...stats, updatedAt: Date.now() - 3_600_001 }), snapshotKey);
+    state.championStats.set(snapshotKey, { ...stats, updatedAt: Date.now() - 3_600_001 });
     respond = () => Response.json({}, { status: 503 });
     const stale = await (await statsApi.GET(request())).json();
     assert.deepEqual(stale.topChampions, stats.topChampions); assert.equal(stale.error, "riot-unavailable");
@@ -881,7 +916,7 @@ test("champion statistics filter unexpected queues, handle empty samples and nev
   const partialAccount = { ...account, puuid: "partial-player" };
   const partial = await coachChampionStats(partialAccount);
   assert.equal(partial.status, "unavailable"); assert.deepEqual(partial.topChampions, []);
-  assert.equal(db.authDatabase().prepare("SELECT summary FROM riot_champion_stats WHERE account_key=?").get(load("lib/riot-history-db.ts").riotHistoryKey(partialAccount, false)), undefined);
+  assert.equal(state.championStats.get(load("lib/riot-history-db.ts").riotHistoryKey(partialAccount, false)), undefined);
   delete process.env.RIOT_API_KEY; calls = [];
   const missing = await coachChampionStats({ ...account, puuid: "missing-key-player" });
   assert.equal(missing.error, "key-missing"); assert.equal(calls.length, 0);

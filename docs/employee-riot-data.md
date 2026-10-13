@@ -57,7 +57,7 @@ Danh mục không tự quét toàn bộ dữ liệu Riot hay tự gọi cả 65 
 
 ```sh
 npm run riot:sync       # đồng bộ lại endpoint từ tài liệu Riot chính thức
-npm run test:auth-riot  # kiểm tra auth/role/routing/cache/RSO/quota với SQLite riêng và HTTP Riot giả lập
+npm run test:auth-riot  # kiểm tra auth/role/routing/cache/RSO/quota với mock state và HTTP Riot giả lập
 npm run typecheck
 ```
 

@@ -1,14 +1,12 @@
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
 import preview from "../mocks/chat-preview.json" with { type: "json" };
 
-export function createDemoChatStore(path) {
-  if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
-  const db = new DatabaseSync(path);
-  db.exec("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS preview_chat (id TEXT PRIMARY KEY, payload TEXT NOT NULL)");
-  db.exec("CREATE TABLE IF NOT EXISTS preview_chat_reads (user_id TEXT NOT NULL, request_id TEXT NOT NULL, seen_count INTEGER NOT NULL, PRIMARY KEY(user_id, request_id))");
-  db.exec("CREATE TABLE IF NOT EXISTS preview_orders (id TEXT PRIMARY KEY, payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS preview_employees (id TEXT PRIMARY KEY, payload TEXT NOT NULL)");
+const mockStores = new Map();
+
+export function createDemoChatStore(key = "preview") {
+  const state = key === ":memory:" ? { chats: new Map(), reads: new Map(), orders: new Map(), employees: new Map() }
+    : mockStores.get(key) ?? { chats: new Map(), reads: new Map(), orders: new Map(), employees: new Map() };
+  if (key !== ":memory:") mockStores.set(key, state);
+  const { chats, reads, orders, employees } = state;
   for (const request of preview.requests) {
     const rows = [
       ["customer", "Mình muốn trao đổi về lịch chơi và mục tiêu của mình."],
@@ -18,20 +16,20 @@ export function createDemoChatStore(path) {
       ["customer", "Cảm ơn bạn 👍"], ["employee", request.lastMessage],
     ];
     const messages = rows.map(([role, text], index) => ({ id: `${request.id}-seed-${index}`, senderId: role === "employee" ? request.employeeId : request.customerId, senderName: role === "employee" ? request.employeeName : request.customerName, senderRole: role, text, createdAt: request.updatedAt - (7 - index) * 10000 }));
-    db.prepare("INSERT OR IGNORE INTO preview_chat VALUES (?, ?)").run(request.id, JSON.stringify({ request, messages }));
+    if (!chats.has(request.id)) chats.set(request.id, { request, messages });
   }
   const accessible = (request, user) => user.role === "employee" ? request.employeeId === user.id : request.customerId === user.id;
-  const read = id => { const row = db.prepare("SELECT payload FROM preview_chat WHERE id = ?").get(id); return row ? JSON.parse(row.payload) : null; };
+  const read = id => chats.has(id) ? structuredClone(chats.get(id)) : null;
   function get(id, user) {
     const data = read(id);
     if (!data || !accessible(data.request, user)) throw new Error("forbidden");
     return data;
   }
-  const cursor = (id, user, data) => db.prepare("SELECT seen_count FROM preview_chat_reads WHERE user_id = ? AND request_id = ?").get(user.id, id)?.seen_count ?? data.messages.reduce((last, message, index) => message.id.startsWith(`${id}-seed-`) ? index + 1 : last, 0);
-  const allOrders = () => db.prepare("SELECT payload FROM preview_orders").all().map(row => JSON.parse(row.payload));
-  const order = id => { const row = db.prepare("SELECT payload FROM preview_orders WHERE id = ?").get(id); if (!row) throw new Error("not-found"); return JSON.parse(row.payload); };
-  const saveOrder = row => db.prepare("INSERT INTO preview_orders VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload").run(row.id, JSON.stringify(row));
-  const saveChat = data => db.prepare("INSERT INTO preview_chat VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload").run(data.request.id, JSON.stringify(data));
+  const cursor = (id, user, data) => reads.get(`${user.id}:${id}`) ?? data.messages.reduce((last, message, index) => message.id.startsWith(`${id}-seed-`) ? index + 1 : last, 0);
+  const allOrders = () => [...orders.values()].map(row => structuredClone(row));
+  const order = id => { const row = orders.get(id); if (!row) throw new Error("not-found"); return structuredClone(row); };
+  const saveOrder = row => orders.set(row.id, structuredClone(row));
+  const saveChat = data => chats.set(data.request.id, structuredClone(data));
   const active = row => ["CLAIMED", "IN_PROGRESS", "PAUSED", "PENDING_REVIEW", "DISPUTED"].includes(row.status);
   function syncOrderChat(row, employee) {
     const service = row.service === "Rank Boost" && /duo/i.test(row.queue) ? "Duo boost" : row.service;
@@ -43,20 +41,20 @@ export function createDemoChatStore(path) {
   return {
     get,
     seedWorkflow(fixture, cached = []) {
-      for (const employee of fixture.employees) db.prepare("INSERT OR IGNORE INTO preview_employees VALUES (?, ?)").run(employee.id, JSON.stringify(employee));
-      const employees = fixture.employees;
+      for (const employee of fixture.employees) if (!employees.has(employee.id)) employees.set(employee.id, structuredClone(employee));
+      const fixtureEmployees = fixture.employees;
       for (const base of fixture.orders) {
         if (base.id === "ASC-1054") continue; // Old Sofia placeholder is replaced by its existing customer conversation.
-        if (db.prepare("SELECT id FROM preview_orders WHERE id = ?").get(base.id)) continue;
+        if (orders.has(base.id)) continue;
         const saved = cached.find(row => row?.id === base.id);
-        const valid = saved && ["OPEN", "PENDING_PAYMENT", "CLAIMED", "IN_PROGRESS", "PAUSED", "PENDING_REVIEW", "COMPLETED", "CANCELLED", "DISPUTED", "REFUNDED"].includes(saved.status) && (!active(saved) || saved.employeeId) && (!saved.employeeId || employees.some(e => e.id === saved.employeeId));
+        const valid = saved && ["OPEN", "PENDING_PAYMENT", "CLAIMED", "IN_PROGRESS", "PAUSED", "PENDING_REVIEW", "COMPLETED", "CANCELLED", "DISPUTED", "REFUNDED"].includes(saved.status) && (!active(saved) || saved.employeeId) && (!saved.employeeId || fixtureEmployees.some(e => e.id === saved.employeeId));
         const row = valid ? { ...base, status: saved.status, employeeId: saved.employeeId, progress: Number.isFinite(saved.progress) && saved.progress >= 0 && saved.progress <= 100 ? saved.progress : base.progress, updatedAt: Number.isFinite(Date.parse(saved.updatedAt)) ? saved.updatedAt : base.updatedAt } : base;
         saveOrder(row);
-        syncOrderChat(row, employees.find(e => e.id === row.employeeId));
+        syncOrderChat(row, fixtureEmployees.find(e => e.id === row.employeeId));
       }
       const template = fixture.orders.find(row => row.id === "ASC-1054") ?? fixture.orders[0];
       for (const request of preview.requests) {
-        if (db.prepare("SELECT id FROM preview_orders WHERE id = ?").get(request.id)) continue;
+        if (orders.has(request.id)) continue;
         const data = read(request.id);
         const existing = data.request;
         const row = { ...template, id: existing.id, game: existing.game === "valorant" ? "Valorant" : existing.game === "teamfight-tactics" ? "Teamfight Tactics" : "League of Legends", service: existing.subject.toLowerCase().includes("coaching") ? "Coaching" : "Rank Boost", customer: { id: existing.customerId, name: existing.customerName, email: "", country: "VN", timezone: "Asia/Ho_Chi_Minh" }, employeeId: existing.employeeId ?? undefined, status: existing.status === "resolved" ? "COMPLETED" : existing.employeeId ? "IN_PROGRESS" : "OPEN", progress: existing.status === "resolved" ? 100 : 0, updatedAt: new Date(existing.updatedAt).toISOString() };
@@ -67,15 +65,14 @@ export function createDemoChatStore(path) {
     },
     workflow(user) {
       const rows = allOrders();
-      const employee = db.prepare("SELECT payload FROM preview_employees WHERE id = ?").get(user.id);
-      const viewer = employee ? JSON.parse(employee.payload) : null;
+      const viewer = employees.get(user.id) ?? null;
       const orders = rows.filter(row => user.role === "employee" ? row.employeeId === user.id || (row.status === "OPEN" && !row.employeeId && viewer?.games.includes(row.game) && viewer.type === (row.service === "Coaching" ? "COACH" : "BOOSTER")) : row.customer.id === user.id).map(row => user.role === "employee" && row.employeeId !== user.id ? { ...row, customer: { id: "", name: "", email: "", country: "", timezone: "" }, riotId: "", instructions: "", adminNotes: "", employeeNotes: "" } : row);
       return { orders, ids: rows.map(row => row.id) };
     },
     createOrder(user, input) {
       if (user.role !== "customer" || typeof input?.submissionId !== "string" || !/^[a-f0-9-]{36}$/.test(input.submissionId)) throw new Error("invalid-request");
       const id = `ASC-${input.submissionId}`;
-      const existing = db.prepare("SELECT id FROM preview_orders WHERE id = ?").get(id);
+      const existing = orders.has(id);
       if (existing) { const row = order(id); if (row.customer.id !== user.id) throw new Error("forbidden"); return { order: row, ...get(id, user) }; }
       const games = { "league-of-legends": "League of Legends", valorant: "Valorant", "teamfight-tactics": "Teamfight Tactics" };
       const services = { "rank-boost": "Rank Boost", "duo-boost": "Rank Boost", placements: "Placement Matches", "placement-matches": "Placement Matches", coaching: "Coaching" };
@@ -101,20 +98,17 @@ export function createDemoChatStore(path) {
     },
     claimOrder(id, user) {
       if (user.role !== "employee") throw new Error("forbidden");
-      db.exec("BEGIN IMMEDIATE");
       try {
         const row = order(id);
-        const raw = db.prepare("SELECT payload FROM preview_employees WHERE id = ?").get(user.id);
-        const employee = raw && JSON.parse(raw.payload);
+        const employee = employees.get(user.id);
         if (row.status !== "OPEN" || row.employeeId) throw new Error("ORDER_ALREADY_CLAIMED");
         if (!employee || employee.status !== "ACTIVE" || !employee.games.includes(row.game) || employee.type !== (row.service === "Coaching" ? "COACH" : "BOOSTER")) throw new Error("FORBIDDEN");
         if (allOrders().filter(row => row.employeeId === user.id && active(row)).length >= employee.maxActiveOrders) throw new Error("ORDER_LIMIT");
         row.employeeId = user.id; row.status = "IN_PROGRESS"; row.startedAt = row.updatedAt = new Date().toISOString();
         saveOrder(row);
         const chat = syncOrderChat(row, employee);
-        db.exec("COMMIT");
         return { order: row, ...chat };
-      } catch(error) { db.exec("ROLLBACK"); throw error; }
+      } catch(error) { throw error; }
     },
     updateOrder(id, user, action, progress) {
       const row = order(id);
@@ -127,8 +121,7 @@ export function createDemoChatStore(path) {
     },
     unread(user) {
       const byRequest = {};
-      for (const row of db.prepare("SELECT payload FROM preview_chat").all()) {
-        const data = JSON.parse(row.payload);
+      for (const data of chats.values()) {
         if (!accessible(data.request, user)) continue;
         const count = data.messages.slice(cursor(data.request.id, user, data)).filter(message => message.senderId !== user.id).length;
         if (count) byRequest[data.request.id] = count;
@@ -140,19 +133,18 @@ export function createDemoChatStore(path) {
       const index = data.messages.findIndex(message => message.id === messageId);
       if (index < 0) throw new Error("invalid-request");
       const seen = Math.max(cursor(id, user, data), index + 1);
-      db.prepare("INSERT INTO preview_chat_reads VALUES (?, ?, ?) ON CONFLICT(user_id,request_id) DO UPDATE SET seen_count = MAX(seen_count, excluded.seen_count)").run(user.id, id, seen);
+      reads.set(`${user.id}:${id}`, Math.max(reads.get(`${user.id}:${id}`) ?? 0, seen));
       return this.unread(user);
     },
-    list(user) { return db.prepare("SELECT payload FROM preview_chat").all().map(row => JSON.parse(row.payload).request).filter(request => accessible(request, user)).sort((a, b) => b.updatedAt - a.updatedAt); },
+    list(user) { return [...chats.values()].map(data => structuredClone(data.request)).filter(request => accessible(request, user)).sort((a, b) => b.updatedAt - a.updatedAt); },
     register(id, seed, user) {
       if (read(id)) return;
       if (user.role !== "customer" || !/^DEMO-[a-f0-9-]{8,36}$/.test(id) || seed?.request?.id !== id || typeof seed.request.subject !== "string") throw new Error("forbidden");
       const request = { id, subject: seed.request.subject.slice(0,120), game: String(seed.request.game ?? "Other").slice(0,80), status: "open", customerId: user.id, customerName: user.name, employeeId: null, employeeName: null, employeeOnline: 0, updatedAt: Date.now(), lastMessage: "" };
-      db.prepare("INSERT OR IGNORE INTO preview_chat VALUES (?, ?)").run(id, JSON.stringify({ request, messages: [] }));
+      chats.set(id, { request, messages: [] });
     },
     send(id, user, text, clientId) {
       if (typeof clientId !== "string" || !/^[a-f0-9-]{36}$/.test(clientId)) throw new Error("invalid-request");
-      db.exec("BEGIN IMMEDIATE");
       try {
         const data = get(id, user);
         if (data.request.status !== "assigned" || !data.request.employeeId) throw new Error("not-assigned");
@@ -160,12 +152,11 @@ export function createDemoChatStore(path) {
           const now = Date.now();
           data.messages.push({ id: clientId, senderId: user.id, senderName: user.name, senderRole: user.role, text: text.trim(), createdAt: now });
           data.request.updatedAt = now; data.request.lastMessage = text.trim();
-          db.prepare("UPDATE preview_chat SET payload = ? WHERE id = ?").run(JSON.stringify(data), id);
+          saveChat(data);
         }
-        db.exec("COMMIT");
         return data;
-      } catch (error) { db.exec("ROLLBACK"); throw error; }
+      } catch (error) { throw error; }
     },
-    close() { db.close(); },
+    close() {},
   };
 }

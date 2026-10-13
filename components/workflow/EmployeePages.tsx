@@ -31,6 +31,8 @@ import {
 import type { AvailableOrder } from "@/types/workflow";
 import { EmployeeSocketChat } from "@/components/employee/EmployeeSocketChat";
 import { RiotClientCard } from "./RiotClientCard";
+import { PhoneNumberField } from "@/components/ui/PhoneNumberField";
+import { employeeTimeZones } from "@/lib/employee-time-zones";
 
 export function EmployeeDashboard() {
   const s = useWorkflow();
@@ -444,6 +446,7 @@ export function EmployeeOrderDetail({ id }: { id: string }) {
       )}
       {own && action && action !== "claim" && (
         <FormModal
+          className="wf-employee-action-modal"
           title={
             action === "complete"
               ? "Xác nhận bạn đã hoàn tất dịch vụ?"
@@ -531,6 +534,7 @@ export function EmployeeAccount({ security = false }: { security?: boolean }) {
   const s = useWorkflow();
   const e = s.employees.find((e) => e.id === s.employeeId)!;
   const notify = useEmployeeNotice();
+  const [phone, setPhone] = useState(e.phone);
   return (
     <>
       <PageHeader
@@ -564,7 +568,7 @@ export function EmployeeAccount({ security = false }: { security?: boolean }) {
                 ["Giới hạn", `${e.maxActiveOrders} đơn`],
               ]}
             />
-            <form
+            <form className="wf-contact-form"
               onSubmit={async (event) => {
                 event.preventDefault();
                 const data = new FormData(event.currentTarget);
@@ -575,13 +579,12 @@ export function EmployeeAccount({ security = false }: { security?: boolean }) {
                 notify("Đã cập nhật hồ sơ.");
               }}
             >
-              <Field label="Số điện thoại">
-                <input name="phone" defaultValue={e.phone} maxLength={30} />
-              </Field>
+              <PhoneNumberField value={phone} onChange={setPhone} languageOverride="vi" />
               <Field label="Múi giờ">
                 <select name="timezone" defaultValue={e.timezone}>
-                  <option>Asia/Ho_Chi_Minh</option>
-                  <option>Asia/Bangkok</option>
+                  {employeeTimeZones.map(group => <optgroup key={group.region} label={group.region}>
+                    {group.zones.map(zone => <option key={zone} value={zone}>{zone.replace(/^[^/]+\//, "").replaceAll("_", " ")}</option>)}
+                  </optgroup>)}
                 </select>
               </Field>
               <button className="ap-button primary">Lưu hồ sơ</button>

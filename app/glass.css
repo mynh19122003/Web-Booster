@@ -311,11 +311,9 @@ body:has(#hero) .scene-fallback { z-index: 1; }
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
-  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  cursor: pointer;
 }
-.game-product-tab svg { color: #817d84; transition: color 180ms ease, transform 180ms ease; }
-.game-product-tab:hover { transform: translateY(-1px); border-color: rgba(255, 159, 60, 0.35); color: #f4e6d9; }
-.game-product-tab:hover svg { color: #ffae62; }
+.game-product-tab svg { color: #817d84; }
 .game-product-tab[aria-selected="true"] {
   border-color: rgba(255, 159, 60, 0.62);
   background: linear-gradient(135deg, rgba(255, 159, 60, 0.16), rgba(217, 119, 6, 0.07));
@@ -412,9 +410,9 @@ body:has(#hero) .scene-fallback { z-index: 1; }
   border-radius: 18px;
   background: linear-gradient(160deg, rgba(255,255,255,.045), rgba(13,13,15,.9) 55%);
   box-shadow: 0 16px 35px rgba(0,0,0,.18);
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-.coach-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--coach-accent), transparent 35%); box-shadow: 0 20px 38px rgba(0,0,0,.3); }
+.coach-card:hover { border-color: color-mix(in srgb, var(--coach-accent), transparent 35%); box-shadow: 0 20px 38px rgba(0,0,0,.3); }
 .coach-card-main { display: flex; flex: 1; flex-direction: column; height: 100%; color: inherit; text-decoration: none; }
 .coach-card-cover {
   position: relative;
@@ -1121,17 +1119,9 @@ img[src*="league-of-legends-mark.png"], img[src*="league-of-legends-mark.png" i]
 @media (forced-colors:active) { .account-shop .shop-radio-list input[type="checkbox"] { appearance:auto; -webkit-appearance:auto; } .account-shop .shop-radio-list input[type="checkbox"]::before { content:none; } }
 /* Consistent interactive hover feedback across all game categories. */
 .game-product-tab {
-  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
+  transition: none;
 }
 @media (hover: hover) and (pointer: fine) {
-  .game-product-tab:hover {
-    background: rgba(255,181,71,.09);
-    border-color: rgba(255,181,71,.65);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 1px rgba(255,181,71,.1), 0 0 14px rgba(255,181,71,.1);
-    color: #fff0d8;
-    transform: translateY(-1px);
-  }
-  .game-product-tab[aria-selected="true"]:hover { background: rgba(255,181,71,.17); }
   .account-shop .shop-account-card:hover,
   .coach-directory .coach-card:hover {
     border-color: rgba(255,181,71,.55);
@@ -1521,10 +1511,10 @@ html[dir="rtl"] .order-option-row[aria-checked="true"] .order-option-switch > sp
 .rank-gain-dropdown > summary:focus-visible { outline:2px solid #ffb547; outline-offset:3px; }
 .rank-gain-dropdown > summary svg { flex:0 0 auto; color:#c2b4a1; transition:transform 220ms cubic-bezier(.2,.75,.25,1),color 180ms; }
 .rank-gain-dropdown[open] > summary svg { transform:rotate(180deg); color:#ffb547; }
-.rank-gain-options { position:absolute; z-index:80; top:calc(100% + 8px); right:0; display:grid; width:max(100%,190px); max-height:min(300px,55vh); gap:3px; overflow:auto; padding:6px; border:1px solid rgba(255,255,255,.16); border-radius:14px; background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.025) 34%),rgba(17,18,21,.97); box-shadow:inset 0 1px 0 rgba(255,255,255,.17),0 20px 45px rgba(0,0,0,.52); -webkit-backdrop-filter:blur(24px) saturate(150%); backdrop-filter:blur(24px) saturate(150%); transform-origin:top right; animation:dropdown-open 180ms cubic-bezier(.16,1,.3,1) both; }
-.rank-gain-options button { display:flex; min-height:39px; align-items:center; justify-content:space-between; gap:12px; padding:8px 10px; border:1px solid transparent; border-radius:9px; color:#d4d2ce; cursor:pointer; font-size:12px; text-align:left; transition:background 160ms,border-color 160ms,color 160ms,transform 160ms; }
+.rank-gain-options { position:absolute; z-index:80; top:calc(100% + 8px); right:0; display:grid; width:max(100%,190px); max-height:min(300px,55vh); gap:3px; overflow:auto; padding:6px; border:1px solid rgba(255,255,255,.16); border-radius:14px; background:#18191c; box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 20px 45px rgba(0,0,0,.52); transform-origin:top right; animation:dropdown-open 180ms cubic-bezier(.16,1,.3,1) both; }
+.rank-gain-options button { display:flex; min-height:39px; align-items:center; justify-content:space-between; gap:12px; padding:8px 10px; border:1px solid transparent; border-radius:9px; background:#18191c; color:#d4d2ce; cursor:pointer; font-size:12px; text-align:left; transition:background 160ms,border-color 160ms,color 160ms,transform 160ms; }
 .rank-gain-options button:hover,.rank-gain-options button:focus-visible { border-color:rgba(255,181,71,.34); background:rgba(255,181,71,.1); color:#fff; outline:none; transform:translateX(2px); }
-.rank-gain-options button[aria-selected="true"] { border-color:rgba(255,181,71,.4); background:linear-gradient(100deg,rgba(255,181,71,.15),rgba(255,181,71,.045)); color:#ffd18c; }
+.rank-gain-options button[aria-selected="true"] { border-color:rgba(255,181,71,.4); background:#34291b; color:#ffd18c; }
 .rank-gain-options button svg { color:#ffb547; }
 /* Keep scrollable menus quiet against the glass surface. */
 :is(.rank-gain-options, .role-picker > [role="listbox"], .shop-owned-list, .phone-country-options, .dashboard-locale-list) {

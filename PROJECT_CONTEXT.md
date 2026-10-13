@@ -12,12 +12,12 @@ Các phiên bản dưới đây là khai báo trong `package.json`.
 | Ngôn ngữ | TypeScript **6.0.3**, `strict: true`; alias `@/*` trỏ vào root |
 | Styling | Tailwind CSS / PostCSS plugin **4.3.3**, CSS global theo domain và một số CSS Modules |
 | State | Zustand **5.0.15**; React hooks cho state cục bộ |
-| Database | SQLite qua built-in `node:sqlite` / `DatabaseSync`, prepared SQL; **không ORM** |
+| Dữ liệu server | Mock data trong bộ nhớ; reset khi khởi động lại server |
 | Animation / 3D | `motion` **14.0.0** (`motion/react`), GSAP **3.15.0**, Three.js **0.186.1**, Fiber **9.8.1**, Drei **10.7.9** |
 | Icons / ảnh | Lucide React **1.51.0**, React Icons `^5.7.0`, Simple Icons / Iconify; `react-easy-crop` `^6.2.4` |
 | Chất lượng | ESLint **9.39.5** + Next preset **16.3.8**, Prettier **3.9.9**, Playwright **1.63.0**, Axe **4.13.0** |
 
-Không có Axios, TanStack Query/SWR, NextAuth, Zod/Yup, React Hook Form hay UI kit Shadcn/Radix/MUI. `package.json` không khai báo Node engine; runtime phải hỗ trợ `node:sqlite`, không suy ra phiên bản runtime từ `@types/node`.
+Không có Axios, TanStack Query/SWR, NextAuth, Zod/Yup, React Hook Form hay UI kit Shadcn/Radix/MUI. `package.json` không khai báo Node engine.
 
 ## 2. Project Architecture & Conventions
 
@@ -39,10 +39,10 @@ tests/               Playwright và node:test; docs/ chứa tài liệu luồng
 ```
 
 - Component dùng PascalCase `.tsx`; hooks `use*.ts`; phần lớn file `lib/` và `data/` dùng kebab-case. Theo naming của thư mục hiện tại khi thêm file.
-- Server Components mặc định; thêm `'use client'` khi cần tương tác/hooks/browser APIs. Không đưa SQLite, filesystem, crypto hay secret vào client bundle.
+- Server Components mặc định; thêm `'use client'` khi cần tương tác/hooks/browser APIs. Không đưa mock state server, filesystem, crypto hay secret vào client bundle.
 - `app/layout.tsx` dùng `SiteShell`, các provider ngôn ngữ/tiền tệ và CSS theo domain. Navigation dùng `next/link`, `next/navigation`.
 - Types dùng chung đặt gần domain hoặc trong `types/`; props cục bộ có thể khai báo trong component. Không có quy định mọi interface phải nằm trong một file trung tâm.
-- DB mặc định `.data/auth.sqlite`, có thể đổi bằng `AUTH_DATABASE_PATH`; WAL, foreign keys, bảng/migration quản lý trong `lib/*-db.ts`. Route dùng DB chạy Node runtime, không Edge.
+- Mock state server nằm trong `lib/mock-state.ts`; tài khoản, phiên, chat, coach và cache Riot reset khi server khởi động lại. Các route liên quan chạy Node runtime.
 
 ## 3. UI / Design System Patterns
 
@@ -57,10 +57,10 @@ tests/               Playwright và node:test; docs/ chứa tài liệu luồng
 
 - Gọi API bằng native `fetch`. JSON dùng `Content-Type: application/json`; upload dùng `FormData`, không tự đặt multipart header. Handler trả `NextResponse.json`; lỗi thường `{ error: "machine-code" }`, success shape tùy endpoint, chưa có envelope thống nhất.
 - Form controlled bằng `useState`/`onSubmit`, HTML validation và kiểm tra thủ công; có trạng thái busy/error/success. Server kiểm tra kiểu, độ dài, enum và giá trị số; không chỉ tin validation frontend.
-- Auth custom: password salted scrypt, session token hash trong DB, cookie `ascend_session` HttpOnly; Google OAuth riêng. Dùng `currentUser()` và kiểm tra quyền/ownership phía server. Mutation phải giữ kiểm tra same-origin; ưu tiên helper `isSameOrigin` cho route mới.
-- Role từ DB: `employee` vào `/employee`; `customer`/`user` vào home `/` (luồng checkout có thể giữ next hợp lệ). Employee thông thường quản lý profile của mình; demo/admin có quyền riêng. Public profile chỉ hiển thị; chỉnh sửa/sync Riot thuộc employee editor có quyền.
+- Auth custom: password salted scrypt, session token hash trong mock state server, cookie `ascend_session` HttpOnly; Google OAuth riêng. Dùng `currentUser()` và kiểm tra quyền/ownership phía server. Mutation phải giữ kiểm tra same-origin; ưu tiên helper `isSameOrigin` cho route mới.
+- Role từ mock state: `employee` vào `/employee`; `customer`/`user` vào home `/` (luồng checkout có thể giữ next hợp lệ). Employee thông thường quản lý profile của mình; demo/admin có quyền riêng. Public profile chỉ hiển thị; chỉnh sửa/sync Riot thuộc employee editor có quyền.
 - Riot: `lib/riot-api.ts` và catalog allowlist; key chỉ ở server env. LoL/TFT resolve `Name#Tag`, lấy rank/history; Valorant player data cần kết nối RSO được Riot chấp thuận. Không coi API key đơn lẻ là đủ quyền cho mọi endpoint.
-- History snapshot lưu SQLite, đưa vào render đầu tiên; dữ liệu cũ refresh nền bằng `after()`, client polling/focus với dedupe và giới hạn request. Lỗi upstream giữ snapshot tốt gần nhất.
+- History snapshot lưu trong bộ nhớ khi server chạy, đưa vào render đầu tiên; dữ liệu cũ refresh nền bằng `after()`, client polling/focus với dedupe và giới hạn request. Lỗi upstream giữ snapshot tốt gần nhất.
 - Profile/avatar cập nhật giữa component/tab qua custom event và localStorage revision, không phải WebSocket/SSE. Một số Zustand store persist localStorage, có hydration chủ động; wallet/orders local là demo.
 
 ## 5. DO's & DON'Ts

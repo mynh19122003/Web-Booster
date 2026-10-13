@@ -1,5 +1,7 @@
 # Master development tasks — implementation and verification
 
+> Historical implementation note: references to SQLite below describe the former backend. The current preview uses in-memory mock state and resets on server restart.
+
 Implemented the requirements from `gemini-code-1791636874954.md` using the existing application structure. The document's example paths were adapted to the files actually present in this repository.
 
 | Task | Result |

@@ -72,6 +72,28 @@ export function parseOrderRequest(value: unknown): OrderRequestInput | null {
     };
   } else if (body.riotAccount !== null) return null;
 
+  let coaching: OrderRequestInput["coaching"];
+  if (fields.service === "coaching") {
+    if (!body.coaching || typeof body.coaching !== "object" || Array.isArray(body.coaching)) return null;
+    const session = body.coaching as Record<string, unknown>;
+    if (typeof session.coachId !== "string" || !/^[a-z0-9-]{1,80}$/.test(session.coachId) ||
+      typeof session.coachName !== "string" || session.coachName.trim().length < 1 || session.coachName.length > 100 ||
+      typeof session.quantity !== "number" || !Number.isInteger(session.quantity) || session.quantity < 1 || session.quantity > 10 ||
+      !["live", "vod"].includes(String(session.sessionFormat))) return null;
+    for (const field of ["date", "time", "timeZone"] as const) {
+      if (session[field] !== undefined && (typeof session[field] !== "string" || session[field].length > 80)) return null;
+    }
+    coaching = {
+      coachId: session.coachId,
+      coachName: session.coachName.trim(),
+      quantity: session.quantity,
+      sessionFormat: session.sessionFormat as "live" | "vod",
+      ...(typeof session.date === "string" ? { date: session.date } : {}),
+      ...(typeof session.time === "string" ? { time: session.time } : {}),
+      ...(typeof session.timeZone === "string" ? { timeZone: session.timeZone } : {}),
+    };
+  }
+
   return {
     submissionId: fields.submissionId,
     service: fields.service,
@@ -84,5 +106,6 @@ export function parseOrderRequest(value: unknown): OrderRequestInput | null {
     customerNotes: fields.customerNotes,
     flashSlot: body.flashSlot as OrderRequestInput["flashSlot"],
     riotAccount,
+    ...(coaching ? { coaching } : {}),
   };
 }

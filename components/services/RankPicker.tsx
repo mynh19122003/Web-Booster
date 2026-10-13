@@ -3,7 +3,7 @@ import { translateText } from "@/lib/i18n";
 
 import Image from "next/image";
 import { Check, ChevronDown, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
@@ -14,7 +14,8 @@ import { APEX_PRICE_BANDS, rankPriceFactor } from "@/lib/rank-pricing";
 import { useMoney } from "@/components/ui/Currency";
 import { NumberInput } from "@/components/ui/NumberInput";
 import { GameIdentity } from "@/components/ui/GameIdentity";
-import { rankPromotionPosterFor } from "@/data/rank-promotion-videos";
+import { rankPromotionPosterFor, rankPromotionVideoFor } from "@/data/rank-promotion-videos";
+import { RankPromotionVideo } from "@/components/services/RankPromotionVideo";
 
 const tierGlowColors: Record<string, { glow: string; text: string }> = {
   Iron: { glow: "rgba(161, 161, 170, 0.22)", text: "text-zinc-400" },
@@ -59,6 +60,12 @@ export function RankPicker({
   const money = useMoney();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(value);
+  const [promotion, setPromotion] = useState<{ tier: string; sequence: number } | null>(null);
+  const previousRank = useRef({ game, value });
+  const promotionSequence = useRef(0);
+  const completePromotion = useCallback((sequence: number) => {
+    setPromotion((current) => current?.sequence === sequence ? null : current);
+  }, []);
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const reduced = useReducedMotion();
@@ -90,6 +97,13 @@ export function RankPicker({
 
   const levels = rankLevelsFor(game);
   const selected = levels[value];
+  useEffect(() => {
+    const previous = previousRank.current;
+    if (!reduced && previous.game === game && value > previous.value && levels[value]?.tier !== levels[previous.value]?.tier && rankPromotionVideoFor(game, levels[value]?.tier)) {
+      setPromotion({ tier: levels[value].tier, sequence: ++promotionSequence.current });
+    }
+    previousRank.current = { game, value };
+  }, [game, value, levels, reduced]);
   const apex = apexConfig(game);
   function selectRank(next: number, points: number) {
     onChange(next, points);
@@ -125,7 +139,7 @@ export function RankPicker({
             style={{ background: `radial-gradient(circle, ${tierTheme.glow} 0%, transparent 70%)` }}
             aria-hidden="true"
           />
-          <RankHero game={game} tier={selected.tier} src={selected.icon} />
+          <RankHero game={game} tier={selected.tier} src={selected.icon} promotion={promotion?.tier === selected.tier ? promotion : null} onPromotionComplete={completePromotion} />
         </div>
 
         {/* Centered Rank Title and Change Button */}
@@ -349,11 +363,13 @@ export function RankPicker({
   );
 }
 
-function RankHero({ game, tier, src }: { game: string; tier: string; src: string }) {
+function RankHero({ game, tier, src, promotion, onPromotionComplete }: { game: string; tier: string; src: string; promotion: { sequence: number } | null; onPromotionComplete: (sequence: number) => void }) {
   const poster = rankPromotionPosterFor(game, tier);
+  const video = promotion && rankPromotionVideoFor(game, tier);
+  const artwork = poster ? <Image className="rank-promotion-artwork" src={poster} alt="" width={480} height={480} loading="eager" unoptimized />
+    : <RankEmblem game={game} tier={tier} src={src} />;
   return <div className="relative z-10 w-28 h-28 rank-hero-emblem flex items-center justify-center">
-    {poster ? <Image className="rank-promotion-artwork" src={poster} alt="" width={480} height={480} loading="eager" unoptimized />
-      : <RankEmblem game={game} tier={tier} src={src} />}
+    {video ? <RankPromotionVideo key={promotion.sequence} src={video} poster={poster} sequence={promotion.sequence} onComplete={onPromotionComplete}>{artwork}</RankPromotionVideo> : artwork}
   </div>;
 }
 

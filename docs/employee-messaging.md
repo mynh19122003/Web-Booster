@@ -1,5 +1,7 @@
 # Employee messaging
 
+> Historical implementation note: SQLite and employee-grant commands below describe the former backend. The current preview uses in-memory mock state and fixture employee accounts; see the README.
+
 Customers sign in at `/login` and use `/messages`, `/support`, or the floating support chat to create a request. Each request contains a subject, game, and first message. Messages are saved in the same SQLite database as accounts; they are shared across browsers and survive restarts.
 
 Employees can sign in at `/login` or `/employee/login`; their database role always sends them to `/employee`. User/customer accounts default to `/profile`, including when they use the employee form. Employees can filter requests, accept an unassigned request, reply to its customer, and mark it completed. Only the assigned employee can reply or complete that request. Customers can reopen a completed request, returning it to the unassigned queue. Conversations refresh every three seconds while open. The workspace also links to the [Riot data console](./employee-riot-data.md).

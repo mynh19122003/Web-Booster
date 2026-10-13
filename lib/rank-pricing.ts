@@ -1,4 +1,4 @@
-export const PRICING_VERSION = "2026-10-10";
+export const PRICING_VERSION = "2026-10-13";
 
 export const SERVER_MULTIPLIERS: Readonly<Record<string, number>> = {
   NA: 1, KR: 1.2,

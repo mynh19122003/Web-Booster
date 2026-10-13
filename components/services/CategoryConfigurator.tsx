@@ -15,6 +15,7 @@ import { gameConfigFor } from "@/lib/game-config";
 import { ranksFor } from "@/lib/service-options";
 import { categoryQuote } from "@/lib/project-pricing";
 import { calculateDuoPrice, DUO_RANK_OPTIONS, type DuoQueueType } from "@/lib/pricing/duo-pricing-matrix";
+import { calculateValorantDuoPrice } from "@/lib/pricing/valorant-duo-pricing";
 import { PRICING_VERSION } from "@/lib/rank-pricing";
 import { useStore } from "@/store/useStore";
 import { useLanguage } from "@/components/ui/LanguageProvider";
@@ -58,9 +59,11 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
   const [mode, setMode] = useState(productId === "games" ? "Ranked duo" : productId === "smurfs" ? "Fresh / Unranked" : "Ranked profile");
   const [rank, setRank] = useState(account || productId === "placements" ? "Unranked" : "Silver " + (game === "valorant" ? "1" : "IV"));
   const lolDuo = game === "league-of-legends" && productId === "games";
+  const valorantDuo = game === "valorant" && productId === "games";
+  const duoGame = lolDuo || valorantDuo;
   const duoQueueType: DuoQueueType = mode === "High-rank duo" ? "high_elo" : mode === "Casual duo" ? "normal" : "ranked";
-  const duoRanks = duoQueueType === "high_elo" ? DUO_RANK_OPTIONS.high_elo : DUO_RANK_OPTIONS.ranked;
-  const selectedRank = lolDuo ? duoQueueType === "normal" ? "Normal" : duoRanks.includes(rank) ? rank : duoRanks[0] : rank;
+  const duoRanks: readonly string[] = valorantDuo ? ranks.filter(rank => !rank.startsWith("Radiant") && (duoQueueType !== "high_elo" || /^(Ascendant|Immortal)/.test(rank))) : duoQueueType === "high_elo" ? DUO_RANK_OPTIONS.high_elo : DUO_RANK_OPTIONS.ranked;
+  const selectedRank = duoGame ? duoQueueType === "normal" ? "Normal" : duoRanks.includes(rank) ? rank : duoRanks[0] : rank;
   const [detail, setDetail] = useState(productId === "mastery" ? "Aatrox" : productId === "challenges" ? game === "valorant" ? "Daily" : "Player Diff" : "");
   const [budget, setBudget] = useState("Any budget");
   const [start, setStart] = useState(productId === "honor" ? 3 : productId === "mastery" ? 1 : 0);
@@ -85,15 +88,15 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
   const quoteRequired = base.quoteRequired;
   const price = quoteRequired ? 0 : Number((base.price * (express ? 1.2 : 1)).toFixed(2));
   const duoDisplay = base.duoPricing && money.currency === "EUR" && typeof money.usdPerEur === "number" && Number.isFinite(money.usdPerEur) && money.usdPerEur > 0
-    ? calculateDuoPrice({rank:selectedRank,server:s.region,gameCount:quantity,currency:"EUR",queueType:duoQueueType,usdPerEur:money.usdPerEur})
+    ? (valorantDuo ? calculateValorantDuoPrice : calculateDuoPrice)({rank:selectedRank,server:s.region,gameCount:quantity,currency:"EUR",queueType:duoQueueType,usdPerEur:money.usdPerEur})
     : base.duoPricing;
   const formatDuo = (value: number) => duoDisplay?.currency === money.currency
     ? new Intl.NumberFormat(intlLocales[language], {style:"currency",currency:money.currency}).format(value)
     : money.format(value);
   const duoExpressAmount = duoDisplay && money.amount(price) !== null
     ? Number((Number(money.amount(price)!.toFixed(2)) - duoDisplay.finalPrice).toFixed(2)) : 0;
-  const from = account ? mode : progression ? `${title}: ${start}` : lolDuo && duoQueueType === "normal" ? text("Any rank", "Mọi rank") : ranked ? selectedRank : title;
-  const unit = translateText(language, copy?.unit ?? "games", copy?.unitVi);
+  const from = account ? mode : progression ? `${title}: ${start}` : duoGame && duoQueueType === "normal" ? text("Any rank", "Mọi rank") : ranked ? selectedRank : title;
+  const unit = productId === "ranked-wins" && tftWinType === "first" ? text("first-place finishes", "trận hạng nhất") : translateText(language, copy?.unit ?? "games", copy?.unitVi);
   const to = account ? `${rank} · ${budget}` : progression ? `${title}: ${goal}${detail ? ` · ${detail}` : ""}` : `${quantity} ${unit}${productId === "games" ? ` · ${mode}` : ""}${detail ? ` · ${detail}` : ""}`;
   const options = productId === "games" ? ["Ranked duo", "High-rank duo", "Casual duo"] : account ? ["Ranked profile", "Fresh / Unranked"] : [];
   const optionName = (option: string) => ({ "Ranked duo": text("Ranked duo", "Chơi đôi xếp hạng"), "High-rank duo": text("High-rank duo", "Chơi đôi rank cao"), "Casual duo": text("Casual duo", "Chơi đôi thường"), "Ranked profile": text("Ranked profile", "Tài khoản có rank"), "Fresh / Unranked": text("Fresh / Unranked", "Tài khoản chưa rank") }[option] ?? option);
@@ -102,7 +105,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
   const valid = !["mastery", "challenges", "clash"].includes(productId) || Boolean(detail.trim());
   const unavailablePrice = !quoteRequired && money.amount(price) === null;
   const reviewLabel = quoteRequired ? text("Review request", "Xem yêu cầu") : t("reviewPlan");
-  const checkoutLabel = lolDuo ? text("Book duo games", "Đặt trận chơi đôi") : text("Continue to checkout", "Tiếp tục thanh toán");
+  const checkoutLabel = duoGame ? text("Book duo games", "Đặt trận chơi đôi") : text("Continue to checkout", "Tiếp tục thanh toán");
 
   function review(addOnly = false) {
     if (!valid) {
@@ -144,7 +147,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
           <span className="category-icon"><Icon size={24} aria-hidden="true" /></span>
           <div><p>{config.name}</p><h3>{title}</h3></div>
         </header>
-        <p className="category-description">{account ? text("Set your preferred account profile, server and budget. We will confirm matching availability before you purchase.", "Chọn hồ sơ tài khoản, máy chủ và ngân sách. Tài khoản phù hợp sẽ được xác nhận trước khi mua.") : translateText(language, copy?.en ?? "", copy?.vi)}</p>
+        <p className="category-description">{account ? text("Set your preferred account profile, server and budget. We will confirm matching availability before you purchase.", "Chọn hồ sơ tài khoản, máy chủ và ngân sách. Tài khoản phù hợp sẽ được xác nhận trước khi mua.") : productId === "ranked-wins" && tftWinType === "first" ? text("Choose your current rank and the number of first-place finishes.", "Chọn rank hiện tại và số trận đạt hạng nhất mong muốn.") : translateText(language, copy?.en ?? "", copy?.vi)}</p>
 
         {options.length > 0 && <div className="category-packages" role="group" aria-label={text("Choose a plan", "Chọn gói")}>
           {options.map((option) => <button key={option} type="button" aria-pressed={mode === option} onClick={() => setMode(option)}>
@@ -154,8 +157,8 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         </div>}
 
         <div className="category-form-grid">
-          {(ranked || account) && !(lolDuo && duoQueueType === "normal") && <label className="category-field">{account ? text("Preferred rank", "Rank mong muốn") : productId === "placements" ? text("Previous season rank", "Rank mùa trước") : t("currentRank")}
-            <select value={selectedRank} onChange={(event) => setRank(event.target.value)}>{(account || productId === "placements" ? ["Unranked", ...ranks] : lolDuo ? duoRanks : ranks).map((item) => <option key={item}>{item}</option>)}</select>
+          {(ranked || account) && !(duoGame && duoQueueType === "normal") && <label className="category-field">{account ? text("Preferred rank", "Rank mong muốn") : productId === "placements" ? text("Previous season rank", "Rank mùa trước") : t("currentRank")}
+            <select value={selectedRank} onChange={(event) => setRank(event.target.value)}>{(account || productId === "placements" ? ["Unranked", ...ranks] : duoGame ? duoRanks : ranks).map((item) => <option key={item}>{item}</option>)}</select>
           </label>}
           <div className="category-field"><RegionSelector value={s.region} options={regionsForGame(game)} onChange={(region) => s.set({ region })} /></div>
           {account ? <label className="category-field">{text("Budget (USD)", "Ngân sách (USD)")}
@@ -173,16 +176,18 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
               <div className="flex gap-2">
                 <button
                   type="button"
+                  aria-pressed={tftWinType === "top4"}
                   className={`px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${tftWinType === "top4" ? "border-amber-400/80 bg-amber-500/20 text-white" : "border-white/10 bg-black/30 text-zinc-400 hover:text-white"}`}
                   onClick={() => setTftWinType("top4")}
                 >
                   {translateText(language, "Top 4 Finish (Standard)", "Top 4 (Tiêu chuẩn)")}</button>
                 <button
                   type="button"
+                  aria-pressed={tftWinType === "first"}
                   className={`px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-all ${tftWinType === "first" ? "border-amber-400/80 bg-amber-500/20 text-white" : "border-white/10 bg-black/30 text-zinc-400 hover:text-white"}`}
                   onClick={() => setTftWinType("first")}
                 >
-                  {translateText(language, "1st Place Only (First Pick)", "Chỉ hạng nhất")}</button>
+                  {translateText(language, "1st Place Only (+35%)", "Chỉ hạng nhất (+35%)")}</button>
               </div>
             </div>
           )}
@@ -265,7 +270,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         {unavailablePrice && <p className="category-validation" role="status">{text("Currency rate unavailable. Choose USD to continue.", "Chưa có tỷ giá. Chọn USD để tiếp tục.")}</p>}
         <p className="category-summary-note"><ShieldCheck size={15} aria-hidden="true" />{text("Review your details before submitting", "Kiểm tra thông tin trước khi gửi")}</p>
       </aside>
-      {inView && !s.modal && createPortal(<div className={`category-mobile-review${lolDuo ? " category-duo-mobile" : ""}`}>
+      {inView && !s.modal && createPortal(<div className={`category-mobile-review${duoGame ? " category-duo-mobile" : ""}`}>
         <div><strong>{quoteRequired ? text("Custom quote", "Báo giá riêng") : money.format(price)}</strong><small>{title} · {account ? rank : progression ? `${start} → ${goal}` : `${quantity} ${unit}`}</small></div>
         <button type="button" className="mobile-start-boost" disabled={unavailablePrice} onClick={() => review()}>{quoteRequired ? reviewLabel : checkoutLabel}<ArrowRight size={16} aria-hidden="true" /></button>
       </div>, document.body)}

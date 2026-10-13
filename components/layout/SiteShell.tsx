@@ -27,8 +27,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <SkipLink />
         <CurrencyProvider />
         {isAuthRoute ? <main id="main">{children}</main> : <>
-          <SceneLoader />
-          <InitialLoader />
+          {path === "/" && <SceneLoader />}
+          {path === "/" && <InitialLoader />}
           <PointerEffects />
           <Header key={path} />
           <Experience><main id="main" tabIndex={-1}>{children}</main></Experience>

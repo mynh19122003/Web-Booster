@@ -52,6 +52,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
   const failedSend = useRef<{ id: string; text: string; clientId: string } | null>(null);
   const userId = user?.id;
   const demoMode = publicMockMode && (!employeeUser || employeeAccounts.some(account => account.id === employeeUser.id));
+  const demoEmployee = demoMode && Boolean(employeeUser);
   const lastMessageId = messages.at(-1)?.id;
   const currentRequestId = current?.id;
   const chatRequest = useCallback((path: string, options: RequestInit) => demoMode ? publicRequest(path, options) : fetch(path, options), [demoMode]);
@@ -67,6 +68,19 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
   }, [demoMode]);
 
   const refreshList = useCallback(async (signal?: AbortSignal) => {
+    if (demoEmployee && employeeUser) {
+      if (signal?.aborted) return;
+      setUser(employeeUser);
+      setLoaded(true);
+      if (socket.current?.connected) {
+        const result = await socket.current.timeout(10000).emitWithAck("chat:list", {}) as ChatReply;
+        if (signal?.aborted) return;
+        if (!result.ok || !result.requests) throw new Error("connection");
+        setRequests(result.requests);
+        setSelected(value => value || result.requests![0]?.id || "");
+      }
+      return;
+    }
     const response = await chatRequest("/api/requests", { cache: "no-store", signal });
     if (response.status === 401) { setUser(null); setLoaded(true); return; }
     if (!response.ok) throw new Error("connection");
@@ -80,7 +94,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
     setRequests(rows);
     setSelected(value => value || rows[0]?.id || "");
     setLoaded(true);
-  }, [chatRequest, demoMode, employeeUser]);
+  }, [chatRequest, demoMode, demoEmployee, employeeUser]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -116,6 +130,16 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
     if (!selected || !userId) return;
     const controller = new AbortController();
     async function loadThread() {
+      if (demoEmployee) {
+        if (!connected || !socket.current?.connected) return;
+        const result = await socket.current.timeout(10000).emitWithAck("chat:join", { id: selected }) as ChatReply;
+        if (controller.signal.aborted) return;
+        if (!result.ok || !result.request || !result.messages) throw new Error(result.error ?? "connection");
+        applyUpdate({ request: result.request, messages: result.messages });
+        setJoined(true);
+        setError("");
+        return;
+      }
       const response = await chatRequest(`/api/requests/${encodeURIComponent(selected)}`, { cache: "no-store", signal: controller.signal });
       if (!response.ok) throw new Error("connection");
       const data = await response.json() as ChatUpdate;
@@ -131,7 +155,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
     }
     void loadThread().catch(() => { if (!controller.signal.aborted) setError("connection"); });
     return () => controller.abort();
-  }, [selected, connected, userId, applyUpdate, chatRequest, demoMode]);
+  }, [selected, connected, userId, applyUpdate, chatRequest, demoMode, demoEmployee]);
 
   useEffect(() => {
     if (log.current) log.current.scrollTop = log.current.scrollHeight;
@@ -222,7 +246,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
           <div className="messenger-input-wrap"><textarea aria-label={copy("Message", "Tin nhắn")} placeholder={current.status === "open" ? copy("Waiting for a booster to accept this order", "Chờ booster nhận đơn để trò chuyện") : current.status === "resolved" ? copy("Conversation completed", "Hội thoại đã hoàn tất") : copy("Write a message…", "Nhập tin nhắn…")} ref={input} value={draft} maxLength={2000} rows={1} disabled={pending || current.status !== "assigned"} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(); } }} /><button type="button" className="messenger-emoji-button" disabled={current.status !== "assigned"} aria-label={copy("Choose emoji", "Chọn biểu tượng cảm xúc")} aria-expanded={emojis} onClick={() => setEmojis(value => !value)}>{emojis ? <X size={20} /> : <Smile size={22} />}</button>{emojis && <div className="messenger-emojis" role="group" aria-label={copy("Emoji", "Biểu tượng cảm xúc")}>{["😊", "👍", "❤️", "🎮", "🔥", "🙌"].map(emoji => <button type="button" key={emoji} aria-label={emoji} onClick={() => { setDraft(value => `${value}${emoji}`.slice(0, 2000)); setEmojis(false); input.current?.focus(); }}>{emoji}</button>)}</div>}</div>
           <button type="submit" className="messenger-send" disabled={!draft.trim() || !canSend || pending} aria-label={copy("Send message", "Gửi tin nhắn")}><Send size={23} /></button>
         </form>
-      </> : <div className="support-inbox-gate"><MessageCircle size={36} /><h2>{copy("Choose a conversation", "Chọn một hội thoại")}</h2><p>{copy("Your booster conversations appear here after placing an order.", "Hội thoại với Booster xuất hiện tại đây sau khi đặt hàng.")}</p></div>}
+      </> : <div className="support-inbox-gate"><MessageCircle size={36} /><h2>{error ? copy("Unable to load conversations", "Chưa thể tải hội thoại") : copy("Choose a conversation", "Chọn một hội thoại")}</h2><p>{error ? copy("Check the chat connection and try again.", "Kiểm tra kết nối chat và thử lại.") : copy("Your booster conversations appear here after placing an order.", "Hội thoại với Booster xuất hiện tại đây sau khi đặt hàng.")}</p></div>}
     </section>
   </div>;
 }

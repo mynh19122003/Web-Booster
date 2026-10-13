@@ -26,7 +26,7 @@ import type { MatchHistory, RiotRank } from "@/lib/riot-types";
 import { playerRank, rankWinRate } from "@/lib/riot-display";
 import { CoachDataLoading } from "./CoachDataLoading";
 
-type EmployeeView = { specialization: string; games: string[]; completedOrders: number; riotId: string; riotRank?: RiotRank | null; avatarInitials?: string; showGameplay: boolean };
+type EmployeeView = { specialization: string; games: string[]; completedOrders: number; riotId: string; riotRank?: RiotRank | null; avatarInitials?: string; showGameplay: boolean; availabilityControl?: React.ReactNode };
 export function CoachProfile({ coach: initialCoach, canEdit = false, initialHistory = null, employeeView }: { coach: Coach; canEdit?: boolean; initialHistory?: MatchHistory | null; employeeView?: EmployeeView }) {
   const [profile, setCoach] = useState(initialCoach);
   const coach = employeeView ? initialCoach : profile;
@@ -90,8 +90,13 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
     return matching < 0 ? 0 : matching;
   }
 
-  function bookSession() {
-    if (employeeView) return;
+  async function bookSession() {
+    if (employeeView || !displayOnline) return;
+    try {
+      const response = await publicRequest(`/api/coaches/${encodeURIComponent(coach.slug)}`, { cache: "no-store" });
+      const latest = response.ok ? (await response.json()).coach as Coach | undefined : undefined;
+      if (!latest?.online) { setOnline(false); return; }
+    } catch { return; }
     const packageName = mode === "duo" ? `${selectedOffer.startRank} → ${selectedOffer.targetRank} Duo` : `${quantity}h Coaching Session`;
     set({
       game: coach.game,
@@ -154,7 +159,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             </div>
           </div>
           <div className="coach-profile-hero-side">
-            <div className={"coach-profile-presence " + (displayOnline ? "is-online" : "is-offline")}><i className={displayOnline ? "is-online" : ""} />{displayOnline ? t("coachOnline") : t("coachOffline")}</div>
+            {employeeView?.availabilityControl ?? <div className={"coach-profile-presence " + (displayOnline ? "is-online" : "is-offline")}><i className={displayOnline ? "is-online" : ""} />{displayOnline ? t("coachOnline") : t("coachOffline")}</div>}
             {canEdit && !employeeView && <Link className="coach-profile-edit-link" href={`/employee/coaches/${coach.slug}/edit`}><Pencil size={15} />{translateText(language, "Edit profile", "Chỉnh sửa hồ sơ")}</Link>}
             {!employeeView && <a className="coach-profile-hero-cta" href="#coach-booking">{t("coachLearnFrom")} <ArrowUpRight size={16} /></a>}
           </div>
@@ -231,7 +236,8 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
             <p className="coach-session-helper">{translateText(language, "Save 5% on 3+ games/hours · 10% on 5+", "3+ trận/giờ giảm 5% · 5+ giảm 10%")}</p>
             {discount > 0 && <div className="coach-discount-summary"><span>{money.format(subtotal)}</span><strong>−{Math.round(discountRate * 100)}% · {money.format(discount)}</strong></div>}
             <div className="coach-estimate"><span>{t("coachOrderTotal")}</span><strong>{money.format(total)}</strong></div>
-            <button type="button" className="button coach-book-button" onClick={bookSession}>{mode === "duo" ? t("coachBookDuo") : t("coachBookCoach")} <ArrowUpRight size={16} /></button>
+            {!displayOnline && <p className="coach-booking-unavailable" role="status">{translateText(language, "This coach is offline. Booking is unavailable until they return.", "Coach đang offline. Bạn có thể đặt lịch khi coach online trở lại.")}</p>}
+            <button type="button" className="button coach-book-button" onClick={bookSession} disabled={!displayOnline}>{mode === "duo" ? t("coachBookDuo") : t("coachBookCoach")} <ArrowUpRight size={16} /></button>
           </aside>}
         </div>
       </div>

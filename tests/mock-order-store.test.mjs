@@ -1,15 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { createDemoChatStore } from "../scripts/demo-chat-store.mjs";
 import { workflowFixture } from "./helpers/workflow-fixture.mjs";
 
-test("saved claims seed missing mock data and persisted order/chat ownership survives restart", () => {
-  const directory = mkdtempSync(join(tmpdir(), "ascend-orders-"));
-  const path = join(directory, "orders.sqlite");
+test("saved claims seed missing mock data and order/chat ownership survives store handles", () => {
+  const path = `orders-${randomUUID()}`;
   const customer = { id: "demo-customer", name: "Minh Anh", email: "minhanh@ascend.demo", role: "customer" };
   const zero = { id: "emp-zero", name: "Zero", role: "employee" };
   let store = createDemoChatStore(path);
@@ -29,7 +25,7 @@ test("saved claims seed missing mock data and persisted order/chat ownership sur
     assert.equal(saved.progress, 45);
     assert.equal(store.get(created.order.id, customer).request.employeeName, "Zero");
     assert.equal(JSON.stringify(saved).includes("not-stored"), false);
-  } finally { store.close(); rmSync(directory, { recursive: true, force: true }); }
+  } finally { store.close(); }
 });
 
 test("paid coaching fixture is available to coaches and excludes boosters", () => {

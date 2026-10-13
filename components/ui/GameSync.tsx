@@ -19,14 +19,12 @@ export function GameSync({
 
   useEffect(() => {
     const game = slug ?? useStore.getState().game;
-    const requested = service ?? useStore.getState().service;
-    const selected = servicesFor(game).some((s) => s.slug === requested)
-      ? requested
-      : "rank-boost";
     const categoryParam = searchParams.get("category");
-    const validProduct = categoryParam && productsByGame[game]?.some((p) => p.id === categoryParam)
-      ? categoryParam
-      : null;
+    const category = productsByGame[game]?.find(product => product.id === categoryParam);
+    const validProduct = category?.id ?? null;
+    // The selected category wins over the page's default service when tabs change the URL.
+    const requested = category ? category.service ?? "rank-boost" : service ?? useStore.getState().service;
+    const selected = servicesFor(game).some((s) => s.slug === requested) ? requested : "rank-boost";
 
     set({
       game,
@@ -35,7 +33,7 @@ export function GameSync({
       quoteOverride: null,
       quoteAddOns: [],
       service: selected,
-      queue: queue ?? (selected === "duo-boost" ? "Duo" : game === "valorant" ? "Competitive" : game === "teamfight-tactics" ? "Ranked" : "Solo"),
+      queue: category?.queue ?? queue ?? (selected === "duo-boost" ? "Duo" : game === "valorant" ? "Competitive" : game === "teamfight-tactics" ? "Ranked" : "Solo"),
       role: game === "valorant" ? "Duelist" : game === "league-of-legends" ? "Mid" : "Any",
       ...initialRanks(game),
     });

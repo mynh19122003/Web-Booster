@@ -4,13 +4,11 @@ import { gameConfigFor } from "@/lib/game-config";
 import { productsByGame, categoryKeys, type ProductCategory } from "@/lib/product-categories";
 import { useStore } from "@/store/useStore";
 import { useLanguage } from "@/components/ui/LanguageProvider";
-import { useEffect, useId, useRef } from "react";
-import { ActiveIndicator } from "@/components/ui/InteractionMotion";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 export function GameProductNav({ gameSlug, gameName }: { gameSlug: string; gameName: string }) {
   const { t, language } = useLanguage();
-  const indicatorId = useId();
   const searchParams = useSearchParams();
   const { service, queue, product, set } = useStore();
   const products = productsByGame[gameSlug] ?? productsByGame["league-of-legends"];
@@ -78,7 +76,6 @@ export function GameProductNav({ gameSlug, gameName }: { gameSlug: string; gameN
                 document.getElementById(`product-${gameSlug}-${products[next].id}`)?.focus();
               }}
               aria-controls="category-content" onClick={() => choose(item)} className="game-product-tab">
-              {item.id === active && <ActiveIndicator id={indicatorId} />}
               <Icon size={16} aria-hidden="true" />
               <span>{categoryLabel(item)}</span>
             </button>

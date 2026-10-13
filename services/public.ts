@@ -133,6 +133,13 @@ export async function publicRequest(input: string, options: RequestInit = {}): P
     const checkout = path === "/api/checkout";
     if (checkout) {
       try {
+        if (body.order?.service === "coaching") {
+          const slug = body.order?.coaching?.coachId;
+          if (typeof slug !== "string") return json({ error: "invalid-request" }, 400);
+          const coachResponse = await fetch(`/api/coaches/${encodeURIComponent(slug)}`, { cache: "no-store" });
+          const coach = coachResponse.ok ? (await coachResponse.json()).coach : null;
+          if (!coach?.online || coach.game !== body.game) return json({ error: "coach-offline" }, 409);
+        }
         const { mockOrderCommand } = await import("@/services/mock-order-flow");
         const result = await mockOrderCommand("workflow:create", { ...body.order, game: body.game, amount: body.amount });
         persistDemoChat(result.request!, result.messages ?? []);

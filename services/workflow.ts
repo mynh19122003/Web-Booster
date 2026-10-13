@@ -9,6 +9,7 @@ import { workflowFixtures } from "@/mocks/workflow";
 import { employeeDemo } from "@/lib/workflow/demo";
 import employeeAccounts from "@/mocks/employee-accounts.json";
 import { publicMockMode } from "@/lib/public-data-source";
+import { isEmployeeTimeZone } from "@/lib/employee-time-zones";
 import { connectMockOrderFlow, mockOrderCommand, mockWorkflowFallback, stopMockOrderFlow } from "@/services/mock-order-flow";
 import { can } from "@/services/admin";
 import { useAdminStore } from "@/lib/admin/store";
@@ -524,7 +525,8 @@ export const employeeMockService: EmployeeService = {
     const e = employee();
     if (
       phone.length > 30 ||
-      !["Asia/Ho_Chi_Minh", "Asia/Bangkok"].includes(timezone)
+      (phone !== "" && !/^\+[1-9]\d{5,14}$/.test(phone)) ||
+      !isEmployeeTimeZone(timezone)
     )
       throw new Error("Thông tin hồ sơ không hợp lệ.");
     store.setState((s) => ({

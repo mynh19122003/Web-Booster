@@ -5,7 +5,7 @@ export function PointerEffects() {
   const reflection = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (
-      !matchMedia("(pointer:fine)")
+      !matchMedia("(pointer:fine) and (prefers-reduced-motion:no-preference)")
         .matches
     )
       return;

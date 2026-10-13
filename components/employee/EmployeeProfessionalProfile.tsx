@@ -7,6 +7,7 @@ import type { Coach } from "@/data/coaches";
 import { EmployeeRiotAccount, useEmployeeRiotAccount } from "./EmployeeRiotAccount";
 import { riotPlatforms, type MatchHistory } from "@/lib/riot-types";
 import { playerRank } from "@/lib/riot-display";
+import { EmployeeAvailabilityToggle } from "./EmployeeAvailabilityToggle";
 
 export function EmployeeProfessionalProfile() {
   const employee = useWorkflow(state => state.employees.find(row => row.id === state.employeeId));
@@ -31,6 +32,6 @@ export function EmployeeProfessionalProfile() {
   coach.peakRank = rank ? `${rank.tier.charAt(0)}${rank.tier.slice(1).toLowerCase()}${["MASTER", "GRANDMASTER", "CHALLENGER"].includes(rank.tier) ? "" : ` ${rank.division}`}` : history.status === "ready" && !history.rankError ? "Unranked" : "—";
   return <LanguageProvider><div className="employee-professional-profile">
     <EmployeeRiotAccount key={employee.id} employee={employee} saved={riot} />
-    <CoachProfile key={`${employee.id}:${riot?.riotId}:${riot?.game}:${riot?.platform}:${history.updatedAt}`} coach={coach} initialHistory={history} employeeView={{ specialization: employee.type === "COACH" ? "Coach · Huấn luyện" : "Booster · Nâng hạng", games: employee.games, completedOrders: employee.completedOrders, riotId: riot?.riotId ?? employee.riotId, riotRank: rank, showGameplay: true, avatarInitials: matched ? undefined : employee.name.trim().split(/\s+/).map(part => part[0]).slice(0, 2).join("") }} />
+    <CoachProfile key={`${employee.id}:${riot?.riotId}:${riot?.game}:${riot?.platform}:${history.updatedAt}`} coach={coach} initialHistory={history} employeeView={{ specialization: employee.type === "COACH" ? "Coach · Huấn luyện" : "Booster · Nâng hạng", games: employee.games, completedOrders: employee.completedOrders, riotId: riot?.riotId ?? employee.riotId, riotRank: rank, showGameplay: true, avatarInitials: matched ? undefined : employee.name.trim().split(/\s+/).map(part => part[0]).slice(0, 2).join(""), availabilityControl: <EmployeeAvailabilityToggle /> }} />
   </div></LanguageProvider>;
 }

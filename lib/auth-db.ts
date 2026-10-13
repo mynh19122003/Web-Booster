@@ -1,62 +1,26 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { mkdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { DatabaseSync } from "node:sqlite";
-
-declare global {
-  var ascendAuthDatabase: DatabaseSync | undefined;
-}
+import employeeAccounts from "@/mocks/employee-accounts.json";
+import { mockState } from "@/lib/mock-state";
 
 export type AuthUser = { id: string; name: string; email: string; role: "customer" | "user" | "employee" };
+type StoredUser = AuthUser & { password_hash: string | null; google_sub?: string };
 
-function database() {
-  if (globalThis.ascendAuthDatabase) return globalThis.ascendAuthDatabase;
-  const path = process.env.AUTH_DATABASE_PATH || join(process.cwd(), ".data", "auth.sqlite");
-  mkdirSync(dirname(path), { recursive: true });
-  const db = new DatabaseSync(path);
-  db.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL COLLATE NOCASE UNIQUE,
-      password_hash TEXT,
-      google_sub TEXT UNIQUE,
-      created_at TEXT NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS sessions (
-      token_hash TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      expires_at INTEGER NOT NULL,
-      created_at TEXT NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS sessions_expiry ON sessions(expires_at);
-  `);
-  const columns = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
-  if (!columns.some(column => column.name === "role")) {
-    db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'employee'))");
-  }
-  globalThis.ascendAuthDatabase = db;
-  return db;
+for (const account of employeeAccounts) {
+  if (!mockState.users.has(account.id)) mockState.users.set(account.id, {
+    id: account.id, name: account.name, email: account.email, role: "employee",
+    password_hash: createPasswordHash(account.password),
+  } satisfies StoredUser);
+  if (account.id === "emp-luna" && !mockState.coachAccess.has(account.id)) mockState.coachAccess.set(account.id, "demo");
 }
 
+const users = mockState.users as Map<string, StoredUser>;
 const tokenHash = (token: string) => createHash("sha256").update(token).digest("hex");
-export const safeUser = (row: AuthUser): AuthUser => ({
-  id: row.id,
-  name: row.name,
-  email: row.email,
-  role: row.role,
-});
-
-export const authDatabase = database;
+export const safeUser = (row: AuthUser): AuthUser => ({ id: row.id, name: row.name, email: row.email, role: row.role });
 
 export function createPasswordHash(password: string) {
   const salt = randomBytes(16);
-  const hash = scryptSync(password, salt, 64);
-  return `${salt.toString("hex")}:${hash.toString("hex")}`;
+  return `${salt.toString("hex")}:${scryptSync(password, salt, 64).toString("hex")}`;
 }
-
 export function verifyPassword(password: string, stored: string | null) {
   if (!stored) return false;
   const [saltHex, hashHex] = stored.split(":");
@@ -65,111 +29,71 @@ export function verifyPassword(password: string, stored: string | null) {
   const actual = scryptSync(password, Buffer.from(saltHex, "hex"), expected.length);
   return expected.length === actual.length && timingSafeEqual(expected, actual);
 }
-
 export function createUser(name: string, email: string, password: string) {
-  const id = randomBytes(16).toString("hex");
-  database().prepare(
-    "INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)",
-  ).run(id, name, email.toLowerCase(), createPasswordHash(password), new Date().toISOString());
-  return { id, name, email: email.toLowerCase(), role: "customer" } satisfies AuthUser;
+  const normalized = email.toLowerCase();
+  if (findUserByEmail(normalized)) throw new Error("UNIQUE constraint failed: users.email");
+  const user: StoredUser = { id: randomBytes(16).toString("hex"), name, email: normalized, role: "customer", password_hash: createPasswordHash(password) };
+  users.set(user.id, user);
+  return safeUser(user);
 }
-
 export function findUserByEmail(email: string) {
-  const row = database().prepare(
-    "SELECT id, name, email, role, password_hash FROM users WHERE email = ?",
-  ).get(email.toLowerCase()) as (AuthUser & { password_hash: string | null }) | undefined;
-  return row;
+  return [...users.values()].find(user => user.email === email.toLowerCase());
 }
-
 export function createGoogleUser(name: string, email: string, googleSub: string) {
-  const id = randomBytes(16).toString("hex");
-  database().prepare(
-    "INSERT INTO users (id, name, email, google_sub, created_at) VALUES (?, ?, ?, ?, ?)",
-  ).run(id, name, email.toLowerCase(), googleSub, new Date().toISOString());
-  return { id, name, email: email.toLowerCase(), role: "customer" } satisfies AuthUser;
+  const normalized = email.toLowerCase();
+  if (findUserByEmail(normalized)) throw new Error("UNIQUE constraint failed: users.email");
+  const user: StoredUser = { id: randomBytes(16).toString("hex"), name, email: normalized, role: "customer", password_hash: null, google_sub: googleSub };
+  users.set(user.id, user);
+  return safeUser(user);
 }
-
 export function findGoogleUser(subject: string) {
-  const row = database().prepare(
-    "SELECT id, name, email, role FROM users WHERE google_sub = ?",
-  ).get(subject) as AuthUser | undefined;
-  return row;
+  const user = [...users.values()].find(row => row.google_sub === subject);
+  return user ? safeUser(user) : undefined;
 }
-
 export function createSession(userId: string) {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
-  const db = database();
-  db.prepare("DELETE FROM sessions WHERE expires_at <= ?").run(Date.now());
-  db.prepare("INSERT INTO sessions (token_hash, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
-    .run(tokenHash(token), userId, expiresAt, new Date().toISOString());
+  for (const [hash, session] of mockState.sessions) if (session.expiresAt <= Date.now()) mockState.sessions.delete(hash);
+  mockState.sessions.set(tokenHash(token), { userId, expiresAt });
   return { token, expiresAt };
 }
-
 export function getUserForSession(token: string): AuthUser | null {
-  const row = database().prepare(`
-    SELECT users.id, users.name, users.email, users.role
-    FROM sessions JOIN users ON users.id = sessions.user_id
-    WHERE sessions.token_hash = ? AND sessions.expires_at > ?
-  `).get(tokenHash(token), Date.now()) as AuthUser | undefined;
-  return row ? safeUser(row) : null;
+  const session = mockState.sessions.get(tokenHash(token));
+  const user = session?.expiresAt && session.expiresAt > Date.now() ? users.get(session.userId) : undefined;
+  return user ? safeUser(user) : null;
 }
-
-export function deleteSession(token: string) {
-  database().prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash(token));
+export function deleteSession(token: string) { mockState.sessions.delete(tokenHash(token)); }
+function revokeOtherSessions(userId: string, token: string) {
+  const current = tokenHash(token);
+  for (const [hash, session] of mockState.sessions) if (session.userId === userId && hash !== current) mockState.sessions.delete(hash);
 }
-
 export function changeUserPassword(userId: string, newPassword: string, sessionToken: string) {
   if (getUserForSession(sessionToken)?.id !== userId) return "unauthorized" as const;
-  const db = database();
-  db.exec("BEGIN IMMEDIATE");
-  try {
-    const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(userId) as { password_hash: string | null } | undefined;
-    if (!row?.password_hash) { db.exec("ROLLBACK"); return "external-account" as const; }
-    if (verifyPassword(newPassword, row.password_hash)) { db.exec("ROLLBACK"); return "same-password" as const; }
-    db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(newPassword), userId);
-    db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(userId, tokenHash(sessionToken));
-    db.exec("COMMIT");
-    return "saved" as const;
-  } catch (error) { db.exec("ROLLBACK"); throw error; }
+  const user = users.get(userId);
+  if (!user?.password_hash) return "external-account" as const;
+  if (verifyPassword(newPassword, user.password_hash)) return "same-password" as const;
+  user.password_hash = createPasswordHash(newPassword);
+  revokeOtherSessions(userId, sessionToken);
+  return "saved" as const;
 }
 
 export type UserProfile = { name: string; email: string; phone: string; country: string; discord: string; avatar: string | null };
-function profileDatabase() {
-  const db = database();
-  db.exec(`CREATE TABLE IF NOT EXISTS user_profiles (
-    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    phone TEXT NOT NULL DEFAULT '', country TEXT NOT NULL DEFAULT '', discord TEXT NOT NULL DEFAULT ''
-  )`);
-  const columns = db.prepare("PRAGMA table_info(user_profiles)").all() as { name: string }[];
-  if (!columns.some(column => column.name === "avatar")) db.exec("ALTER TABLE user_profiles ADD COLUMN avatar TEXT");
-  return db;
-}
 export function getUserProfile(user: AuthUser): UserProfile {
-  const details = profileDatabase().prepare("SELECT phone, country, discord, avatar FROM user_profiles WHERE user_id = ?").get(user.id) as Pick<UserProfile, "phone" | "country" | "discord" | "avatar"> | undefined;
-  return { name: user.name, email: user.email, phone: "", country: "", discord: "", avatar: null, ...details };
+  const current = users.get(user.id) ?? user;
+  return { name: current.name, email: current.email, phone: "", country: "", discord: "", avatar: null,
+    ...(mockState.profiles.get(user.id) as Partial<UserProfile> | undefined) };
 }
 export function updateUserAvatar(user: AuthUser, avatar: string | null): UserProfile {
-  profileDatabase().prepare(`INSERT INTO user_profiles (user_id, avatar) VALUES (?, ?)
-    ON CONFLICT(user_id) DO UPDATE SET avatar = excluded.avatar`).run(user.id, avatar);
+  mockState.profiles.set(user.id, { ...mockState.profiles.get(user.id), avatar });
   return getUserProfile(user);
 }
 export function updateUserProfile(user: AuthUser, profile: Omit<UserProfile, "email" | "avatar">, password?: { newPassword: string; sessionToken: string }): UserProfile {
-  if (password && getUserForSession(password.sessionToken)?.id !== user.id) throw new Error("unauthorized");
-  const db = profileDatabase();
-  db.exec("BEGIN IMMEDIATE");
-  try {
-    if (password) {
-      const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(user.id) as { password_hash: string | null } | undefined;
-      if (!row?.password_hash) throw new Error("external-account");
-      if (verifyPassword(password.newPassword, row.password_hash)) throw new Error("same-password");
-      db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(createPasswordHash(password.newPassword), user.id);
-      db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?").run(user.id, tokenHash(password.sessionToken));
-    }
-    db.prepare("UPDATE users SET name = ? WHERE id = ?").run(profile.name, user.id);
-    db.prepare(`INSERT INTO user_profiles (user_id, phone, country, discord) VALUES (?, ?, ?, ?)
-      ON CONFLICT(user_id) DO UPDATE SET phone = excluded.phone, country = excluded.country, discord = excluded.discord`).run(user.id, profile.phone, profile.country, profile.discord);
-    db.exec("COMMIT");
-  } catch (error) { db.exec("ROLLBACK"); throw error; }
+  if (password) {
+    const result = changeUserPassword(user.id, password.newPassword, password.sessionToken);
+    if (result !== "saved") throw new Error(result);
+  }
+  const current = users.get(user.id);
+  if (current) current.name = profile.name;
+  mockState.profiles.set(user.id, { ...mockState.profiles.get(user.id), phone: profile.phone, country: profile.country, discord: profile.discord });
   return getUserProfile({ ...user, name: profile.name });
 }

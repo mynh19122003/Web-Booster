@@ -92,6 +92,8 @@ html[data-theme="light"] body .auth-page .auth-aside { background: #f1f0ed; }
 .coach-profile-page .coach-profile-hero::after { border-radius: inherit; }
 .coach-attributes { margin-top: 0; padding-top: 24px; overflow: visible; }
 .coach-attribute-group, .coach-attribute-badges { overflow: visible; }
+.coach-booking-unavailable { margin: 12px 0; color: #d7b28d; font-size: 13px; line-height: 1.5; }
+.coach-book-button:disabled { cursor: not-allowed; opacity: .48; filter: grayscale(.35); transform: none; }
 .coach-attribute-badge { max-width: 100%; transition: border-color .2s, color .2s, background-color .2s; }
 .coach-attribute-badge:hover { border-color: #ff9f3c66; color: #fff; background: #ff9f3c0a; }
 .coach-language-badge { min-width: 0; }

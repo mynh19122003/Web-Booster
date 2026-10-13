@@ -104,7 +104,7 @@ export function Stats({ items }: { items: [string, ReactNode][] }) {
       {items.map(([label, value]) => (
         <article className="ap-stat" key={label}>
           <span>{label}</span>
-          <strong>{value}</strong>
+          <strong key={typeof value === "string" || typeof value === "number" ? value : label}>{value}</strong>
           <small>Cập nhật theo hoạt động</small>
         </article>
       ))}
