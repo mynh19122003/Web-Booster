@@ -5,12 +5,7 @@ import {
   isWorkflowSnapshot,
   type WorkflowState,
 } from "@/lib/workflow/store";
-import { workflowFixtures } from "@/mocks/workflow";
-import { employeeDemo } from "@/lib/workflow/demo";
-import employeeAccounts from "@/mocks/employee-accounts.json";
-import { publicMockMode } from "@/lib/public-data-source";
 import { isEmployeeTimeZone } from "@/lib/employee-time-zones";
-import { connectMockOrderFlow, mockOrderCommand, mockWorkflowFallback, stopMockOrderFlow } from "@/services/mock-order-flow";
 import { can } from "@/services/admin";
 import { useAdminStore } from "@/lib/admin/store";
 import type { Permission } from "@/types/admin";
@@ -164,67 +159,18 @@ function patchOrder(
 let initialization: Promise<void> | undefined;
 export function initializeWorkflow() {
   return (initialization ??= (async () => {
-    let identity: { id: string; session: string } | null = null;
-    try {
-      identity = JSON.parse(
-        sessionStorage.getItem("ascend-employee-identity") || "null",
-      );
-    } catch {
-      /* Corrupt mock identity requires login again. */
-    }
-    await store.persist.rehydrate();
-    const cached = store.getState();
-    if (!cached.initialized || !cached.orders.length || !cached.employees.length) {
-      const fixture = publicMockMode ? await mockWorkflowFallback() : workflowFixtures();
-      if (!isWorkflowSnapshot(fixture)) throw new Error("Dữ liệu đơn hàng không hợp lệ.");
-      // Fill missing collections only; retain saved claims, history and employee settings.
-      const preserved = Object.fromEntries(Object.entries(cached).filter(([, value]) => Array.isArray(value) && value.length));
-      store.setState({ ...fixture, ...preserved, initialized: true });
-    }
-    // Add the new demo to older saved projections without resetting claims.
-    const saved = store.getState();
-    const fixtures = workflowFixtures();
+    // The employee API adapter is pending. Ignore old browser demo projections.
     store.setState({
-      employees: saved.employees.some((e) => e.id === employeeDemo.id)
-        ? saved.employees
-        : [...saved.employees, fixtures.employees.find((e) => e.id === employeeDemo.id)!],
-      orders: saved.orders.some((o) => o.id === employeeDemo.orderId)
-        ? saved.orders
-        : [...saved.orders, fixtures.orders.find((o) => o.id === employeeDemo.orderId)!],
-    });
-    store.setState({
-      ready: true,
-      employeeId: identity?.id ?? null,
-      employeeSessionId: identity?.session ?? null,
+      orders: [], employees: [], assignments: [], conversations: [], messages: [],
+      complaints: [], sessions: [], transactions: [], activities: [], issues: [],
+      employeeId: null, employeeSessionId: null, initialized: true, ready: true,
     });
   })());
 }
 export function useWorkflowReady() {
   const ready = store((s) => s.ready);
-  const employeeId = store(s => s.employeeId);
-  useEffect(() => {
-    if (!ready || !publicMockMode || !employeeAccounts.some(account => account.id === employeeId)) return;
-    void connectMockOrderFlow().catch(() => { /* Saved local orders remain visible; mutations require reconnect. */ });
-    return () => stopMockOrderFlow();
-  }, [ready, employeeId]);
   useEffect(() => {
     void initializeWorkflow();
-    const sync = (event: StorageEvent) => {
-      if (event.key !== "ascend-order-flow-v1" || !event.newValue) return;
-      const identity = {
-        employeeId: store.getState().employeeId,
-        employeeSessionId: store.getState().employeeSessionId,
-      };
-      try {
-        const state = JSON.parse(event.newValue).state as WorkflowState;
-        if (isWorkflowSnapshot(state))
-          store.setState({ ...state, ...identity, ready: true });
-      } catch {
-        /* Ignore malformed cross-tab mock data. */
-      }
-    };
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
   }, []);
   return ready;
 }
@@ -242,35 +188,6 @@ export const employeeAuthMockService = {
       store.setState({ employees: [...s.employees, { ...template, id: user.id, name: user.name, completedOrders: 0, online: false, currentIp: "", lastIp: "", riotId: "", verified: false, clientOpen: false }] });
     }
     await employeeAuthMockService.login(existing?.id ?? user.id);
-  },
-  async loginDemo(email: string, password: string) {
-    const account = employeeAccounts.find(account => account.email === email.trim().toLowerCase() && account.password === password);
-    if (!account) throw new Error("Email hoặc mật khẩu không đúng.");
-    await initializeWorkflow();
-    await employeeAuthMockService.login(account.id);
-    // Employee demo must not retain a previous admin identity in this tab.
-    useAdminStore.setState({ user: null });
-  },
-  async prepareRiotFixture() {
-    if (process.env.NODE_ENV !== "development")
-      throw new Error("Chỉ dành cho development.");
-    const s = store.getState();
-    if (s.employees.some((e) => e.id === "emp-riot-poc")) return;
-    const template = s.employees.find((e) => e.id === "emp-nova")!;
-    store.setState({
-      employees: [
-        ...s.employees,
-        {
-          ...template,
-          id: "emp-riot-poc",
-          name: "Riot PoC",
-          maxActiveOrders: 1,
-          riotId: "MockPlayer#VN2",
-          clientOpen: false,
-          verified: false,
-        },
-      ],
-    });
   },
   async login(id: string) {
     const s = store.getState();
@@ -310,7 +227,6 @@ export const employeeAuthMockService = {
     });
   },
   logout() {
-    stopMockOrderFlow();
     const id = store.getState().employeeSessionId;
     sessionStorage.removeItem("ascend-employee-identity");
     store.setState((s) => ({
@@ -341,19 +257,6 @@ export const orderMockService: EmployeeOrderService = {
     );
   },
   async claimOrder(id) {
-    if (publicMockMode && employeeAccounts.some(account => account.id === store.getState().employeeId)) {
-      const e = employee();
-      try {
-        const result = await mockOrderCommand("workflow:claim", { id });
-        store.setState(s => ({ activities: log(s, "Nhận đơn", `${e.name} phụ trách đơn; trò chuyện được mở.`, e.name, id, e.id) }));
-        return result.order!;
-      } catch (error) {
-        const code = error instanceof Error ? error.message : "connection";
-        const messages: Record<string, string> = { ORDER_ALREADY_CLAIMED: "Đơn hàng vừa được nhân viên khác nhận.", ORDER_LIMIT: "Bạn đã đạt giới hạn đơn hàng đang thực hiện.", FORBIDDEN: "Bạn chưa đủ điều kiện nhận đơn này." };
-        if (code in messages) throw new WorkflowError(code as "ORDER_ALREADY_CLAIMED" | "ORDER_LIMIT" | "FORBIDDEN", messages[code]);
-        throw new Error("Chưa kết nối được đơn hàng. Vui lòng thử lại.");
-      }
-    }
     // Web Locks serialize competing tabs. Re-read the shared state inside the lock.
     const claim = async () => {
       const identity = {
@@ -466,7 +369,6 @@ export const orderMockService: EmployeeOrderService = {
       throw new Error("Chỉ cập nhật đơn đang thực hiện của bạn.");
     if (!Number.isFinite(progress) || progress < o.progress || progress > 100)
       throw new Error("Tiến độ phải tăng và nằm trong khoảng 0–100%.");
-    if (publicMockMode && employeeAccounts.some(account => account.id === e.id)) await mockOrderCommand("workflow:update", { id, action: "progress", progress });
     patchOrder(
       id,
       { progress },
@@ -480,7 +382,6 @@ export const orderMockService: EmployeeOrderService = {
     const o = order(id);
     if (o.employeeId !== e.id || o.status !== "IN_PROGRESS")
       throw new Error("Chỉ hoàn tất đơn đang thực hiện của bạn.");
-    if (publicMockMode && employeeAccounts.some(account => account.id === e.id)) await mockOrderCommand("workflow:update", { id, action: "complete" });
     patchOrder(
       id,
       { status: "PENDING_REVIEW", progress: 100 },

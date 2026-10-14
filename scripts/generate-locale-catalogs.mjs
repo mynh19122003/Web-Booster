@@ -267,7 +267,7 @@ async function generateContentLocales() {
   const pages = await readVariable(path.join(root, "data/page-copy.ts"), "english");
   const services = await readVariable(path.join(root, "data/services.ts"), "services");
   const faqs = await readVariable(path.join(root, "data/faqs.ts"), "faqs");
-  const reviews = await readVariable(path.join(root, "data/reviews.ts"), "reviews");
+  const reviews = [];
   const source = [];
   for (const [page, fields] of Object.entries(pages)) for (const [field, value] of Object.entries(fields)) source.push({ key: `page_${page}_${field}`, value });
   for (const service of services) {
@@ -314,7 +314,7 @@ async function checkContentLocales() {
   const pages = await readVariable(path.join(root, "data/page-copy.ts"), "english");
   const services = await readVariable(path.join(root, "data/services.ts"), "services");
   const faqs = await readVariable(path.join(root, "data/faqs.ts"), "faqs");
-  const reviews = await readVariable(path.join(root, "data/reviews.ts"), "reviews");
+  const reviews = [];
   const english = new Set();
   for (const fields of Object.values(pages)) for (const value of Object.values(fields)) english.add(value);
   for (const service of services) { english.add(service.name); english.add(service.description); }
@@ -341,7 +341,7 @@ async function repairContentLocales() {
   const pages = await readVariable(path.join(root, "data/page-copy.ts"), "english");
   const services = await readVariable(path.join(root, "data/services.ts"), "services");
   const faqs = await readVariable(path.join(root, "data/faqs.ts"), "faqs");
-  const reviews = await readVariable(path.join(root, "data/reviews.ts"), "reviews");
+  const reviews = [];
   const source = [];
   for (const [page, fields] of Object.entries(pages)) for (const [field, value] of Object.entries(fields)) source.push({ key: `pages.${page}.${field}`, value });
   for (const service of services) {

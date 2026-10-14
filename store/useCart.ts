@@ -1,12 +1,11 @@
 "use client";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { publicMockMode } from "@/lib/public-data-source";
 
 export type CartItem = { id: string; href: string; game: string; title: string; detail: string; price: number };
 type CartState = { items: CartItem[]; add: (href: string, addAnother?: boolean) => void; remove: (id: string) => void };
 export const useCart = create<CartState>()(persist((set) => ({
-  items: publicMockMode ? [{ id: "demo-cart-coaching", href: "/checkout?amount=24&coach=luna&game=league-of-legends&mode=coaching&name=Luna+Coaching&quantity=1&type=coaching", game: "league-of-legends", title: "Luna Coaching", detail: "Luna · 1 hour", price: 24 }] : [],
+  items: [],
   add: (href, addAnother = false) => {
     // localStorage hydration is synchronous; load saved items before persisting a mutation.
     if (!useCart.persist.hasHydrated()) void useCart.persist.rehydrate();
@@ -29,4 +28,4 @@ export const useCart = create<CartState>()(persist((set) => ({
     set(state => (!addAnother || params.has("account")) && state.items.some(sameProduct) ? state : { items: [...state.items, item] });
   },
   remove: (id) => set(state => ({ items: state.items.filter(item => item.id !== id) })),
-}), { name: "ascend-cart-v1", storage: createJSONStorage(() => localStorage), skipHydration: true }));
+}), { name: "ascend-cart-api-v1", storage: createJSONStorage(() => localStorage), skipHydration: true }));

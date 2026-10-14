@@ -10,7 +10,7 @@ import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/store/useCart";
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Coins, Globe, Mail, ShieldCheck, ShoppingCart, Sparkles, Users, Zap } from "lucide-react";
-import type { ShopAccount } from "@/data/shop-accounts";
+import type { ShopAccount } from "@/types/shop-account";
 import { coachRankCardIconPath } from "@/data/coaches";
 import { AccountInventory } from "./AccountInventory";
 import { AccountCosmetics } from "./AccountCosmetics";
@@ -90,7 +90,7 @@ export function BoostRoyalAccountView({ account }: { account: ShopAccount }) {
             <div className="br-rank-history"><div>{rankIcon ? <Image src={rankIcon} alt="" width={36} height={36} /> : <ShieldCheck size={25} />}<span><small>{translateText(language, "CURRENT RANK", "Hạng hiện tại")}</small><b>{titleRank}</b></span></div><div><Users size={25} /><span><small>{translateText(language, "ACCOUNT LEVEL", "Cấp tài khoản")}</small><b>{translateText(language, "Level", "Cấp độ")}{account.level}</b></span></div><div><Globe size={25} /><span><small>{translateText(language, "REGION", "Khu vực")}</small><b>{account.server}</b></span></div></div>
             {topSkins.length > 0 && <div className="br-top-skins"><div className="br-preview-heading"><small>{translateText(language, "FEATURED SKINS", "Trang phục nổi bật")}</small><a href="#account-skins">{translateText(language, "View listed skins", "Xem trang phục")}<ArrowRight size={13} /></a></div><div>{topSkins.map((skin) => {
               const sources = accountArtworkSources(account.game, skin);
-              return <article key={skin}><AccountImage sources={sources} fill className="br-artwork-image" sizes="(max-width:540px) 45vw, 30vw" fallbackLabel={skin} /><div><b>{skin}</b>{sources.length > 0 && <small>{accountArtworkLabel(account.game, skin)}</small>}</div></article>;
+              return <article key={skin}><AccountImage sources={sources} fill className="br-artwork-image" sizes="(max-width:540px) 45vw, 30vw" fallbackLabel={skin} /><div><b>{skin}</b>{sources.length > 0 && <small>{accountArtworkLabel(account.game)}</small>}</div></article>;
             })}</div></div>}
           </section>
           <section className="br-seller">

@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { dataSource, dataSourceKey } from "./data-source";
+import { dataSourceKey } from "./data-source";
 import type {
   AdminUser,
   StaffMember,
@@ -38,7 +38,7 @@ export const useAdminStore = create<AdminState>()(
       storage: createJSONStorage(() => sessionStorage),
       skipHydration: true,
       partialize: (s) => ({
-        user: dataSource.auth === "mock" ? s.user : null,
+        user: null,
         staff: s.staff,
         invitations: s.invitations,
         sessions: s.sessions,

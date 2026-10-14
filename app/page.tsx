@@ -1,7 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { GameServices } from "@/components/home/GameServices";
 import { OrderTracking } from "@/components/home/OrderTracking";
-import { FeatureShowcase } from "@/components/home/FeatureShowcase";
 import { Reviews } from "@/components/home/Reviews";
 import { FAQ } from "@/components/home/FAQ";
 import { faqs } from "@/data/faqs";
@@ -17,7 +16,6 @@ export default function Home() {
       <Hero />
       <GameServices />
       <OrderTracking />
-      <FeatureShowcase />
       <Reviews />
       <FAQ />
       <script

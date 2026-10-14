@@ -2,8 +2,6 @@ import { mockState } from "@/lib/mock-state";
 import type { Coach } from "@/data/coaches";
 import { coachBase, coachPublished, publicCoachBases } from "@/lib/coach-ownership";
 import { applyCoachRiotProfile } from "@/lib/coach-riot-profile";
-import { publicMockMode } from "@/lib/public-data-source";
-import { mockCoaches } from "@/mocks/public";
 
 export type CoachProfileRow = {
   slug: string;
@@ -142,7 +140,7 @@ export function applyCoachOverride(coach: Coach, override?: CoachProfileOverride
 
 export function getCoachWithOverride(slug: string): Coach | undefined {
   const realBase = coachBase(slug);
-  const base = realBase ?? (publicMockMode ? mockCoaches.find(coach => coach.slug === slug) : undefined);
+  const base = realBase;
   if (!base || (realBase && !coachPublished(slug))) return undefined;
   const override = coachProfileOverride(slug);
   return applyCoachRiotProfile(applyCoachOverride(base, override));
@@ -151,6 +149,5 @@ export function getCoachWithOverride(slug: string): Coach | undefined {
 export function getAllCoachesWithOverrides(): Coach[] {
   const overrides = allCoachProfileOverrides();
   const bases = publicCoachBases();
-  if (publicMockMode) bases.push(...mockCoaches.filter(coach => !coachBase(coach.slug)));
   return bases.map(coach => applyCoachRiotProfile(applyCoachOverride(coach, overrides[coach.slug])));
 }

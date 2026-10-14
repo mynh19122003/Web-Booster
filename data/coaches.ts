@@ -22,9 +22,7 @@ export type Coach = {
   riotProfile?: import("@/lib/coach-riot-profile").CoachRiotProfile;
 };
 
-export const coaches: Coach[] = [
-  { slug: "luna", name: "Luna", game: "league-of-legends", gameName: "League of Legends", peakRank: "Challenger", rating: 4.98, reviewCount: 186, isMvp: true, hourlyRate: 24, online: true, server: "EUW", sessionFormats: ["live", "vod"], languages: ["English", "Tiếng Việt"], roles: ["Mid", "Support"], students: 420, yearsCoaching: 5, bioKey: "coachBioLuna", accent: "#8b72cf" },
-];
+export const coaches: Coach[] = [];
 
 export function coachFor(slug: string) {
   return coaches.find((coach) => coach.slug === slug);

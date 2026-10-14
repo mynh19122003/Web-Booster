@@ -9,9 +9,9 @@ import Image from "next/image";
 import { useEffect, useId, useMemo, useState } from "react";
 import { ActiveIndicator } from "@/components/ui/InteractionMotion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Check, Clock3, GraduationCap, ShieldCheck, Star, Users, Trophy, Swords, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Clock3, GraduationCap, ShieldCheck, Star, Pencil, Trophy, Swords } from "lucide-react";
 import { coachGameLogoPath, coachRankCardIconPath, type Coach } from "@/data/coaches";
-import { coachMockMetrics, coachOffers, coachRankHistory, coachReputation, coachPricing, coachMockFeedback } from "@/data/coach-profile";
+import { coachOffers, coachPricing } from "@/data/coach-profile";
 import { rankLevelsFor } from "@/lib/service-options";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { useMoney } from "@/components/ui/Currency";
@@ -76,10 +76,6 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
   const [quantity, setQuantity] = useState(previous?.quantity ?? 3);
   const offers = useMemo(() => coachOffers(coach), [coach]);
   const selectedOffer = offers.find((offer) => offer.id === selectedOfferId) ?? offers[2];
-  const metrics = useMemo(() => coachMockMetrics(coach), [coach]);
-  const reputation = useMemo(() => coachReputation(coach), [coach]);
-  const rankHistory = useMemo(() => coachRankHistory(coach.game, coach.slug.length), [coach.game, coach.slug]);
-  const feedback = useMemo(() => coachMockFeedback(coach), [coach]);
   const unitPrice = mode === "duo" ? selectedOffer.price : coach.hourlyRate;
   const { total, subtotal, discount, discountRate } = coachPricing(unitPrice, quantity);
 
@@ -192,12 +188,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
               <div><strong>{riotRank?.wins ?? "—"}</strong><small>{translateText(language, "Ranked wins", "Thắng xếp hạng")}</small></div>
               <div><strong>{riotRank?.losses ?? "—"}</strong><small>{translateText(language, "Ranked losses", "Thua xếp hạng")}</small></div>
               <div><strong>{riotRank ? `${rankWinRate(riotRank)}%` : "—"}</strong><small>{translateText(language, "Win rate", "Tỷ lệ thắng")}</small></div>
-            </section> : <section className="coach-profile-panel coach-profile-stats coach-profile-stats-four">
-              <div><span className="coach-stat-icon"><Check size={18} /></span><strong>{metrics.completedOrders.toLocaleString()}</strong><small>{t("coachCompletedOrders")}</small></div>
-              <div><span className="coach-stat-icon"><Star size={18} /></span><strong>{Math.round(reputation[0].width)}%</strong><small>{translateText(language, "Five-star reviews", "Đánh giá 5 sao")}</small></div>
-              <div><span className="coach-stat-icon"><Swords size={18} /></span><strong>{metrics.gamesWon.toLocaleString()}</strong><small>{t("coachGamesWon")}</small></div>
-              <div><span className="coach-stat-icon"><Clock3 size={18} /></span><strong>{metrics.since}</strong><small>{t("coachMemberSince")}</small></div>
-            </section>}
+            </section> : null}
 
             <section className="coach-profile-panel coach-profile-about">
               <div className="coach-profile-section-title"><GraduationCap size={18} /><h2>{t("aboutCoach")}</h2></div>
@@ -208,20 +199,7 @@ export function CoachProfile({ coach: initialCoach, canEdit = false, initialHist
 
             <section className="coach-profile-panel">
               <div className="coach-profile-section-title"><Star size={18} /><h2>{t("coachReputation")}</h2></div>
-              <div className="coach-reputation-layout">
-                <div className="coach-reputation-score"><strong>{coach.rating.toFixed(2)}</strong><span><span>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={14} fill="currentColor" />)}</span>{t("coachRatingsFromVerified")}</span></div>
-                <div className="coach-reputation-bars">{reputation.map((row) => <div className="coach-reputation-row" key={row.stars}><span>{row.stars} <Star size={11} fill="currentColor" /></span><div><i style={{ width: row.width + "%" }} /></div><small>{row.count}</small></div>)}</div>
-              </div>
-            </section>
-
-            {!employeeView && !coach.riotProfile && <section className="coach-profile-panel">
-              <div className="coach-profile-section-title"><Trophy size={18} /><div><h2>{t("coachRankHistory")}</h2><small>{t("coachCompetitiveProgress")}</small></div></div>
-              <div className="coach-rank-history">{rankHistory.map((step) => <div className="coach-rank-history-item" key={step.rank}><Image src={coachRankCardIconPath(coach.game, step.rank)} alt="" width={44} height={44} /><div><strong>{step.rank}</strong><span><i style={{ width: step.winRate + "%" }} /></span><small>{step.wins}W · {step.losses}L</small></div><small>{step.winRate}%</small></div>)}</div>
-            </section>}
-
-            <section className="coach-profile-panel">
-              <div className="coach-profile-section-title"><Users size={18} /><div><h2>{t("coachClientFeedback")}</h2><small>{t("coachRatingsFromVerified")}</small></div></div>
-              <div className="coach-feedback-grid">{feedback.map((review) => <article className="coach-feedback-card" key={review.initials}><span className="coach-feedback-stars">★★★★★</span><p>“{translateText(language,review.en,review.vi)}”</p><div><span>{review.initials}</span><div><strong>{review.name}</strong><small>{translateText(language, "Review", "Đánh giá")}</small></div><Check size={14} /></div></article>)}</div>
+              <div className="coach-reputation-score"><strong>{coach.reviewCount ? coach.rating.toFixed(2) : "—"}</strong><span>{coach.reviewCount} {t("coachRatingsFromVerified")}</span></div>
             </section>
           </div>
 

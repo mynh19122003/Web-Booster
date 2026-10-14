@@ -6,15 +6,13 @@ import { metadata } from "@/lib/seo";
 import { getCoachWithOverride } from "@/lib/coach-profile-db";
 import { currentUser } from "@/lib/current-user";
 import { canManageCoach } from "@/lib/coach-ownership";
-import { publicMockMode } from "@/lib/public-data-source";
-import { mockCoaches } from "@/mocks/public";
 
 const findCoach = (slug: string) => getCoachWithOverride(slug);
 
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return (publicMockMode ? mockCoaches : coaches).map((coach) => ({ slug: coach.slug }));
+  return coaches.map((coach) => ({ slug: coach.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/coaches/[slug]">): Promise<Metadata> {
@@ -28,6 +26,6 @@ export default async function CoachPage({ params }: PageProps<"/coaches/[slug]">
   const { slug } = await params;
   const coach = findCoach(slug);
   if (!coach) notFound();
-  const canEdit = publicMockMode ? false : canManageCoach(await currentUser(), slug);
+  const canEdit = canManageCoach(await currentUser(), slug);
   return <CoachProfile coach={coach} canEdit={canEdit} />;
 }

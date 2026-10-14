@@ -14,8 +14,6 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import { adminAuthService } from "@/services/admin";
-import { employeeAuthService } from "@/services/workflow-adapter";
-import { employeeDemo } from "@/lib/workflow/demo";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { Field } from "./Ui";
 function AuthFrame({ children }: { children: React.ReactNode }) {
@@ -83,14 +81,8 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
     setPending(true);
     setError("");
     try {
-      if (adminAuthService.getLoginProfiles().length > 0 &&
-          (mode === "viewer" || email.trim().toLowerCase() === employeeDemo.email)) {
-        await employeeAuthService.loginDemo(email, String(data.get("password")));
-        router.push("/employee");
-      } else {
-        await adminAuthService.login(email, String(data.get("password")), mode);
-        router.push("/admin");
-      }
+      await adminAuthService.login(email, String(data.get("password")), mode);
+      router.push("/admin");
     } catch (e) {
       setError(
         e instanceof Error
@@ -163,7 +155,6 @@ export function LoginPage({ changed = false }: { changed?: boolean }) {
               type={show ? "text" : "password"}
               name="password"
               key={mode}
-              defaultValue={mode === "viewer" ? employeeDemo.password : ""}
               minLength={8}
               required
               placeholder="Nhập mật khẩu, ít nhất 8 ký tự"

@@ -25,7 +25,7 @@ export function AccountCosmetics({ game, skins, total }: { game: string; skins: 
       const sources = accountArtworkSources(game, skin);
       return <article key={skin}>
         <AccountImage sources={sources} fill className="br-artwork-image" sizes="(max-width:540px) 45vw, (max-width:800px) 30vw, 180px" fallbackLabel={skin} />
-        <div><b>{skin}</b>{sources.length > 0 && <small>{accountArtworkLabel(game, skin)}</small>}</div>
+        <div><b>{skin}</b>{sources.length > 0 && <small>{accountArtworkLabel(game)}</small>}</div>
       </article>;
     })}</div>
     {visible.length === 0 && <p className="account-empty-search">{skins.length ? translateText(language,"No skins match your search.","Không tìm thấy trang phục phù hợp.") : translateText(language,"No skin previews listed for this account.","Tài khoản chưa có hình xem trước trang phục.")}</p>}

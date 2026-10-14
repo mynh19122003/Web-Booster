@@ -27,8 +27,7 @@ export interface WorkflowAdapter {
   security: typeof securityMockService;
   dashboard: typeof dashboardMockService;
 }
-export const workflowSource = "mock" as const;
-// Explicit mock selection. No HTTP endpoints and no automatic API fallback.
+export const workflowSource = "local" as const;
 export const workflowServices: WorkflowAdapter = {
   load: initializeWorkflow,
   auth: employeeAuthMockService,

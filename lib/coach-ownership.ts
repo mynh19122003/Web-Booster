@@ -17,7 +17,7 @@ export function coachBase(slug: string): Coach | undefined {
 export function coachPublished(slug: string): boolean {
   const row = rows().find(row => row.slug === slug);
   if (row) return row.published;
-  return Boolean(coachFor(slug)) && (mockState.coachPublication.get(slug) ?? true);
+  return false;
 }
 export function publicCoachBases(): Coach[] {
   const slugs = new Set(rows().map(row => row.slug));

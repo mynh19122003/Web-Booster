@@ -1,7 +1,0 @@
-[
-  { "id": "emp-sofia", "name": "Sofia", "email": "sofia@ascend.demo", "password": "Ascend@123" },
-  { "id": "emp-zen", "name": "Zen", "email": "zen@ascend.demo", "password": "Ascend@123" },
-  { "id": "emp-nova", "name": "Nova", "email": "nova@ascend.demo", "password": "Ascend@123" },
-  { "id": "emp-luna", "name": "Luna", "email": "luna@ascend.demo", "password": "Ascend@123" },
-  { "id": "emp-zero", "name": "Zero", "email": "zero@ascend.demo", "password": "Ascend@123" }
-]

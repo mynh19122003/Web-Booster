@@ -8,12 +8,9 @@ import type { Socket } from "socket.io-client";
 import { createChatSocket } from "@/lib/chat-socket-client";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 import { intlLocales, translateText } from "@/lib/i18n";
-import { publicMockMode } from "@/lib/public-data-source";
-import { persistDemoChat, publicRequest } from "@/services/public";
-import { mockRequests, mockMessages } from "@/mocks/public";
+import { publicRequest } from "@/services/public";
 import type { AuthUser } from "@/lib/auth-db";
 import type { CustomerRequest, SupportMessage } from "@/lib/chat-types";
-import employeeAccounts from "@/mocks/employee-accounts.json";
 import { chatCopy, chatOrderLabel } from "@/lib/chat-presentation";
 
 type ChatUpdate = { request: CustomerRequest; messages: SupportMessage[] };
@@ -51,50 +48,32 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
   const input = useRef<HTMLTextAreaElement>(null);
   const failedSend = useRef<{ id: string; text: string; clientId: string } | null>(null);
   const userId = user?.id;
-  const demoMode = publicMockMode && (!employeeUser || employeeAccounts.some(account => account.id === employeeUser.id));
-  const demoEmployee = demoMode && Boolean(employeeUser);
   const lastMessageId = messages.at(-1)?.id;
   const currentRequestId = current?.id;
-  const chatRequest = useCallback((path: string, options: RequestInit) => demoMode ? publicRequest(path, options) : fetch(path, options), [demoMode]);
+  const chatRequest = useCallback((path: string, options: RequestInit) => publicRequest(path, options), []);
   useEffect(() => { activeId.current = selected; }, [selected]);
 
   const applyUpdate = useCallback((update: ChatUpdate) => {
-    if (demoMode) persistDemoChat(update.request, update.messages);
     setRequests(rows => [...rows.filter(row => row.id !== update.request.id), update.request].sort((a, b) => b.updatedAt - a.updatedAt));
     if (update.request.id === activeId.current) {
       setCurrent(update.request);
       setMessages(update.messages);
     }
-  }, [demoMode]);
+  }, []);
 
   const refreshList = useCallback(async (signal?: AbortSignal) => {
-    if (demoEmployee && employeeUser) {
-      if (signal?.aborted) return;
-      setUser(employeeUser);
-      setLoaded(true);
-      if (socket.current?.connected) {
-        const result = await socket.current.timeout(10000).emitWithAck("chat:list", {}) as ChatReply;
-        if (signal?.aborted) return;
-        if (!result.ok || !result.requests) throw new Error("connection");
-        setRequests(result.requests);
-        setSelected(value => value || result.requests![0]?.id || "");
-      }
-      return;
-    }
     const response = await chatRequest("/api/requests", { cache: "no-store", signal });
     if (response.status === 401) { setUser(null); setLoaded(true); return; }
     if (!response.ok) throw new Error("connection");
     const data = await response.json() as { user: AuthUser; requests: CustomerRequest[] };
     if (signal?.aborted) return;
-    const viewer = demoMode && employeeUser ? employeeUser : data.user;
+    const viewer = data.user;
     setUser(viewer);
-    const missing = demoMode ? mockRequests.filter(row => !data.requests.some(existing => existing.id === row.id)) : [];
-    missing.forEach(row => persistDemoChat(row, structuredClone(mockMessages[row.id])));
-    const rows = [...data.requests, ...missing].filter(row => viewer.role !== "employee" || row.employeeId === viewer.id).sort((a, b) => b.updatedAt - a.updatedAt);
+    const rows = data.requests.filter(row => viewer.role !== "employee" || row.employeeId === viewer.id).sort((a, b) => b.updatedAt - a.updatedAt);
     setRequests(rows);
     setSelected(value => value || rows[0]?.id || "");
     setLoaded(true);
-  }, [chatRequest, demoMode, demoEmployee, employeeUser]);
+  }, [chatRequest]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -104,7 +83,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
 
   useEffect(() => {
     if (!userId) return;
-    const client = createChatSocket(demoMode, Boolean(employeeUser), employeeUser?.id);
+    const client = createChatSocket();
     socket.current = client;
     client.on("connect", () => {
       setConnected(true); setError("");
@@ -114,7 +93,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
       client.timeout(10000).emit("chat:list", {}, (timeout: Error | null, result: ChatReply) => {
         if (timeout || !result?.ok || !result.user || !result.requests) { setError("connection"); return; }
         setUser(result.user); setRequests(result.requests);
-        setSelected(id => result.requests!.some(row => row.id === id) || /^DEMO-[a-f0-9-]{8,36}$/.test(id) ? id : result.requests![0]?.id ?? "");
+        setSelected(id => result.requests!.some(row => row.id === id) ? id : result.requests![0]?.id ?? "");
       });
     });
     client.on("disconnect", () => { setConnected(false); setJoined(false); });
@@ -124,29 +103,19 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
     client.on("chat:changed", () => { void refreshList().catch(() => setError("connection")); });
     client.connect();
     return () => { client.disconnect(); socket.current = null; };
-  }, [userId, applyUpdate, refreshList, demoMode, employeeUser]);
+  }, [userId, applyUpdate, refreshList]);
 
   useEffect(() => {
     if (!selected || !userId) return;
     const controller = new AbortController();
     async function loadThread() {
-      if (demoEmployee) {
-        if (!connected || !socket.current?.connected) return;
-        const result = await socket.current.timeout(10000).emitWithAck("chat:join", { id: selected }) as ChatReply;
-        if (controller.signal.aborted) return;
-        if (!result.ok || !result.request || !result.messages) throw new Error(result.error ?? "connection");
-        applyUpdate({ request: result.request, messages: result.messages });
-        setJoined(true);
-        setError("");
-        return;
-      }
       const response = await chatRequest(`/api/requests/${encodeURIComponent(selected)}`, { cache: "no-store", signal: controller.signal });
       if (!response.ok) throw new Error("connection");
       const data = await response.json() as ChatUpdate;
       if (controller.signal.aborted) return;
       setCurrent(data.request); setMessages(data.messages);
       if (connected && socket.current) {
-        socket.current.timeout(10000).emit("chat:join", { id: selected, ...(demoMode ? { seed: data } : {}) }, (timeout: Error | null, result: ChatReply) => {
+        socket.current.timeout(10000).emit("chat:join", { id: selected }, (timeout: Error | null, result: ChatReply) => {
           if (controller.signal.aborted) return;
           if (timeout || !result?.ok || !result.request || !result.messages) { setError(result?.error ?? "connection"); return; }
           applyUpdate({ request: result.request, messages: result.messages }); setJoined(true); setError("");
@@ -155,7 +124,7 @@ export function MessengerChat({ compact = false, initialRequestId = "", employee
     }
     void loadThread().catch(() => { if (!controller.signal.aborted) setError("connection"); });
     return () => controller.abort();
-  }, [selected, connected, userId, applyUpdate, chatRequest, demoMode, demoEmployee]);
+  }, [selected, connected, userId, applyUpdate, chatRequest]);
 
   useEffect(() => {
     if (log.current) log.current.scrollTop = log.current.scrollHeight;

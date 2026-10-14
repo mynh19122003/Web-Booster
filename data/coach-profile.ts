@@ -28,30 +28,11 @@ export function coachOffers(coach: Coach): CoachOffer[] {
   }));
 }
 
-export function coachRankHistory(game: string, seed = 0) {
-  const ranks = game === "valorant"
-    ? ["Gold", "Platinum", "Diamond", "Ascendant", "Immortal", "Radiant"]
-    : ["Silver", "Gold", "Platinum", "Emerald", "Diamond", "Master", "Grandmaster", "Challenger"];
-  return ranks.map((rank, index) => {
-    const games = 80 + index * 23 + seed * 7;
-    const wins = Math.round(games * ([51, 54, 56, 59, 63, 68, 72, 76][index] + seed % 3) / 100);
-    return { rank, wins, losses: games - wins, winRate: Math.round(wins / games * 100) };
-  });
-}
-
 export function coachPricing(unitPrice: number, quantity: number) {
   const discountRate = quantity >= 5 ? 0.1 : quantity >= 3 ? 0.05 : 0;
   const subtotal = Math.round(unitPrice * quantity * 100) / 100;
   const discount = Math.round(subtotal * discountRate * 100) / 100;
   return { subtotal, discount, discountRate, total: Math.round((subtotal - discount) * 100) / 100 };
-}
-
-export function coachMockFeedback(coach: Coach) {
-  return [
-    { initials: "AK", name: "Alex K.", en: `${coach.name} helped me understand my ${coach.roles[0]} decisions. The practice plan was clear and useful.`, vi: `${coach.name} giúp tôi hiểu các quyết định khi chơi ${coach.roles[0]}. Kế hoạch luyện tập rất rõ ràng.` },
-    { initials: "JL", name: "Jamie L.", en: `A focused ${coach.gameName} session with actionable feedback on my mistakes.`, vi: `Buổi học ${coach.gameName} tập trung, có hướng dẫn cụ thể để sửa lỗi của tôi.` },
-    { initials: "MT", name: "Minh T.", en: `Patient explanations from ${coach.name}. I know what to work on before my next session.`, vi: `${coach.name} giải thích kiên nhẫn. Tôi biết cần luyện gì trước buổi học tiếp theo.` },
-  ];
 }
 
 export function coachReputation(coach: Coach) {
@@ -66,12 +47,4 @@ export function coachReputation(coach: Coach) {
     { stars: 2, count: two },
     { stars: 1, count: Math.max(0, coach.reviewCount - five - four - three - two) },
   ].map(row => ({ ...row, width: coach.reviewCount > 0 ? row.count / coach.reviewCount * 100 : 0 }));
-}
-
-export function coachMockMetrics(coach: Coach) {
-  return {
-    completedOrders: coach.students * 8 + coach.reviewCount,
-    gamesWon: coach.students * 41 + coach.reviewCount * 3,
-    since: 2026 - coach.yearsCoaching,
-  };
 }

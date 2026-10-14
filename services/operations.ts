@@ -1,29 +1,11 @@
 "use client";
-import { dataSource, selectDataSource } from "@/lib/admin/data-source";
 import { unavailable, ApiFeatureUnavailableError } from "@/lib/api/errors";
-import {
-  mockOrderService,
-  mockAssignmentService,
-  mockChatService,
-} from "./mock/operations.service";
 import type { OrderService, AssignmentService, ChatService } from "./contracts";
 export {
   incomingStatuses,
   activeStatuses,
   workload,
 } from "@/lib/admin/operations-model";
-const mockOrderAdapter = {
-  ...mockOrderService,
-  getOrderById: mockOrderService.getOrder,
-  assignStaff:
-    dataSource.assignments === "mock"
-      ? mockOrderService.assignStaff
-      : unavailable("assignments"),
-  reassignStaff:
-    dataSource.assignments === "mock"
-      ? mockOrderService.reassignStaff
-      : unavailable("assignments"),
-};
 const apiOrderAdapter = {
   getOrders: unavailable("orders"),
   getOrder: unavailable("orders"),
@@ -39,15 +21,7 @@ const apiOrderAdapter = {
   updateProgress: unavailable("orders"),
   saveNotes: unavailable("orders"),
 };
-export const orderService = selectDataSource<typeof mockOrderAdapter>(
-  dataSource.orders,
-  mockOrderAdapter,
-  apiOrderAdapter,
-) satisfies OrderService;
-const mockAssignmentAdapter = {
-  ...mockAssignmentService,
-  assignStaff: mockOrderService.assignStaff,
-};
+export const orderService = apiOrderAdapter satisfies OrderService;
 const apiAssignmentAdapter = {
   getAssignments: unavailable("assignments"),
   getAvailableStaff: unavailable("assignments"),
@@ -57,15 +31,7 @@ const apiAssignmentAdapter = {
     throw new ApiFeatureUnavailableError("assignments");
   },
 };
-export const assignmentService = selectDataSource<typeof mockAssignmentAdapter>(
-  dataSource.assignments,
-  mockAssignmentAdapter,
-  apiAssignmentAdapter,
-) satisfies AssignmentService;
-const mockChatAdapter = {
-  ...mockChatService,
-  getMessages: mockChatService.getConversationMessages,
-};
+export const assignmentService = apiAssignmentAdapter satisfies AssignmentService;
 const apiChatAdapter = {
   prepareAttachment: unavailable("chat"),
   getConversations: unavailable("chat"),
@@ -76,8 +42,4 @@ const apiChatAdapter = {
   markAsRead: unavailable("chat"),
   archiveConversation: unavailable("chat"),
 };
-export const chatService = selectDataSource<typeof mockChatAdapter>(
-  dataSource.chat,
-  mockChatAdapter,
-  apiChatAdapter,
-) satisfies ChatService;
+export const chatService = apiChatAdapter satisfies ChatService;

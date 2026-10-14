@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useWorkflow } from "@/lib/workflow/store";
-import { publicMockMode } from "@/lib/public-data-source";
-import employeeAccounts from "@/mocks/employee-accounts.json";
-import { mockCoaches } from "@/mocks/public";
 import { notifyCoachProfileUpdated } from "@/lib/coach-profile-events";
 
 let presenceRevision = 0;
@@ -14,26 +11,22 @@ export function EmployeeAvailabilityToggle({ compact = false }: { compact?: bool
   const online = useWorkflow(state => state.employees.find(employee => employee.id === state.employeeId)?.online ?? false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const demo = publicMockMode && employeeAccounts.some(account => account.id === employeeId);
-  const demoAccount = demo ? employeeAccounts.find(account => account.id === employeeId) : undefined;
-  const demoCoachSlug = demoAccount && mockCoaches.some(coach => coach.slug === demoAccount.id.slice(4)) ? demoAccount.id.slice(4) : null;
-
   useEffect(() => {
-    if (!employeeId || (demo && !demoCoachSlug)) return;
+    if (!employeeId) return;
     const controller = new AbortController();
     const revision = presenceRevision;
-    void fetch(demoCoachSlug ? `/api/coaches/${encodeURIComponent(demoCoachSlug)}` : "/api/employee/status", { cache: "no-store", signal: controller.signal })
+    void fetch("/api/employee/status", { cache: "no-store", signal: controller.signal })
       .then(async response => {
         if (!response.ok) return;
         const data = await response.json();
-        const savedOnline = demoCoachSlug ? data.coach?.online : data.isOnline;
+        const savedOnline = data.isOnline;
         if (!controller.signal.aborted && revision === presenceRevision && typeof savedOnline === "boolean") {
           useWorkflow.setState(state => ({ employees: state.employees.map(employee => employee.id === employeeId ? { ...employee, online: savedOnline } : employee) }));
         }
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [employeeId, demo, demoCoachSlug]);
+  }, [employeeId]);
 
   async function toggle() {
     if (!employeeId || busy) return;
@@ -42,11 +35,11 @@ export function EmployeeAvailabilityToggle({ compact = false }: { compact?: bool
     setBusy(true);
     setError("");
     try {
-      if (!demo || demoCoachSlug) {
-        const response = await fetch(demoCoachSlug ? "/api/mock/coach-presence" : "/api/employee/status", {
+      {
+        const response = await fetch("/api/employee/status", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(demoCoachSlug ? { employeeId, password: demoAccount?.password, isOnline: next } : { isOnline: next }),
+          body: JSON.stringify({ isOnline: next }),
         });
         const result = await response.json();
         if (!response.ok || result.isOnline !== next) throw new Error("Không thể lưu trạng thái.");

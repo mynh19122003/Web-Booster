@@ -1,19 +1,12 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useOperations } from "./operations-store";
-import { initializeReviewData } from "@/services/mock/bootstrap";
-import { assignmentService } from "@/services/operations";
-import { dataSource } from "./data-source";
 import { ApiFeatureUnavailableError } from "@/lib/api/errors";
 import { adminError } from "@/lib/admin/vi";
 export function useOperationsHydration() {
   const ready = useOperations((s) => s.ready);
   useEffect(() => {
-    void initializeReviewData();
-    if (dataSource.assignments !== "mock" || dataSource.orders !== "mock")
-      return;
-    const timer = setInterval(() => assignmentService.expireOffers(), 1000);
-    return () => clearInterval(timer);
+    useOperations.setState({ ready: true, initialized: true });
   }, []);
   return ready;
 }

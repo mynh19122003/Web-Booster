@@ -1,17 +1,8 @@
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import employeeAccounts from "@/mocks/employee-accounts.json";
 import { mockState } from "@/lib/mock-state";
 
 export type AuthUser = { id: string; name: string; email: string; role: "customer" | "user" | "employee" };
 type StoredUser = AuthUser & { password_hash: string | null; google_sub?: string };
-
-for (const account of employeeAccounts) {
-  if (!mockState.users.has(account.id)) mockState.users.set(account.id, {
-    id: account.id, name: account.name, email: account.email, role: "employee",
-    password_hash: createPasswordHash(account.password),
-  } satisfies StoredUser);
-  if (account.id === "emp-luna" && !mockState.coachAccess.has(account.id)) mockState.coachAccess.set(account.id, "demo");
-}
 
 const users = mockState.users as Map<string, StoredUser>;
 const tokenHash = (token: string) => createHash("sha256").update(token).digest("hex");

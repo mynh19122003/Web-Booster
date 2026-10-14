@@ -23,7 +23,7 @@ const server = createServer((request, response) => {
 const origin = process.env.CHAT_ORIGIN ?? `http://${hostname}:${port}`;
 const previewOrigins = ["http://127.0.0.1:3101", "http://127.0.0.1:3102", "http://localhost:3101", "http://localhost:3102"];
 const allowedOrigins = process.env.CHAT_ALLOWED_ORIGINS?.split(",").map(value => value.trim()).filter(Boolean) ?? (previewOrigins.includes(origin) ? previewOrigins : []);
-const io = attachChatSocketServer(server, { origin, allowedOrigins, mock: process.env.NEXT_PUBLIC_PUBLIC_DATA_SOURCE !== "api" });
+const io = attachChatSocketServer(server, { origin, allowedOrigins });
 server.listen(port, hostname, () => console.log(`Ready on ${origin} (Socket.IO enabled)`));
 for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => {
   io.close();

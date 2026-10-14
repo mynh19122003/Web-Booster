@@ -49,13 +49,6 @@ export function Hero() {
               }}>{t("startClimb")} <ArrowUpRight size={19} /></Link>
               <a className="button ghost !px-6 !py-3.5 !text-base" href="#services" onClick={exploreServices}>{t("exploreServices")} <ArrowDown size={17} /></a>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="avatar-stack shrink-0" aria-hidden="true"><span>AK</span><span>JL</span><span>RM</span><span>+</span></div>
-              <div className="text-xs leading-relaxed md:text-sm">
-                <div><span className="text-[#FF9F3C]" aria-label={t("fiveStars")}>★★★★★</span><strong className="ml-2 text-zinc-100 text-sm md:text-base">4.9/5 {t("rating")}</strong></div>
-                <p className="mt-1 text-zinc-400">15,000+ {t("completedOrders")}</p>
-              </div>
-            </div>
           </div>
           <div className="relative flex min-w-0 flex-col items-center justify-center lg:col-span-5">
             <div id="hero-artifact-anchor" className="pointer-events-none relative flex h-[520px] w-full max-w-[620px] items-center justify-center aspect-square lg:h-[600px] lg:max-w-[660px]" aria-hidden="true" />

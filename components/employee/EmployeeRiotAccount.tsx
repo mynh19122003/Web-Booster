@@ -2,8 +2,6 @@
 import { useState, useSyncExternalStore } from "react";
 import { parseRiotId } from "@/lib/riot-id";
 import { riotPlatforms, type RiotPlatform, type MatchHistory } from "@/lib/riot-types";
-import { publicMockMode } from "@/lib/public-data-source";
-import employeeAccounts from "@/mocks/employee-accounts.json";
 import type { Employee } from "@/types/workflow";
 
 type RiotSettings = { riotId: string; game: string; platform: RiotPlatform; history: MatchHistory; source: "riot" };
@@ -36,7 +34,7 @@ export function EmployeeRiotAccount({ employee, saved }: { employee: Employee; s
     setBusy(true); setMessage("");
     try {
       if (game === "Valorant") throw new Error("Valorant cần kết nối Riot Sign On để tải rank và lịch sử đấu.");
-      const response = await fetch("/api/employee/riot/history", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", body: JSON.stringify({ riotId: `${id.gameName}#${id.tagLine}`, platform, game: game === "Teamfight Tactics" ? "tft" : "lol", publishProfile: true, ...(publicMockMode ? { employee: employeeAccounts.find(account => account.id === employee.id) } : {}) }) });
+      const response = await fetch("/api/employee/riot/history", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", body: JSON.stringify({ riotId: `${id.gameName}#${id.tagLine}`, platform, game: game === "Teamfight Tactics" ? "tft" : "lol", publishProfile: true }) });
       const history = await response.json() as MatchHistory;
       const errors: Record<string, string> = { "key-missing": "Máy chủ chưa cấu hình Riot API key.", "key-rejected": "Riot API key đã hết hạn hoặc không hợp lệ. Cần cập nhật key trên máy chủ.", "account-not-found": "Không tìm thấy tài khoản Riot. Kiểm tra Riot ID, game và máy chủ.", "rate-limited": `Riot đang giới hạn truy vấn. Thử lại sau ${history.retryAfter ?? 60} giây.`, unauthorized: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", "connection-failed": "Không kết nối được Riot API. Vui lòng thử lại." };
       if (!response.ok || history.status !== "ready" || !history.account) throw new Error(errors[history.error ?? ""] ?? "Không tải được tài khoản Riot. Kiểm tra Riot ID và máy chủ rồi thử lại.");

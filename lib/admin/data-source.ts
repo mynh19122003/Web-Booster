@@ -1,10 +1,9 @@
-export type DataSource = "mock" | "api";
+export type DataSource = "api";
 function source(value: string | undefined): DataSource {
-  if (value === undefined || value === "mock") return "mock";
-  if (value === "api") return "api";
-  throw new Error("Invalid Admin data source. Use mock or api.");
+  if (value === undefined || value === "api") return "api";
+  throw new Error("Invalid Admin data source. Use api.");
 }
-/** Explicit per-module sources. Changing a source never enables automatic fallback. */
+/** Admin adapters accept only API data. */
 export const dataSource = {
   auth: source(process.env.NEXT_PUBLIC_ADMIN_AUTH_SOURCE),
   staff: source(process.env.NEXT_PUBLIC_ADMIN_STAFF_SOURCE),
@@ -16,6 +15,3 @@ export const dataSource = {
   notifications: source(process.env.NEXT_PUBLIC_ADMIN_NOTIFICATIONS_SOURCE),
 } as const;
 export const dataSourceKey = Object.values(dataSource).join("-");
-export function selectDataSource<T>(mode: DataSource, mock: T, api: T): T {
-  return mode === "mock" ? mock : api;
-}

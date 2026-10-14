@@ -1,9 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { persistDemoChat, publicRequest } from "@/services/public";
-import type { CustomerRequest, SupportMessage } from "@/lib/chat-types";
-import { publicMockMode } from "@/lib/public-data-source";
+import { publicRequest } from "@/services/public";
 import { createChatSocket } from "@/lib/chat-socket-client";
 
 const UnreadContext = createContext(0);
@@ -26,12 +24,11 @@ export function UserChatNotifications({ children }: { children: React.ReactNode 
   }, [path]);
   useEffect(() => {
     if (!id) return;
-    const socket = createChatSocket(publicMockMode, false);
+    const socket = createChatSocket();
     const update = (data: { total: number }) => {
       if (Number.isSafeInteger(data?.total) && data.total >= 0) setSnapshot({ id, total: data.total });
     };
     socket.on("chat:unread", update);
-    socket.on("chat:update", (data: { request: CustomerRequest; messages: SupportMessage[] }) => { if (publicMockMode) persistDemoChat(data.request, data.messages); });
     socket.on("connect", () => {
       socket.timeout(10000).emit("chat:unread:get", {}, (error: Error | null, result: { ok: boolean; unread: { total: number } }) => {
         if (!error && result?.ok) update(result.unread);

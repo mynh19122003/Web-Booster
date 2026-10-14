@@ -1,9 +1,9 @@
-import { reviews } from "@/data/reviews";
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
 
 export async function GET(request: Request) {
+  const reviews: never[] = [];
   const url = new URL(request.url);
   const rawCursor = Number(url.searchParams.get("cursor") ?? 0);
   const rawLimit = Number(url.searchParams.get("limit") ?? DEFAULT_PAGE_SIZE);
