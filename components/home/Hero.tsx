@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import type { MouseEvent } from "react";
 import { AscendLogo } from "@/components/ui/AscendLogo";
 import { HeroBackgroundAnimation } from "@/components/home/HeroBackgroundAnimation";
 
@@ -15,6 +16,14 @@ export function Hero() {
   const selectedGame = useStore((state) => state.game);
   const gameConfig = gameConfigFor(selectedGame);
   const heroDescription = selectedGame === "valorant" ? t("heroValorant") : selectedGame === "teamfight-tactics" ? t("heroTft") : t("heroLeague");
+  function exploreServices(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const section = document.getElementById("services");
+    if (!section) return;
+    event.preventDefault();
+    if (window.location.hash !== "#services") window.history.pushState(null, "", "#services");
+    section.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+  }
   return (
     <section id="hero" className="hero relative isolate overflow-hidden pt-20">
       <HeroBackgroundAnimation />
@@ -34,8 +43,11 @@ export function Hero() {
               {heroDescription}
             </p>
             <div className="relative z-20 !mt-7 !mb-8 flex flex-wrap items-center gap-4 pointer-events-auto">
-              <Link className="button magnetic !px-7 !py-3.5 !text-base" href="/services#configure">{t("startClimb")} <ArrowUpRight size={19} /></Link>
-              <a className="button ghost !px-6 !py-3.5 !text-base" href="#services">{t("exploreServices")} <ArrowDown size={17} /></a>
+              <Link className="button magnetic !px-7 !py-3.5 !text-base" href="/services#configure" onNavigate={(event) => {
+                event.preventDefault();
+                window.location.assign("/services#configure");
+              }}>{t("startClimb")} <ArrowUpRight size={19} /></Link>
+              <a className="button ghost !px-6 !py-3.5 !text-base" href="#services" onClick={exploreServices}>{t("exploreServices")} <ArrowDown size={17} /></a>
             </div>
             <div className="flex items-center gap-4">
               <div className="avatar-stack shrink-0" aria-hidden="true"><span>AK</span><span>JL</span><span>RM</span><span>+</span></div>
