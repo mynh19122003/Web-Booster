@@ -6,7 +6,7 @@ export function TrophyBreak() {
   const { t } = useLanguage();
   return (
     <section className="trophy-break" id="trophy">
-      <div className="site-container">
+      <div className="site-container" data-reveal>
         <p className="eyebrow">{t("trophyEyebrow")}</p>
         <h2>
           {t("trophyLead")}

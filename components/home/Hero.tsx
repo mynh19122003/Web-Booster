@@ -26,16 +26,16 @@ export function Hero() {
               <span className="size-2 shrink-0 rounded-full bg-[#FF9F3C] shadow-[0_0_10px_#FF9F3C]" aria-hidden="true" />
               {t("premierServices")}
             </div>
-            <h1 className="!text-[clamp(2.5rem,5.2vw,5rem)] !leading-[1.08] !tracking-tight !mb-6">
+            <h1 className="!mb-7 !text-[clamp(2.5rem,5.2vw,5rem)] !leading-[1.08] !tracking-tight">
               {gameConfig.heroTitle}<br />
               <span className="gradient-text">{t("heroTagline")}</span>
             </h1>
-            <p className="!mt-0 mb-8 max-w-xl text-base leading-relaxed text-zinc-300 md:text-lg">
+            <p className="!m-0 max-w-xl text-base leading-relaxed text-zinc-300 md:text-lg">
               {heroDescription}
             </p>
-            <div className="mb-8 flex flex-wrap items-center gap-4">
-              <Link className="button magnetic !px-7 !py-3.5 !text-base" href="/#services">{t("startClimb")} <ArrowUpRight size={19} /></Link>
-              <Link className="button ghost !px-6 !py-3.5 !text-base" href="#services">{t("exploreServices")} <ArrowDown size={17} /></Link>
+            <div className="relative z-20 !mt-7 !mb-8 flex flex-wrap items-center gap-4 pointer-events-auto">
+              <Link className="button magnetic !px-7 !py-3.5 !text-base" href="/services#configure">{t("startClimb")} <ArrowUpRight size={19} /></Link>
+              <a className="button ghost !px-6 !py-3.5 !text-base" href="#services">{t("exploreServices")} <ArrowDown size={17} /></a>
             </div>
             <div className="flex items-center gap-4">
               <div className="avatar-stack shrink-0" aria-hidden="true"><span>AK</span><span>JL</span><span>RM</span><span>+</span></div>
@@ -47,17 +47,17 @@ export function Hero() {
           </div>
           <div className="relative flex min-w-0 flex-col items-center justify-center lg:col-span-5">
             <div id="hero-artifact-anchor" className="pointer-events-none relative flex h-[520px] w-full max-w-[620px] items-center justify-center aspect-square lg:h-[600px] lg:max-w-[660px]" aria-hidden="true" />
-            <div className="relative z-10 mt-4 flex w-full max-w-[440px] items-center gap-3 border-t border-white/[0.08] pt-4 lg:absolute lg:top-full">
+            <div className="hero-artifact-caption relative z-10 mt-6 mb-6 flex w-full max-w-[440px] items-center gap-4 border-t border-white/[0.08] py-5">
               <AscendLogo variant="icon" size="sm" className="shrink-0" />
-              <div className="min-w-0"><p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-300">{t("artifact")}</p><p className="mt-1 text-xs text-zinc-400">{t("artifactDescription")}</p></div>
+              <div className="flex min-w-0 flex-col gap-2"><p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-300">{t("artifact")}</p><p className="text-xs text-zinc-400">{t("artifactDescription")}</p></div>
               <span className="ml-auto shrink-0 font-mono text-[11px] text-zinc-500">01 / ∞</span>
             </div>
           </div>
         </div>
 
         {/* Bottom Area: All Systems Ready + Trust Ribbon */}
-        <div className="relative z-10 mt-auto flex flex-col gap-3">
-          <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3 border-t border-white/[0.06] pt-3 pb-1 font-mono text-[10px] uppercase tracking-widest text-zinc-500 sm:text-[11px]">
+        <div className="hero-dock relative z-10 mt-auto flex flex-col gap-5">
+          <div className="hero-dock-status grid min-h-16 w-full grid-cols-[1fr_auto_1fr] items-center gap-4 border-t border-white/[0.06] py-5 font-mono text-[10px] leading-relaxed uppercase tracking-widest text-zinc-500 sm:text-[11px]">
             <span className="flex items-center gap-2"><span className="size-1.5 shrink-0 rounded-full bg-[#FF9F3C]" aria-hidden="true" /><span>{t("systemsReady")}</span></span>
             <Link href="#services" className="flex items-center justify-center gap-2 text-center transition-colors hover:text-white"><span>{t("scrollExplore")}</span><ArrowDown size={13} className="shrink-0" /></Link>
             <span className="justify-self-end text-right">{t("establishedYear", { year: 2026 })}</span>

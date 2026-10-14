@@ -25,7 +25,7 @@ const trustPillars = [
 export function HeroTrustRibbon() {
   const { t } = useLanguage();
   return (
-    <div className="relative z-10 mt-1 mb-0 w-full pb-12 md:pb-14">
+    <div className="relative z-10 w-full pb-6">
       {/* Ambient backlight */}
       <div
         className="bg-[#D97706]/10 blur-[100px] w-3/4 h-8 absolute inset-x-0 mx-auto -bottom-2 -z-10 pointer-events-none"
@@ -40,7 +40,7 @@ export function HeroTrustRibbon() {
             return (
               <div
                 key={item.key}
-                className="flex items-center justify-center gap-3 py-3.5 px-4 text-center group cursor-default"
+                className="flex min-h-16 items-center justify-center gap-3 py-5 px-4 text-center group cursor-default"
               >
                 <Icon className="text-[#FF9F3C] w-4 h-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
                 <span className="text-xs font-semibold text-zinc-300 group-hover:text-white tracking-wide transition-colors">

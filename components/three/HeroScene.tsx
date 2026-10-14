@@ -6,8 +6,6 @@ import * as THREE from "three";
 import { RankCrystal } from "./RankCrystal";
 import { FloatingParticles } from "./FloatingParticles";
 import { GamePortal } from "./GamePortal";
-import { TrophyScene } from "./TrophyScene";
-import { useStore } from "@/store/useStore";
 export function HeroScene({
   mobile,
   reduced,
@@ -18,18 +16,15 @@ export function HeroScene({
   const root = useRef<THREE.Group>(null);
   const artifact = useRef<THREE.Group>(null);
   const fragment = useRef(0);
-  const assembly = useRef(1);
   const pointer = useRef({ x: 0, y: 0 });
   const { viewport, size, invalidate } = useThree();
-  const target = useStore((s) => s.target);
-  const game = useStore((s) => s.game);
   const path = usePathname();
   const sections = useRef<(HTMLElement | null)[]>([]);
   const bounds = useRef<{ top: number; height: number }[]>([]);
   const anchorBounds = useRef<{ left: number; top: number; width: number; height: number } | null>(null);
   const scrollY = useRef(0);
   useEffect(() => {
-    sections.current = ["hero", "trophy", "final-cta"].map((id) =>
+    sections.current = ["hero"].map((id) =>
       document.getElementById(id),
     );
     const measure = () => {
@@ -107,11 +102,7 @@ export function HeroScene({
         ? mobile
           ? 665
           : Math.min(rect.height * 0.44, 480)
-        : index === 1
-          ? mobile
-            ? 455
-            : rect.height * 0.5
-          : mobile
+        : mobile
             ? 460
             : rect.height * 0.5;
     const py = anchor ? anchor.top - scroll + anchor.height / 2 : rect.top + offset;
@@ -121,14 +112,14 @@ export function HeroScene({
       0,
     );
     const scale =
-      (((anchor ? Math.min(anchor.width * 1.05, 680) : mobile
+      (((anchor ? Math.min(anchor.width * 1.05, anchor.height * 1.05, 680) : mobile
         ? Math.min(size.width * 0.85, 380)
-        : Math.min(size.width * 0.48, 680)) /
+        : Math.min(size.width * 0.36, rect.height * 0.72, 520)) /
         size.width) *
         viewport.width) /
       4.2;
     root.current.scale.setScalar(scale);
-    fragment.current = index === 1 ? assembly.current : 0;
+    fragment.current = 0;
     const time = clock.elapsedTime;
     artifact.current.rotation.y = reduced
       ? -0.22
@@ -142,22 +133,13 @@ export function HeroScene({
         -Math.min(Math.max(-rect.top / size.height, 0), 1) * 0.5;
     }
   });
-  const accent =
-    game === "valorant"
-      ? "#e8876e"
-      : target === 7
-        ? "#b994da"
-        : target === 6
-          ? "#e2ac66"
-          : "#ffc06b";
   return (
     <>
-      <TrophyScene fragment={assembly} reduced={reduced} />
       <group ref={root}>
         <GamePortal />
         <FloatingParticles mobile={mobile} />
         <group ref={artifact}>
-          <RankCrystal fragment={fragment} accent={accent} />
+          <RankCrystal fragment={fragment} accent="#e8876e" />
         </group>
         <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[1.4, 32]} />

@@ -70,7 +70,7 @@ export function FAQ() {
                       type="button"
                       aria-pressed={isActive}
                       onClick={() => jumpToQuestion(Number(index))}
-                      className={`px-4 py-2 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                      className={`faq-topic-button px-4 py-2 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
                         isActive
                           ? "bg-[#FF9F3C]/10 border-[#FF9F3C]/40 text-[#FF9F3C] shadow-[0_0_15px_rgba(255,159,60,0.15)]"
                           : "bg-white/[0.03] hover:bg-white/[0.08] border-white/10 text-zinc-300 hover:text-white"
@@ -84,7 +84,7 @@ export function FAQ() {
             </div>
 
             {/* "NEED A HAND?" Card: Compact glass widget */}
-            <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-xl p-5 hover:border-[#FF9F3C]/40 transition-all flex items-center justify-between mt-8 group">
+            <div className="faq-help-card bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-xl p-5 hover:border-[#FF9F3C]/40 transition-all flex items-center justify-between mt-8 group">
               <div className="flex items-center gap-3.5">
                 <div className="w-10 h-10 rounded-lg bg-[#FF9F3C]/10 border border-[#FF9F3C]/20 flex items-center justify-center text-[#FF9F3C] shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                   <Headphones size={20} />
@@ -121,14 +121,14 @@ export function FAQ() {
 
           {/* 3. RIGHT COLUMN (MIRROR GLASS FAQ CONTAINER) */}
           <div className="h-full lg:col-span-7">
-            <div className="h-full bg-gradient-to-b from-white/[0.04] via-white/[0.015] to-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_20px_50px_rgba(0,0,0,0.6)]">
+            <div className="faq-surface h-full bg-gradient-to-b from-white/[0.04] via-white/[0.015] to-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_20px_50px_rgba(0,0,0,0.6)]">
               <div className="divide-y divide-white/[0.06]">
                 {faqs.map((f, i) => {
                   const isOpen = open === i;
                   return (
                     <div
                       key={f.q}
-                      className={`transition-all duration-200 ${
+                      className={`faq-preview-row transition-all duration-200 ${
                         isOpen ? "bg-white/[0.02] rounded-xl px-4 -mx-4" : "px-2"
                       } py-4`}
                     >

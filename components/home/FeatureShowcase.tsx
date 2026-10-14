@@ -1,205 +1,125 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Headphones,
-  EyeOff,
-  Activity,
-  Gift,
-  Send,
-  Check,
-} from "lucide-react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { Activity, Check, EyeOff, Gift, Headphones } from "lucide-react";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 
+const chatTiming = [1300, 1600, 900, 5800];
+const privacyTiming = [4200, 1800];
+const progressTiming = [800, 800, 800, 800, 800, 2200];
+const rewardTiming = [2400, 2400, 2400];
+const progressValues = [0, 24, 48, 68, 84, 100];
+
+function usePreviewCycle(timing: number[], ref: RefObject<HTMLElement | null>) {
+  const [step, setStep] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let inView = false;
+    const update = () => {
+      setRunning(inView && !document.hidden && !motion.matches);
+      if (motion.matches) setStep(timing.length - 1);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      update();
+    }, { threshold: 0.35 });
+    observer.observe(element);
+    document.addEventListener("visibilitychange", update);
+    motion.addEventListener("change", update);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+      motion.removeEventListener("change", update);
+    };
+  }, [timing, ref]);
+
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(() => setStep((current) => (current + 1) % timing.length), timing[step]);
+    return () => window.clearTimeout(timer);
+  }, [running, step, timing]);
+
+  return step;
+}
+
 export function FeatureShowcase() {
-  const { t } = useLanguage();
-  const [offline, setOffline] = useState(true);
-  const [reward, setReward] = useState(0);
-  const [chat, setChat] = useState(false);
-  const [progress, setProgress] = useState(68);
+  const { t, text } = useLanguage();
+  const chatRef = useRef<HTMLElement>(null);
+  const privacyRef = useRef<HTMLElement>(null);
+  const trackingRef = useRef<HTMLElement>(null);
+  const rewardsRef = useRef<HTMLElement>(null);
+  const chatStep = usePreviewCycle(chatTiming, chatRef);
+  const privacyStep = usePreviewCycle(privacyTiming, privacyRef);
+  const trackingStep = usePreviewCycle(progressTiming, trackingRef);
+  const reward = usePreviewCycle(rewardTiming, rewardsRef);
+  const offline = privacyStep === 0;
+  const progress = progressValues[trackingStep];
 
   return (
-    <section className="section relative isolate overflow-hidden">
-      {/* Ambient background lighting */}
-      <div
-        className="bg-[#D97706]/15 blur-[160px] w-[600px] h-[300px] pointer-events-none rounded-full absolute -top-10 left-1/3 -z-10"
-        aria-hidden="true"
-      />
-
+    <section className="section feature-showcase relative isolate overflow-hidden">
+      <div className="pointer-events-none absolute -top-10 left-1/3 -z-10 h-[300px] w-[600px] rounded-full bg-[#D97706]/15 blur-[160px]" aria-hidden="true" />
       <div className="site-container relative z-10">
         <div className="section-heading" data-reveal>
           <div>
             <p className="eyebrow text-[#FF9F3C]">{t("featureEyebrow")}</p>
-            <h2>
-              {t("featureLead")} <span className="muted">{t("featureFinish")}</span>
-            </h2>
+            <h2>{t("featureLead")} <span className="muted">{t("featureFinish")}</span></h2>
           </div>
-          <p>
-            {t("featureDescription")}
-            <br />
-            {t("featureDescriptionEnd")}
-          </p>
+          <p>{t("featureDescription")}<br />{t("featureDescriptionEnd")}</p>
         </div>
 
-        <div className="feature-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {/* 1. 24/7 LIVE SUPPORT */}
-          <article className="feature-card group relative flex flex-col justify-between h-full p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-white/[0.05] via-white/[0.02] to-transparent backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 hover:border-[#FF9F3C]/50 hover:shadow-[0_0_30px_rgba(255,159,60,0.15)] transition-all duration-300">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#FF9F3C] mb-4 group-hover:scale-105 group-hover:border-[#FF9F3C]/30 transition-all">
-                <Headphones size={20} />
-              </div>
-              <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                {t("liveSupport")}
-              </h3>
-              <div className="space-y-2.5 mb-5 min-h-[110px] flex flex-col justify-center">
-                <div className="self-start max-w-[90%] rounded-xl rounded-tl-sm bg-white/[0.04] border border-white/5 p-3 text-xs text-zinc-300 leading-relaxed">
-                  {t("chatGreeting")}
-                </div>
-                {chat && (
-                  <div className="self-end max-w-[90%] ml-auto rounded-xl rounded-tr-sm bg-[#FF9F3C]/10 border border-[#FF9F3C]/20 p-3 text-xs text-[#F5D7A1] leading-relaxed animate-fadeIn">
-                    {t("chatReply")}
-                  </div>
-                )}
+        <div className="feature-grid">
+          <article ref={chatRef} data-reveal className="feature-card feature-card--support">
+            <div className="feature-card-head"><span className="feature-card-icon"><Headphones size={20} /></span><span className="feature-card-index">01 / 04</span></div>
+            <h3>{t("liveSupport")}</h3>
+            <div className="feature-card-panel feature-chat-panel" aria-label={t("liveSupport")}>
+              <div className="feature-panel-heading"><span className="feature-online-dot" />{text("Support conversation", "Trò chuyện hỗ trợ")}</div>
+              <div className="feature-chat">
+                <div className="feature-chat-bubble feature-chat-bubble--support">{t("chatGreeting")}</div>
+                {chatStep >= 1 && <div className="feature-chat-bubble feature-chat-bubble--customer">{t("chatQuestion")}</div>}
+                {chatStep === 2 && <div className="feature-chat-bubble feature-chat-bubble--support feature-chat-typing" role="status" aria-label={t("chatTyping")}><span /><span /><span /></div>}
+                {chatStep >= 3 && <div className="feature-chat-bubble feature-chat-bubble--support">{t("chatReply")}</div>}
               </div>
             </div>
-
-            <div>
-              <button
-                type="button"
-                onClick={() => setChat(!chat)}
-                className="w-full flex items-center justify-between bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2 text-xs text-zinc-300 hover:text-white transition-all group/btn cursor-pointer"
-              >
-                <span>{chat ? t("resetChat") : t("testChat")}</span>
-                <Send
-                  size={13}
-                  className="text-zinc-500 group-hover/btn:text-[#FF9F3C] transition-colors"
-                />
-              </button>
-            </div>
+            <div className="feature-card-foot"><Headphones size={15} />{text("Here when you need us", "Luôn sẵn sàng hỗ trợ bạn")}</div>
           </article>
 
-          {/* 2. OFFLINE & VPN PRIVACY */}
-          <article className="feature-card group relative flex flex-col justify-between h-full p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-white/[0.05] via-white/[0.02] to-transparent backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 hover:border-[#FF9F3C]/50 hover:shadow-[0_0_30px_rgba(255,159,60,0.15)] transition-all duration-300">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#FF9F3C] mb-4 group-hover:scale-105 group-hover:border-[#FF9F3C]/30 transition-all">
-                <EyeOff size={20} />
-              </div>
-              <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                {t("privacy")}
-              </h3>
-              <div className="min-h-[110px] flex flex-col justify-center gap-3 mb-5">
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-white/5">
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className={`w-2.5 h-2.5 rounded-full transition-all ${
-                        offline
-                          ? "bg-[#FF9F3C] shadow-[0_0_8px_rgba(255,159,60,0.7)]"
-                          : "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"
-                      }`}
-                    />
-                    <strong className="text-xs font-semibold text-white">
-                      {offline ? t("invisibleMode") : t("visibleMode")}
-                    </strong>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={offline}
-                    aria-label={t("invisibleMode")}
-                    onClick={() => setOffline(!offline)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      offline ? "bg-[#FF9F3C]" : "bg-white/10"
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                        offline ? "translate-x-5 !bg-black/40" : "translate-x-0.5"
-                      }`}
-                    />
-                  </button>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  {t("privacyDescription")}
-                </p>
-              </div>
+          <article ref={privacyRef} data-reveal className="feature-card feature-card--privacy">
+            <div className="feature-card-head"><span className="feature-card-icon"><EyeOff size={20} /></span><span className="feature-card-index">02 / 04</span></div>
+            <h3>{t("privacy")}</h3>
+            <div className="feature-card-panel feature-privacy-panel">
+              <div className="feature-panel-heading">{text("PRESENCE CONTROL", "KIỂM SOÁT HIỂN THỊ")}</div>
+              <div className="feature-privacy-row"><span className={`feature-online-dot ${offline ? "" : "feature-online-dot--green"}`} /><strong>{offline ? t("invisibleMode") : t("visibleMode")}</strong><div aria-hidden="true" className={`feature-switch ${offline ? "is-active" : ""}`}><span /></div></div>
+              <p>{offline ? t("privacyDescription") : text("Visible mode shows your activity to friends in this preview.", "Chế độ hiển thị cho phép bạn bè thấy hoạt động trong bản xem trước này.")}</p>
             </div>
+            <div className="feature-card-foot"><Check size={15} />{text("You control your visibility", "Bạn kiểm soát trạng thái hiển thị")}</div>
           </article>
 
-          {/* 3. LIVE MATCH TRACKING */}
-          <article className="feature-card group relative flex flex-col justify-between h-full p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-white/[0.05] via-white/[0.02] to-transparent backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 hover:border-[#FF9F3C]/50 hover:shadow-[0_0_30px_rgba(255,159,60,0.15)] transition-all duration-300">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#FF9F3C] mb-4 group-hover:scale-105 group-hover:border-[#FF9F3C]/30 transition-all">
-                <Activity size={20} />
-              </div>
-              <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                {t("liveTracking")}
-              </h3>
-              <div className="min-h-[110px] flex flex-col justify-center mb-5">
-                <button
-                  type="button"
-                  className="w-full text-left p-3.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-all flex flex-col gap-3 group/prog cursor-pointer"
-                  onClick={() =>
-                    setProgress(progress === 100 ? 68 : Math.min(100, progress + 8))
-                  }
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <strong className="text-3xl font-heading font-extrabold text-white tracking-tight tabular-nums">
-                      {progress}%
-                    </strong>
-                    <span className="text-[#FF9F3C] group-hover/prog:scale-110 transition-transform">
-                      {progress === 100 ? (
-                        <Check size={20} className="text-emerald-400" />
-                      ) : (
-                        <Activity size={20} className="text-[#FF9F3C]" />
-                      )}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#FF9F3C] to-[#D97706] transition-all duration-500 shadow-[0_0_10px_rgba(255,159,60,0.5)]"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  <small className="text-[11px] text-zinc-400 group-hover/prog:text-zinc-200 transition-colors">
-                    {progress === 100
-                      ? t("completeReset")
-                      : t("simulateProgress")}
-                  </small>
-                </button>
+          <article ref={trackingRef} data-reveal className="feature-card feature-card--tracking">
+            <div className="feature-card-head"><span className="feature-card-icon"><Activity size={20} /></span><span className="feature-card-index">03 / 04</span></div>
+            <h3>{t("liveTracking")}</h3>
+            <div className="feature-card-panel feature-progress-panel">
+              <div className="feature-panel-heading"><span className="feature-online-dot" />{text("ORDER PROGRESS", "TIẾN ĐỘ ĐƠN HÀNG")}</div>
+              <div className="feature-progress-dial">
+                <svg viewBox="0 0 120 120" aria-hidden="true"><circle className="feature-dial-track" cx="60" cy="60" r="51" /><circle className="feature-dial-fill" cx="60" cy="60" r="51" pathLength="100" strokeDasharray="100" strokeDashoffset={100 - progress} /></svg>
+                <div><strong>{progress}<span>%</span></strong><span>{progress === 100 ? <Check size={14} /> : <Activity size={14} />}{text("Live progress", "Tiến độ trực tiếp")}</span></div>
               </div>
             </div>
+            <div className="feature-card-foot"><Activity size={15} />{progress === 100 ? text("Order complete", "Đơn hàng hoàn tất") : text("Every match. Every milestone.", "Từng trận đấu. Từng cột mốc.")}</div>
           </article>
 
-          {/* 4. CASHBACK & REWARDS */}
-          <article className="feature-card group relative flex flex-col justify-between h-full p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-white/[0.05] via-white/[0.02] to-transparent backdrop-blur-xl border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1.5 hover:border-[#FF9F3C]/50 hover:shadow-[0_0_30px_rgba(255,159,60,0.15)] transition-all duration-300">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#FF9F3C] mb-4 group-hover:scale-105 group-hover:border-[#FF9F3C]/30 transition-all">
-                <Gift size={20} />
-              </div>
-              <h3 className="text-base font-heading font-bold uppercase tracking-wider text-white mb-4">
-                {t("rewards")}
-              </h3>
-              <div className="min-h-[110px] flex flex-col justify-center mb-5">
-                <button
-                  type="button"
-                  className="w-full text-left p-3.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-all flex items-center gap-4 group/rew cursor-pointer"
-                  onClick={() => setReward((reward + 1) % 3)}
-                >
-                  <div className="flex items-baseline text-4xl font-heading font-extrabold text-[#F5D7A1] drop-shadow-[0_0_12px_rgba(255,159,60,0.25)] tracking-tight tabular-nums">
-                    <span>{[3, 7, 10][reward]}</span>
-                    <span className="text-xl font-heading font-bold text-[#FF9F3C] ml-0.5">%</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-heading font-bold tracking-wider uppercase bg-[#FF9F3C]/10 text-[#FF9F3C] border border-[#FF9F3C]/30 mb-1">
-                      {["BRONZE", "GOLD", "ELITE"][reward]} {t("cashback")}
-                    </span>
-                    <small className="block text-[11px] text-zinc-400 group-hover/rew:text-zinc-200 transition-colors">
-                      {t("switchTier")}
-                    </small>
-                  </div>
-                </button>
-              </div>
+          <article ref={rewardsRef} data-reveal className="feature-card feature-card--rewards">
+            <div className="feature-card-head"><span className="feature-card-icon"><Gift size={20} /></span><span className="feature-card-index">04 / 04</span></div>
+            <h3>{t("rewards")}</h3>
+            <div className="feature-card-panel feature-rewards-panel">
+              <div className="feature-panel-heading">{text("YOUR REWARD TIER", "HẠNG THƯỞNG CỦA BẠN")}</div>
+              <div className="feature-reward-value"><strong>{[3, 7, 10][reward]}<span>%</span></strong><span>{t("cashback")}</span></div>
+              <div className="feature-reward-tiers" aria-label={text("Reward tiers", "Các hạng thưởng")}>{["BRONZE", "GOLD", "ELITE"].map((tier, index) => <span key={tier} className={index === reward ? "is-active" : ""}>{tier}</span>)}</div>
             </div>
+            <div className="feature-card-foot"><Gift size={15} />{text("Rewards on every order", "Phần thưởng trên mỗi đơn hàng")}</div>
           </article>
         </div>
       </div>

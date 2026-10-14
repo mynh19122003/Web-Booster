@@ -1,11 +1,12 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { HeroScene } from "./HeroScene";
 import { BackgroundEnvironment } from "./BackgroundEnvironment";
 import { RenderScheduler } from "./RenderScheduler";
 export default function SceneCanvas() {
+  const layer = useRef<HTMLDivElement>(null);
   const [mobile, setMobile] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -14,6 +15,43 @@ export default function SceneCanvas() {
   const [lost, setLost] = useState(false);
   const path = usePathname();
   const enabled = path === "/";
+  useEffect(() => {
+    const elements = ["hero"]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    let frame = 0;
+    const clip = () => {
+      frame = 0;
+      const section = elements.find((el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top < window.innerHeight && rect.bottom > 0;
+      });
+      if (!layer.current) return;
+      if (!section || (mobile && section.id !== "hero")) {
+        layer.current.style.clipPath = "inset(100%)";
+        return;
+      }
+      const rect = section.getBoundingClientRect();
+      const top = Math.max(0, rect.top);
+      const bottom = Math.max(0, window.innerHeight - rect.bottom);
+      const left = section.id === "hero" ? 0 : window.innerWidth * 0.52;
+      layer.current.style.clipPath = `inset(${top}px 0 ${bottom}px ${left}px)`;
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(clip);
+    };
+    const observer = new ResizeObserver(schedule);
+    elements.forEach((el) => observer.observe(el));
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    clip();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [path, mobile]);
   useEffect(() => {
     const mq = window.matchMedia("(max-width:767px)");
     const rm = window.matchMedia("(prefers-reduced-motion:reduce)");
@@ -33,7 +71,7 @@ export default function SceneCanvas() {
     };
   }, []);
   useEffect(() => {
-    const elements = ["hero", "trophy", "final-cta"]
+    const elements = ["hero"]
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
     const visibility = new Map<Element, boolean>();
@@ -57,6 +95,7 @@ export default function SceneCanvas() {
     );
   return (
     <div
+      ref={layer}
       className="scene-layer"
       aria-hidden="true"
       style={{ visibility: enabled && active ? "visible" : "hidden" }}

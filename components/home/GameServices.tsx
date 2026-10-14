@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { useInteractionMotion } from "@/components/ui/InteractionMotion";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowUpRight, LoaderCircle } from "lucide-react";
 import { games } from "@/data/games";
 import { serviceSlug } from "@/lib/service-options";
 import { serviceCopyFor } from "@/data/service-copy";
@@ -133,27 +133,6 @@ export function GameServices() {
               <br />
               <span className="muted">{t("startClimbing")}</span>
             </h2>
-          </div>
-          <div>
-            <div className="carousel-controls">
-              <button
-                aria-label={t("previousGames")}
-                onClick={() =>
-                  track.current?.scrollBy({ left: -320, behavior: "smooth" })
-                }
-              >
-                <ArrowLeft size={17} />
-              </button>
-              <button
-                aria-label={t("nextGames")}
-                onClick={() =>
-                  track.current?.scrollBy({ left: 320, behavior: "smooth" })
-                }
-              >
-                <ArrowRight size={17} />
-              </button>
-              <span>{t("exploreGames")}</span>
-            </div>
           </div>
         </div>
         <div className="game-track" ref={track}>

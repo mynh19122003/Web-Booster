@@ -1,0 +1,263 @@
+{
+  "divisions": {
+    "url": "https://boostroyal.com/lol-boosting",
+    "details": {
+      "currentTier": "Silver",
+      "currentDivision": "I",
+      "desiredTier": "Gold",
+      "desiredDivision": "IV",
+      "item": "Silver I to Gold IV",
+      "service": 1,
+      "price": 15.98,
+      "defaultPrice": 21.6,
+      "completionTime": "9-12",
+      "server": 1,
+      "coupon": "",
+      "couponDiscount": 1,
+      "discount": true,
+      "orderDetails": {
+        "queue": "Solo/Duo",
+        "specificChampions": false,
+        "priorityOrder": false,
+        "currentLp": "0-20",
+        "lpGain": "19-22 LP",
+        "duoQ": true,
+        "plusWin": false,
+        "streaming": false,
+        "appearOffline": false,
+        "withHighMMR": false,
+        "moderateKDA": false,
+        "points": [
+          0,
+          0
+        ]
+      },
+      "netPrices": {
+        "plusWin": 6.99,
+        "duoQ": 3.99
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "moderateKDAPercentage": 30,
+      "underCoverWinrate": 40,
+      "gameCount": 1,
+      "completionTimeUnit": "hours",
+      "volumeDiscount": {
+        "discount": 0,
+        "nextThreshold": 34.02,
+        "nextDiscount": 5,
+        "progress": 31.96
+      },
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "wins": {
+    "url": "https://boostroyal.com/lol-boosting/ranked-wins",
+    "details": {
+      "currentTier": "Silver",
+      "currentDivision": "I",
+      "gameCount": 4,
+      "item": "4 wins in Silver I",
+      "service": 2,
+      "price": 10.27,
+      "defaultPrice": 13.878,
+      "discount": true,
+      "completionTime": "7-9",
+      "server": 1,
+      "coupon": "",
+      "couponDiscount": 1,
+      "orderDetails": {
+        "queue": "Solo/Duo",
+        "lpGain": "19-22 LP",
+        "appearOffline": false,
+        "specificChampions": false,
+        "priorityOrder": false,
+        "streaming": false,
+        "currentLp": 0,
+        "duoQ": false,
+        "coaching": false,
+        "withHighMMR": false,
+        "demotionShield": false,
+        "moderateKDA": false
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "hours",
+      "volumeDiscount": {
+        "discount": 0,
+        "nextThreshold": 19.73,
+        "nextDiscount": 3,
+        "progress": 34.233333333333334
+      },
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "placements": {
+    "url": "https://boostroyal.com/lol-boosting/placements",
+    "details": {
+      "currentTier": "Silver",
+      "currentDivision": "I",
+      "gameCount": 5,
+      "item": "5 Placement matches Silver I",
+      "price": 14.52,
+      "defaultPrice": 18.150000000000002,
+      "completionTime": "5-7",
+      "service": 6,
+      "server": 1,
+      "coupon": "",
+      "couponDiscount": 1,
+      "discount": true,
+      "orderDetails": {
+        "queue": "Solo/Duo",
+        "currentLp": 0,
+        "appearOffline": false,
+        "specificChampions": false,
+        "priorityOrder": false,
+        "withHighMMR": false,
+        "withFreshMMR": false,
+        "preOrder": false,
+        "streaming": false,
+        "coaching": false,
+        "duoQ": false
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "hours",
+      "volumeDiscount": {
+        "discount": 0,
+        "nextThreshold": 15.48,
+        "nextDiscount": 3,
+        "progress": 48.4
+      },
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "mastery": {
+    "url": "https://boostroyal.com/lol-boosting/champion-mastery",
+    "details": {
+      "currentTier": 1,
+      "desiredTier": 7,
+      "item": "Level 1 to Level 7",
+      "price": 46.53,
+      "defaultPrice": 51.7,
+      "completionTime": "3-4",
+      "service": 11,
+      "coupon": "",
+      "couponDiscount": 1,
+      "server": 1,
+      "discount": true,
+      "orderDetails": {
+        "queue": false,
+        "rank": "Unranked",
+        "priorityOrder": false,
+        "appearOffline": false,
+        "streaming": false,
+        "champion": "Aatrox"
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "days",
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "honor": {
+    "url": "https://boostroyal.com/lol-boosting/honor",
+    "details": {
+      "currentLevel": 3,
+      "desiredLevel": 5,
+      "item": "Honor 3 to Honor 5",
+      "service": 106,
+      "price": 348.3,
+      "defaultPrice": 387,
+      "completionTime": "35-46",
+      "server": 1,
+      "coupon": "",
+      "couponDiscount": 1,
+      "discount": true,
+      "orderDetails": {
+        "appearOffline": false,
+        "priorityOrder": false,
+        "streaming": false
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "days",
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "challenges": {
+    "url": "https://boostroyal.com/lol-boosting/challenges",
+    "details": {
+      "currentService": "Player Diff",
+      "gameCount": 3,
+      "item": "3 tokens Player Diff",
+      "service": 107,
+      "price": 6.51,
+      "defaultPrice": 7.23,
+      "completionTime": "6-8",
+      "server": 1,
+      "coupon": "",
+      "couponDiscount": 1,
+      "discount": true,
+      "orderDetails": {
+        "appearOffline": false,
+        "priorityOrder": false,
+        "streaming": false,
+        "specificChampions": false
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "hours",
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  },
+  "normals": {
+    "url": "https://boostroyal.com/lol-boosting/normals",
+    "details": {
+      "gameCount": 5,
+      "item": "5 Normal games",
+      "price": 12.6,
+      "defaultPrice": 15,
+      "completionTime": "3-4",
+      "service": 8,
+      "coupon": "",
+      "couponDiscount": 1,
+      "server": 1,
+      "discount": true,
+      "orderDetails": {
+        "appearOffline": false,
+        "specificChampions": false,
+        "priorityOrder": false,
+        "duoQ": false,
+        "streaming": false,
+        "netWin": false,
+        "queue": "Summoners Rift"
+      },
+      "couponDiscountPercent": 1,
+      "loyaltyDiscount": 1,
+      "premium": false,
+      "completionTimeUnit": "hours",
+      "discountSource": "none",
+      "discountFactor": 1,
+      "listPrice": null
+    }
+  }
+}

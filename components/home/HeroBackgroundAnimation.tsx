@@ -132,22 +132,6 @@ export function HeroBackgroundAnimation() {
       mouse.x += (mouse.targetX - mouse.x) * 0.08;
       mouse.y += (mouse.targetY - mouse.y) * 0.08;
 
-      if (mouse.x > -500 && mouse.y > -500 && !isReducedMotion) {
-        const spotlight = context.createRadialGradient(
-          mouse.x,
-          mouse.y,
-          0,
-          mouse.x,
-          mouse.y,
-          320
-        );
-        spotlight.addColorStop(0, "rgba(255, 159, 60, 0.09)");
-        spotlight.addColorStop(0.5, "rgba(217, 119, 6, 0.04)");
-        spotlight.addColorStop(1, "rgba(0, 0, 0, 0)");
-        context.fillStyle = spotlight;
-        context.fillRect(0, 0, width, height);
-      }
-
       // Render Embers
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -202,23 +186,7 @@ export function HeroBackgroundAnimation() {
       className="pointer-events-none absolute inset-0 -z-10 overflow-hidden select-none"
       aria-hidden="true"
     >
-      {/* 1. DUAL-LAYER AMBIENT GLOW BLOBS */}
-      {/* Primary blob behind 3D artifact (Burnt Orange, slow pulse) */}
-      <div
-        className="absolute top-1/3 -right-24 sm:right-10 md:right-24 w-[640px] h-[640px] rounded-full bg-[#D97706]/20 blur-[160px] animate-pulse-slow motion-reduce:animate-none"
-        style={{ transform: "translate3d(0, 0, 0)" }}
-      />
-
-      {/* Secondary blob behind Hero text (Prime Gold, floating gentle loop) */}
-      <div
-        className="absolute top-16 -left-20 sm:left-4 w-[480px] h-[480px] rounded-full bg-[#FF9F3C]/12 blur-[140px] animate-float-slow motion-reduce:animate-none"
-        style={{ transform: "translate3d(0, 0, 0)" }}
-      />
-
-      {/* Centered deep ambient warmth layer */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[400px] bg-gradient-to-b from-[#D97706]/15 via-[#FF9F3C]/05 to-transparent rounded-full blur-[150px]" />
-
-      {/* 2. FLOATING EMBER PARTICLES CANVAS */}
+      {/* Particles sit over the shared page background. */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
     </div>
   );

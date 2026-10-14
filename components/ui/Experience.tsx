@@ -13,14 +13,18 @@ export function Experience({ children }: { children: React.ReactNode }) {
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
-        gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
+        gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+          const siblings = Array.from(el.parentElement?.querySelectorAll(":scope > [data-reveal]") ?? []);
           gsap.from(el, {
-            y: 24,
+            y: 18,
             opacity: 0,
-            duration: 0.7,
-            scrollTrigger: { trigger: el, start: "top 94%", once: true },
-          }),
-        );
+            duration: 0.65,
+            delay: Math.min(Math.max(siblings.indexOf(el), 0) * 0.07, 0.21),
+            ease: "power2.out",
+            clearProps: "transform",
+            scrollTrigger: { trigger: el, start: "top 92%", once: true },
+          });
+        });
         if (document.querySelector(".step-line"))
           gsap.to(".step-line", {
             scaleX: 1,

@@ -10,6 +10,7 @@ import "./employee-riot.css";
 import "./order-workspace.css";
 import "./coach-refinements.css";
 import "./interaction-refinements.css";
+import "./home-refinements.css";
 
 const rajdhani = Rajdhani({
   // Rajdhani has no Vietnamese glyph subset; Vietnamese headings use the body font.

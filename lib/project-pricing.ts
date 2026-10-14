@@ -1,4 +1,6 @@
 import snapshot from "@/data/pricing/project-prices.json";
+import categoryRates from "@/data/pricing/category-rates.json";
+import { lolChampions } from "@/data/lol-champions";
 import { rankPriceFactor } from "@/lib/rank-pricing";
 import { calculateDuoPrice, type DuoPriceResult, type DuoQueueType } from "@/lib/pricing/duo-pricing-matrix";
 import { calculateValorantDuoPrice } from "@/lib/pricing/valorant-duo-pricing";
@@ -47,6 +49,24 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
   if (!Number.isInteger(quantity) || quantity < 1) return missing;
   const quantityLimit: Record<string, number> = { wins: 20, "ranked-wins": 20, placements: 5, normals: 30, unrated: 30, arena: 20, clash: 5, challenges: 10 };
   if (quantityLimit[product] && quantity > quantityLimit[product]) return missing;
+  if (game === "league-of-legends" && ["mastery", "honor"].includes(product)) {
+    const mastery = product === "mastery";
+    if (!Number.isInteger(start) || !Number.isInteger(goal) || start < (mastery ? 1 : 3) || goal <= start || goal > (mastery ? 10 : 5)) return missing;
+    if (mastery && !lolChampions.some(champion => [champion.id, champion.name].some(name => name.toLowerCase() === detail.trim().toLowerCase()))) return missing;
+    const steps = mastery ? categoryRates.mastery : categoryRates.honor;
+    const selectedSteps = steps.filter(step => step.from >= start && step.to <= goal);
+    if (selectedSteps.length !== goal - start) return missing;
+    return {
+      price: serverPrice(selectedSteps.reduce((sum, step) => sum + step.naUsd, 0), region),
+      quoteRequired: false,
+      minHours: selectedSteps.reduce((sum, step) => sum + step.minHours, 0),
+      maxHours: selectedSteps.reduce((sum, step) => sum + step.maxHours, 0),
+    };
+  }
+  if (game === "league-of-legends" && product === "challenges" && detail.trim().toLowerCase() === "player diff") {
+    const row = categoryRates.challenges.find(row => row.quantity === quantity);
+    return row ? {price: serverPrice(row.naUsd, region), quoteRequired: false, minHours: row.minHours, maxHours: row.maxHours} : missing;
+  }
   if (["league-of-legends", "valorant"].includes(game) && product === "games") {
     if (queue !== "Duo") return missing;
     try {
@@ -61,7 +81,7 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
   }
   const ranked = ["wins", "ranked-wins", "placements"].includes(product);
   if (
-    ranked && !(game === "teamfight-tactics" && product === "placements" && queue === "Double Up") &&
+    ranked && !(game === "teamfight-tactics" && product === "placements" && queue === "Double Up") && !(game === "league-of-legends" && queue === "Flex 5v5") &&
     queue !==
       (game === "league-of-legends"
         ? "Solo"
@@ -84,11 +104,7 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
         String(p.currentTier) +
         (division && p.currentTier !== "Unranked" ? " " + division : "");
       const sourceGain = game === "valorant" ? 22 : 19;
-      if (
-        product === "wins" &&
-        detail &&
-        Number.parseInt(detail) !== sourceGain
-      )
+      if (product === "wins" && game !== "league-of-legends" && detail && Number.parseInt(detail) !== sourceGain)
         return false;
       return (
         p.quantity === quantity &&
@@ -121,7 +137,7 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
           (game === "league-of-legends" ? "player diff" : "daily")
       );
     if (product === "normals")
-      return p.quantity === quantity && queue === "Normal Draft";
+      return p.quantity === quantity && ["Normal Draft", "Quickplay", "ARAM"].includes(queue);
     if (product === "unrated")
       return p.quantity === quantity && ["Unrated", "Swiftplay"].includes(queue);
     if (product === "arena") return p.quantity === quantity;
@@ -133,12 +149,12 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
     if (ranked) {
       // Rank rows define the unit/package rate for the entire tier, including every division.
       selected = matches.find(row => row.kind === "Theo rank" && row.currentTier === tierFor(rank));
-      if (product === "wins" && detail && Number.parseInt(detail) !== (game === "valorant" ? 22 : 19)) return missing;
+      if (product === "wins" && game !== "league-of-legends" && detail && Number.parseInt(detail) !== 22) return missing;
       if (product === "placements" && quantity > 5) return missing;
       if (selected?.quantity) scale = quantity / selected.quantity;
       else return missing;
     } else if (["normals", "unrated", "arena", "clash"].includes(product)) {
-      if ((product === "normals" && queue !== "Normal Draft") || (product === "unrated" && !["Unrated", "Swiftplay"].includes(queue))) return missing;
+      if ((product === "normals" && !["Normal Draft", "Quickplay", "ARAM"].includes(queue)) || (product === "unrated" && !["Unrated", "Swiftplay"].includes(queue))) return missing;
       selected = matches.find(row => product !== "clash" || row.currentTier === clashTier);
       if (!selected?.quantity) return missing;
       scale = quantity / selected.quantity;
@@ -159,8 +175,16 @@ export function categoryQuote(input: CategoryPriceInput): CategoryQuote {
     } else return missing;
   }
   if (!selected || !Number.isFinite(scale) || scale <= 0) return missing;
+  let gainFactor = 1;
+  if (game === "league-of-legends" && product === "wins" && detail) {
+    const gain = Number.parseInt(detail);
+    const gainKey = ({14:"14-17 LP",17:"17-19 LP",19:"19-22 LP",22:"22-25 LP",25:"25-28 LP",28:"28-30 LP",30:"30-33 LP",33:"30-33 LP"} as Record<number,string>)[gain];
+    const rate = categoryRates.wins.find(row => row.tier === tierFor(rank) && row.gain === gainKey);
+    if (!gainKey || (!rate && gain !== 19)) return missing;
+    gainFactor = rate?.factor ?? 1;
+  }
   // TFT Strict Wins: verified +35% on the source calculator, applied to project base prices.
-  const packagePrice = selected.naUsd * scale * (product === "ranked-wins" && winType === "first" ? 1.35 : 1);
+  const packagePrice = selected.naUsd * scale * gainFactor * (product === "ranked-wins" && winType === "first" ? 1.35 : 1);
   const [min, max] = selected.completionTime.split("-").map(Number),
     days = selected.completionTimeUnit === "days" ? 24 : 1;
   return {

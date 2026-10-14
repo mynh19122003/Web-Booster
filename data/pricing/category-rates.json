@@ -1,0 +1,437 @@
+{
+  "reviewedAt": "2026-10-14",
+  "sources": [
+    "https://boostroyal.com/lol-boosting",
+    "https://boostroyal.com/lol-boosting/champion-mastery",
+    "https://boostroyal.com/lol-boosting/honor",
+    "https://boostroyal.com/lol-boosting/challenges",
+    "https://boostroyal.com/lol-boosting/ranked-wins",
+    "https://boostroyal.com/lol-boosting/normals"
+  ],
+  "policy": "Source quote ratios anchored to existing NA commercial packages. Flex uses existing Solo rates; seven tier pairs verified equal. Champion selection does not change the mastery price. Honor levels below 3 are not sold by the source calculator.",
+  "mastery": [
+    {
+      "from": 1,
+      "to": 2,
+      "naUsd": 3.318510638297873,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "naUsd": 3.318510638297873,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "naUsd": 6.637021276595746,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "naUsd": 9.955531914893617,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 5,
+      "to": 6,
+      "naUsd": 13.274042553191492,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 6,
+      "to": 7,
+      "naUsd": 15.486382978723404,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 7,
+      "to": 8,
+      "naUsd": 16.592553191489362,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 8,
+      "to": 9,
+      "naUsd": 16.592553191489362,
+      "minHours": 12,
+      "maxHours": 16
+    },
+    {
+      "from": 9,
+      "to": 10,
+      "naUsd": 17.69872340425532,
+      "minHours": 12,
+      "maxHours": 16
+    }
+  ],
+  "honor": [
+    {
+      "from": 3,
+      "to": 4,
+      "naUsd": 159.22072351421187,
+      "minHours": 384,
+      "maxHours": 504
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "naUsd": 230.7692764857881,
+      "minHours": 456,
+      "maxHours": 600
+    }
+  ],
+  "wins": [
+    {
+      "tier": "Iron",
+      "gain": "0-14 LP",
+      "factor": 0.6980392156862746
+    },
+    {
+      "tier": "Iron",
+      "gain": "14-17 LP",
+      "factor": 0.8
+    },
+    {
+      "tier": "Iron",
+      "gain": "17-19 LP",
+      "factor": 0.8980392156862745
+    },
+    {
+      "tier": "Iron",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Iron",
+      "gain": "22-25 LP",
+      "factor": 1.0470588235294118
+    },
+    {
+      "tier": "Iron",
+      "gain": "25-28 LP",
+      "factor": 1.2000000000000002
+    },
+    {
+      "tier": "Iron",
+      "gain": "28-30 LP",
+      "factor": 1.4980392156862745
+    },
+    {
+      "tier": "Iron",
+      "gain": "30-33 LP",
+      "factor": 1.8980392156862746
+    },
+    {
+      "tier": "Bronze",
+      "gain": "0-14 LP",
+      "factor": 0.7
+    },
+    {
+      "tier": "Bronze",
+      "gain": "14-17 LP",
+      "factor": 0.8
+    },
+    {
+      "tier": "Bronze",
+      "gain": "17-19 LP",
+      "factor": 0.9
+    },
+    {
+      "tier": "Bronze",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Bronze",
+      "gain": "22-25 LP",
+      "factor": 1.05
+    },
+    {
+      "tier": "Bronze",
+      "gain": "25-28 LP",
+      "factor": 1.2
+    },
+    {
+      "tier": "Bronze",
+      "gain": "28-30 LP",
+      "factor": 1.5
+    },
+    {
+      "tier": "Bronze",
+      "gain": "30-33 LP",
+      "factor": 1.9
+    },
+    {
+      "tier": "Silver",
+      "gain": "0-14 LP",
+      "factor": 0.7003891050583658
+    },
+    {
+      "tier": "Silver",
+      "gain": "14-17 LP",
+      "factor": 0.7976653696498054
+    },
+    {
+      "tier": "Silver",
+      "gain": "17-19 LP",
+      "factor": 0.8988326848249028
+    },
+    {
+      "tier": "Silver",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Silver",
+      "gain": "22-25 LP",
+      "factor": 1.0505836575875487
+    },
+    {
+      "tier": "Silver",
+      "gain": "25-28 LP",
+      "factor": 1.1984435797665371
+    },
+    {
+      "tier": "Silver",
+      "gain": "28-30 LP",
+      "factor": 1.4980544747081714
+    },
+    {
+      "tier": "Silver",
+      "gain": "30-33 LP",
+      "factor": 1.8988326848249029
+    },
+    {
+      "tier": "Gold",
+      "gain": "0-14 LP",
+      "factor": 0.7
+    },
+    {
+      "tier": "Gold",
+      "gain": "14-17 LP",
+      "factor": 0.8
+    },
+    {
+      "tier": "Gold",
+      "gain": "17-19 LP",
+      "factor": 0.9
+    },
+    {
+      "tier": "Gold",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Gold",
+      "gain": "22-25 LP",
+      "factor": 1.048
+    },
+    {
+      "tier": "Gold",
+      "gain": "25-28 LP",
+      "factor": 1.198
+    },
+    {
+      "tier": "Gold",
+      "gain": "28-30 LP",
+      "factor": 1.498
+    },
+    {
+      "tier": "Gold",
+      "gain": "30-33 LP",
+      "factor": 1.8980000000000001
+    },
+    {
+      "tier": "Platinum",
+      "gain": "0-14 LP",
+      "factor": 0.7010014306151645
+    },
+    {
+      "tier": "Platinum",
+      "gain": "14-17 LP",
+      "factor": 0.7997138769670958
+    },
+    {
+      "tier": "Platinum",
+      "gain": "17-19 LP",
+      "factor": 0.8998569384835479
+    },
+    {
+      "tier": "Platinum",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Platinum",
+      "gain": "22-25 LP",
+      "factor": 1.050071530758226
+    },
+    {
+      "tier": "Platinum",
+      "gain": "25-28 LP",
+      "factor": 1.2002861230329043
+    },
+    {
+      "tier": "Platinum",
+      "gain": "28-30 LP",
+      "factor": 1.5007153075822603
+    },
+    {
+      "tier": "Platinum",
+      "gain": "30-33 LP",
+      "factor": 1.9012875536480685
+    },
+    {
+      "tier": "Emerald",
+      "gain": "0-14 LP",
+      "factor": 0.7006134969325153
+    },
+    {
+      "tier": "Emerald",
+      "gain": "14-17 LP",
+      "factor": 0.7999999999999999
+    },
+    {
+      "tier": "Emerald",
+      "gain": "17-19 LP",
+      "factor": 0.9006134969325152
+    },
+    {
+      "tier": "Emerald",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Emerald",
+      "gain": "22-25 LP",
+      "factor": 1.0503067484662576
+    },
+    {
+      "tier": "Emerald",
+      "gain": "25-28 LP",
+      "factor": 1.2
+    },
+    {
+      "tier": "Emerald",
+      "gain": "28-30 LP",
+      "factor": 1.5006134969325153
+    },
+    {
+      "tier": "Emerald",
+      "gain": "30-33 LP",
+      "factor": 1.9006134969325152
+    },
+    {
+      "tier": "Diamond",
+      "gain": "0-14 LP",
+      "factor": 0.7002652519893899
+    },
+    {
+      "tier": "Diamond",
+      "gain": "14-17 LP",
+      "factor": 0.8001768346595933
+    },
+    {
+      "tier": "Diamond",
+      "gain": "17-19 LP",
+      "factor": 0.9000884173297966
+    },
+    {
+      "tier": "Diamond",
+      "gain": "19-22 LP",
+      "factor": 1
+    },
+    {
+      "tier": "Diamond",
+      "gain": "22-25 LP",
+      "factor": 1.0495137046861183
+    },
+    {
+      "tier": "Diamond",
+      "gain": "25-28 LP",
+      "factor": 1.1998231653404068
+    },
+    {
+      "tier": "Diamond",
+      "gain": "28-30 LP",
+      "factor": 1.4995579133510168
+    },
+    {
+      "tier": "Diamond",
+      "gain": "30-33 LP",
+      "factor": 1.9000884173297965
+    }
+  ],
+  "challenges": [
+    {
+      "quantity": 1,
+      "naUsd": 2.33,
+      "minHours": 2,
+      "maxHours": 3
+    },
+    {
+      "quantity": 2,
+      "naUsd": 4.66,
+      "minHours": 4,
+      "maxHours": 5
+    },
+    {
+      "quantity": 3,
+      "naUsd": 6.99,
+      "minHours": 6,
+      "maxHours": 8
+    },
+    {
+      "quantity": 4,
+      "naUsd": 9.32,
+      "minHours": 7,
+      "maxHours": 9
+    },
+    {
+      "quantity": 5,
+      "naUsd": 10.715852534562213,
+      "minHours": 9,
+      "maxHours": 12
+    },
+    {
+      "quantity": 6,
+      "naUsd": 12.852580645161291,
+      "minHours": 11,
+      "maxHours": 14
+    },
+    {
+      "quantity": 7,
+      "naUsd": 15.000046082949309,
+      "minHours": 13,
+      "maxHours": 17
+    },
+    {
+      "quantity": 8,
+      "naUsd": 17.136774193548387,
+      "minHours": 15,
+      "maxHours": 20
+    },
+    {
+      "quantity": 9,
+      "naUsd": 19.28423963133641,
+      "minHours": 17,
+      "maxHours": 22
+    },
+    {
+      "quantity": 10,
+      "naUsd": 19.799631336405533,
+      "minHours": 18,
+      "maxHours": 23
+    }
+  ]
+}

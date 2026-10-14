@@ -30,6 +30,63 @@ const input = { rank: "Silver IV", server: "NA", gameCount: 1, currency: "USD", 
 const quote = overrides => calculateDuoPrice({ ...input, ...overrides });
 const category = overrides => categoryQuote({ game: "league-of-legends", product: "games", region: "NA", queue: "Duo", rank: "Silver IV", quantity: 5, start: 0, goal: 0, detail: "", winType: "top4", clashTier: "", clashBoosters: 0, ...overrides });
 
+test("Flex quotes work across divisions, quantities, servers and LP gains", () => {
+  const ranks = rankLevelsFor("league-of-legends");
+  for (let index = 0; index < 27; index++) {
+    for (const region of ["NA", "KR", "EUW"]) for (const gain of ["14-17 LP", "19-22 LP", "30-33 LP"]) {
+      const args = ["rank-boost", 1, "league-of-legends", 0, 0, region, gain];
+      const solo = estimateQuote(index,index+1,"Solo",...args);
+      const flex = estimateQuote(index,index+1,"Flex 5v5",...args);
+      assert.equal(flex.quoteRequired,false,`${ranks[index].label}/${region}/${gain}`);
+      assert.equal(flex.price,solo.price);
+    }
+  }
+  for (const product of ["wins","placements"]) for (const tier of ["Iron","Silver","Emerald","Diamond"]) {
+    const input = {product,rank:`${tier} II`,quantity:3};
+    assert.equal(category({...input,queue:"Flex 5v5"}).price,category({...input,queue:"Solo"}).price);
+    assert.equal(category({...input,queue:"Flex 5v5"}).quoteRequired,false);
+  }
+});
+
+test("mastery covers every valid level interval and champion without losing package prices", () => {
+  for (const detail of ["Aatrox","Ahri","Zed","Kai'Sa"]) for (let start=1;start<10;start++) for (let goal=start+1;goal<=10;goal++) {
+    const result = category({product:"mastery",detail,start,goal,queue:"Solo"});
+    assert.equal(result.quoteRequired,false,`${detail}/${start}-${goal}`);
+    assert.ok(result.price>0 && result.minHours>0 && result.maxHours>=result.minHours);
+  }
+  assert.equal(category({product:"mastery",detail:"Ahri",start:1,goal:7}).price,51.99);
+  assert.equal(category({product:"mastery",detail:"Ahri",start:1,goal:7,region:"KR"}).price,62.39);
+  for (const input of [{start:0,goal:7},{start:7,goal:7},{start:9,goal:11},{start:1.5,goal:7},{detail:"unknown champion",start:1,goal:7}]) {
+    assert.equal(category({product:"mastery",detail:"Ahri",...input}).quoteRequired,true);
+  }
+});
+
+test("Honor steps and challenge counts are complete and preserve existing packages", () => {
+  assert.equal(category({product:"honor",start:3,goal:5}).price,389.99);
+  for (const [start,goal] of [[3,4],[4,5]]) assert.equal(category({product:"honor",start,goal}).quoteRequired,false);
+  assert.equal(category({product:"honor",start:0,goal:5}).quoteRequired,true);
+  for(let quantity=1;quantity<=10;quantity++) assert.equal(category({product:"challenges",detail:"Player Diff",quantity}).quoteRequired,false);
+  assert.equal(category({product:"challenges",detail:"Player Diff",quantity:3}).price,6.99);
+  assert.equal(category({product:"challenges",detail:"unknown",quantity:3}).quoteRequired,true);
+  for (const queue of ["Normal Draft","Quickplay","ARAM"]) assert.equal(category({product:"normals",queue,quantity:10}).quoteRequired,false);
+});
+
+test("ranked wins no longer lose prices when expected LP gain changes", () => {
+  for (const tier of ["Iron","Bronze","Silver","Gold","Platinum","Emerald","Diamond"]) {
+    const base = {product:"wins",queue:"Flex 5v5",rank:`${tier} IV`,quantity:5};
+    let previous = 0;
+    for (const points of [14,17,19,22,25,28,30]) {
+      const result = category({...base,detail:`${points} LP / win`});
+      assert.equal(result.quoteRequired,false);
+      assert.ok(result.price>=previous);
+      assert.equal(result.minHours,category(base).minHours);
+      assert.equal(result.maxHours,category(base).maxHours);
+      previous = result.price;
+    }
+    assert.equal(category({...base,detail:"19 LP / win"}).price,category(base).price);
+  }
+});
+
 test("matrix covers every division and high rank with the documented group prices", () => {
   assert.equal(DUO_RANK_OPTIONS.ranked.length, 28);
   for (const rank of DUO_RANK_OPTIONS.ranked) {

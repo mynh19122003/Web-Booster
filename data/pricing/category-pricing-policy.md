@@ -1,5 +1,21 @@
 # Category pricing
 
+## Extension reviewed 2026-10-14
+
+`category-rates.json` extends the existing commercial table using BoostRoyal's public calculator. Reproduce the observations with `collect-category-pricing.mjs`, `sample-category-rates.mjs`, then `build-category-rates.mjs`. Evidence is saved in `outputs/category-pricing-20261014/samples.json`. These scripts only request quotes; they never create orders.
+
+- Flex 5v5: seven paired Solo/Flex division, win and placement quotes (Iron–Diamond) returned equal prices. Enable the existing Solo commercial rates and server factors for Flex. All 28 standard Flex division transitions were also checked. Existing commercial apex LP bands remain project policy.
+- Champion mastery: collect nine adjacent steps from level 1 to 10. Step source prices are 2.97, 2.97, 5.94, 8.91, 11.88, 13.86, 14.85, 14.85 and 15.84 in the calculator's base currency. Scale these relative to its 1→7 quote of 46.53 and the project's existing USD51.99 package. Sum unrounded steps and round only the final server total. Aatrox and Ahri 1→7 quotes are equal; project policy applies the same level schedule to every recognized champion. Level 0 is excluded because the source returns a zero quote.
+- Honor: 3→4 and 4→5 quote 142.2 and 206.1, with 16–21 and 19–25 days respectively. Scale against the source 3→5 quote348.3 and project USD389.99 package. Levels below 3 return zero at source, so the UI starts at level 3.
+- LoL Player Diff challenges: store actual quote ratios for quantities 1–10, including source bulk discounts; preserve the project three-token USD6.99 price. Other challenge names still require review.
+- LoL wins: store per-tier LP gain ratios for all eight source gain bands, Iron–Diamond. The UI offers supported gain choices and the source ratios scale the current project package. Existing default gain prices remain unchanged, including higher-tier packages.
+- Normal Draft, Quickplay and ARAM: five-game source quotes all returned12.6; use the project's Normal Draft package for all three modes.
+- All automatic category quotes now expose a price table using the same calculation as the summary. Progression tables show level steps; match tables show common quantities. Tables update with server, mode, champion and gain. Rank progression also exposes a per-division table. Optional priority remains +20%.
+
+Sources: [BoostRoyal mastery](https://boostroyal.com/lol-boosting/champion-mastery), [Honor](https://boostroyal.com/lol-boosting/honor), [ranked wins](https://boostroyal.com/lol-boosting/ranked-wins), [challenges](https://boostroyal.com/lol-boosting/challenges), [normals](https://boostroyal.com/lol-boosting/normals), [rank boost](https://boostroyal.com/lol-boosting). Cross-check: [BoostRoom mastery](https://boostroom.com/product/lol-champion-mastery-boost) lists USD2.53 for1→2 and USD6.33 for2→3. These competitor prices are comparison evidence, not mixed into the project's rates.
+
+Account categories retain inventory prices; custom account specifications and unsupported challenge types retain custom quotes. The checkout currently creates fulfillment requests rather than charging a live payment.
+
 Reviewed on 2026-10-13 against BoostRoyal's public calculators:
 
 - https://boostroyal.com/lol-boosting/ranked-wins

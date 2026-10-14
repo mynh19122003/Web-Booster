@@ -47,7 +47,7 @@ export function estimateQuote(
   const unavailable = (): Quote => ({price:0, ...time, quoteRequired:true, lines:[]});
   if (!Number.isInteger(current) || !Number.isInteger(target) || !ranks[current] || !ranks[target] || !Number.isFinite(steps) || steps <= 0 || !region) return unavailable();
   // Source snapshots cover standard solo ranked queues and PC Valorant.
-  if ((game === "league-of-legends" && queue !== "Solo") ||
+  if ((game === "league-of-legends" && !["Solo", "Flex 5v5"].includes(queue)) ||
       (game === "teamfight-tactics" && !["Ranked","Double Up"].includes(queue)) ||
       (game === "valorant" && queue !== "Competitive") || service !== "rank-boost") return unavailable();
   const gain = game === "league-of-legends" ? lpGain : game === "valorant" ? "22 RR" : "default";

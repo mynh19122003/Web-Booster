@@ -126,6 +126,10 @@ export function ServiceConfigurator() {
   );
   const unitService =
     service.slug === "coaching" || service.slug === "placements";
+  const rankPriceRows = service.slug === "rank-boost" ? ranks.slice(0, -1).map((rank, index) => ({
+    label: `${isApexRank(s.game, index) ? rankDescription(s.game, index, apexStartLp(s.game, index)) : rank} → ${isApexRank(s.game, index + 1) ? rankDescription(s.game, index + 1, apexStartLp(s.game, index + 1)) : ranks[index + 1]}`,
+    quote: estimateQuote(index, index + 1, queue, service.slug, 1, s.game, 0, apexStartLp(s.game, index + 1), s.region, s.lpGain),
+  })).filter(row => !row.quote.quoteRequired) : [];
   const categoryProduct = s.product ?? (service.slug === "placements" ? "placements" : service.slug === "duo-boost" ? "games" : null);
   const hasCategoryForm = Boolean(categoryProduct && !["divisions", "ranks", "double-up", "coaching"].includes(categoryProduct));
 
@@ -336,6 +340,11 @@ export function ServiceConfigurator() {
                   </div>
                 )}
 
+                {rankPriceRows.length > 0 && <details className="category-optional category-price-table">
+                  <summary>{translateText(language, "Price table", "Bảng giá")}<small>{queue} · {s.region} · {money.currency}</small></summary>
+                  <p>{translateText(language, "Prices per division at the selected LP gain. Optional extras are added to your order total.", "Giá từng bậc theo mức LP đã chọn. Dịch vụ bổ sung được cộng vào tổng đơn.")}</p>
+                  <div className="rank-price-table-scroll"><table><thead><tr><th scope="col">{translateText(language, "Rank progression", "Bậc rank")}</th><th scope="col">{translateText(language, "Price", "Giá")}</th></tr></thead><tbody>{rankPriceRows.map(row => <tr key={row.label}><th scope="row">{row.label}</th><td>{money.format(row.quote.price)}</td></tr>)}</tbody></table></div>
+                </details>}
                 {/* Sub-options: Region, Role, Queue */}
                 <div className="grid grid-cols-1 items-stretch gap-4 pt-2 sm:grid-cols-3">
                   <div className="journey-field min-h-[104px] rounded-xl border border-white/[0.06] bg-black/40 p-3.5 backdrop-blur-md transition-all hover:border-[#FF9F3C]/50 hover:bg-black/50">

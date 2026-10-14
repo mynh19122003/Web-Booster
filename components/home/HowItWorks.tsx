@@ -30,7 +30,7 @@ export function HowItWorks() {
               t("stepThreeDescription"),
             ],
           ].map(([n, title, text]) => (
-            <article key={n}>
+            <article key={n} data-reveal>
               <span>{n}</span>
               <h3>{title}</h3>
               <p>{text}</p>

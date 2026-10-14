@@ -155,35 +155,39 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-reflection: inset 0 1px 1px #ffffff26;
 }
-/* One continuous ambient canvas behind the hero, trust dock, and game catalog. */
+/* Continue the hero's warm ambient canvas through the entire home page. */
 body:has(#hero) main {
   isolation: isolate;
-  background: #070708;
+  background: var(--bg);
 }
 body:has(#hero) main::before,
 body:has(#hero) main::after {
   content: "";
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
 }
 body:has(#hero) main::before {
-  height: 1500px;
   background:
-    radial-gradient(ellipse 78% 38% at 72% 8%, rgba(245, 158, 11, 0.14), transparent 72%),
-    radial-gradient(ellipse 70% 34% at 24% 45%, rgba(217, 119, 6, 0.07), transparent 75%),
-    linear-gradient(180deg, rgba(69, 39, 15, 0.16), #09090b 56%, #070708 100%);
+    radial-gradient(ellipse 78% 38% at 72% 38%, rgba(245, 158, 11, 0.17), transparent 75%),
+    radial-gradient(ellipse 70% 32% at 24% 72%, rgba(217, 119, 6, 0.12), transparent 75%);
+  background-size: 100% 1300px;
+  background-repeat: repeat-y;
 }
 body:has(#hero) main::after {
-  height: 1800px;
   opacity: 0.035;
   background-image: radial-gradient(rgba(255, 255, 255, 0.9) 0.65px, transparent 0.65px);
   background-size: 17px 17px;
-  mask-image: linear-gradient(180deg, #000 0%, #000 68%, transparent 100%);
 }
 /* Keep the shared ambient canvas behind the fixed Three.js layer. */
 body:has(#hero) main { z-index: 0; }
+body:has(#hero) main > section {
+  background: transparent;
+}
+body:has(#hero) .footer {
+  background: var(--bg);
+}
 body:has(#hero) .scene-layer,
 body:has(#hero) .scene-fallback { z-index: 1; }
 .hero-trust-glass {
@@ -603,7 +607,7 @@ body:has(#hero) .scene-fallback { z-index: 1; }
   .request-form .request-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 body:has(#hero) .services-section {
-  background: linear-gradient(180deg, transparent 0%, rgba(9, 9, 11, 0.58) 34%, rgba(7, 7, 8, 0.86) 100%);
+  background: transparent;
 }
 body:has(#hero) .services-section > .absolute {
   opacity: 0.48;
@@ -618,10 +622,17 @@ body:has(#hero) .game-card:focus-within {
   box-shadow: 0 0 28px rgba(245, 158, 11, 0.14), 0 18px 38px rgba(0, 0, 0, 0.44);
 }
 @media (max-width: 767px) {
-  body:has(#hero) main::before { height: 1250px; }
-  body:has(#hero) main::after { height: 1450px; }
+  body:has(#hero) main::before { background-size: 100% 1100px; }
 }
-html body { background-color: #0f0f10; }
+html body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 48% 42% at 50% 0%, rgba(162, 86, 17, .20), transparent 85%),
+    radial-gradient(ellipse 30% 65% at 0% 30%, rgba(153, 83, 17, .12), transparent 85%),
+    radial-gradient(ellipse 30% 70% at 100% 60%, rgba(158, 100, 43, .17), transparent 85%);
+  background-attachment: fixed;
+}
+html[data-theme="light"] body { background-image: none; }
 body :is(.dashboard, .auth-layout, .config-panel, .catalog-banner, .content-card, .support-form, .dialog, .glass-panel) {
   position: relative;
   isolation: isolate;

@@ -2,12 +2,8 @@ import { Hero } from "@/components/home/Hero";
 import { GameServices } from "@/components/home/GameServices";
 import { OrderTracking } from "@/components/home/OrderTracking";
 import { FeatureShowcase } from "@/components/home/FeatureShowcase";
-import { TrophyBreak } from "@/components/home/TrophyBreak";
 import { Reviews } from "@/components/home/Reviews";
-import { SecuritySection } from "@/components/home/SecuritySection";
-import { HowItWorks } from "@/components/home/HowItWorks";
 import { FAQ } from "@/components/home/FAQ";
-import { CTA } from "@/components/home/CTA";
 import { faqs } from "@/data/faqs";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { metadata as makeMetadata } from "@/lib/seo";
@@ -22,12 +18,8 @@ export default function Home() {
       <GameServices />
       <OrderTracking />
       <FeatureShowcase />
-      <TrophyBreak />
       <Reviews />
-      <SecuritySection />
-      <HowItWorks />
       <FAQ />
-      <CTA />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

@@ -83,7 +83,8 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
     return () => observer.disconnect();
   }, []);
   const max = copy?.max ?? 1;
-  const categoryQueue = productId === "games" ? "Duo" : productId === "normals" ? (["Normal Draft","Quickplay","ARAM"].includes(s.queue) ? s.queue : "Normal Draft") : productId === "unrated" ? (["Unrated","Swiftplay"].includes(s.queue) ? s.queue : "Unrated") : productId === "arena" ? "Arena" : productId === "clash" ? "Clash" : s.queue;
+  const minLevel = productId === "mastery" ? 1 : productId === "honor" ? 3 : 0;
+  const categoryQueue = productId === "games" ? "Duo" : productId === "normals" ? (["Normal Draft","Quickplay","ARAM"].includes(s.queue) ? s.queue : "Normal Draft") : productId === "unrated" ? (["Unrated","Swiftplay"].includes(s.queue) ? s.queue : "Unrated") : productId === "arena" ? "Arena" : productId === "clash" ? "Clash" : config.queues.includes(s.queue) ? s.queue : config.queues[0];
   const base = categoryQuote({game,product:productId,region:s.region,queue:categoryQueue,rank:selectedRank,quantity,start,goal,detail,winType:tftWinType,clashTier,clashBoosters,duoQueueType});
   const quoteRequired = base.quoteRequired;
   const price = quoteRequired ? 0 : Number((base.price * (express ? 1.2 : 1)).toFixed(2));
@@ -97,6 +98,14 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
     ? Number((Number(money.amount(price)!.toFixed(2)) - duoDisplay.finalPrice).toFixed(2)) : 0;
   const from = account ? mode : progression ? `${title}: ${start}` : duoGame && duoQueueType === "normal" ? text("Any rank", "Mọi rank") : ranked ? selectedRank : title;
   const unit = productId === "ranked-wins" && tftWinType === "first" ? text("first-place finishes", "trận hạng nhất") : translateText(language, copy?.unit ?? "games", copy?.unitVi);
+  const priceRows = (progression
+    ? Array.from({length: productId === "mastery" ? 9 : productId === "honor" ? 2 : 5}, (_, index) => {
+        const from = productId === "mastery" ? index + 1 : productId === "honor" ? index + 3 : index * 10;
+        return {label: `${from} → ${from + (max === 100 ? 10 : 1)}`, start: from, goal: from + (max === 100 ? 10 : 1), quantity};
+      })
+    : [1,3,5,10,20].filter(count => count <= max).map(count => ({label:`${count} ${unit}`,start,goal,quantity:count})))
+    .map(row => ({...row,quote:categoryQuote({game,product:productId,region:s.region,queue:categoryQueue,rank:selectedRank,quantity:row.quantity,start:row.start,goal:row.goal,detail,winType:tftWinType,clashTier,clashBoosters,duoQueueType})}))
+    .filter(row => !row.quote.quoteRequired);
   const to = account ? `${rank} · ${budget}` : progression ? `${title}: ${goal}${detail ? ` · ${detail}` : ""}` : `${quantity} ${unit}${productId === "games" ? ` · ${mode}` : ""}${detail ? ` · ${detail}` : ""}`;
   const options = productId === "games" ? ["Ranked duo", "High-rank duo", "Casual duo"] : account ? ["Ranked profile", "Fresh / Unranked"] : [];
   const optionName = (option: string) => ({ "Ranked duo": text("Ranked duo", "Chơi đôi xếp hạng"), "High-rank duo": text("High-rank duo", "Chơi đôi rank cao"), "Casual duo": text("Casual duo", "Chơi đôi thường"), "Ranked profile": text("Ranked profile", "Tài khoản có rank"), "Fresh / Unranked": text("Fresh / Unranked", "Tài khoản chưa rank") }[option] ?? option);
@@ -212,7 +221,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
             </>
           )}
           {productId === "wins" && <label className="category-field">{game === "valorant" ? "RR / win" : "LP / win"}
-            <select value={detail} onChange={(event) => setDetail(event.target.value)}><option value="">{text("Choose expected gain", "Chọn điểm nhận mỗi trận")}</option>{[14, 17, 19, 22, 25, 28, 30, 33].map((points) => <option key={points}>{points} {game === "valorant" ? "RR" : "LP"} {translateText(language, "/ win", "/ trận thắng")}</option>)}</select>
+            <select value={detail} onChange={(event) => setDetail(event.target.value)}><option value="">{text("Choose expected gain", "Chọn điểm nhận mỗi trận")}</option>{(game === "valorant" ? [22] : [14, 17, 19, 22, 25, 28, 30]).map((points) => <option key={points}>{points} {game === "valorant" ? "RR" : "LP"} {translateText(language, "/ win", "/ trận thắng")}</option>)}</select>
           </label>}
           {["mastery", "challenges", "clash"].includes(productId) && <label className="category-field category-field-wide">{productId === "mastery" ? text("Champion", "Tướng") : productId === "clash" ? text("Team / tournament", "Đội / giải đấu") : text("Challenge / target", "Thử thách / mục tiêu")} *
             <input ref={goalRef} list={productId === "mastery" ? "lol-champions-list" : undefined} value={detail} onChange={(event) => setDetail(event.target.value)} placeholder={productId === "mastery" ? "e.g. Ahri, Zed..." : text("Enter your goal", "Nhập mục tiêu của bạn")} maxLength={150} required aria-invalid={attempted && !valid} aria-describedby={`goal-help-${productId}`} />
@@ -231,7 +240,7 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         </div>
 
         {progression ? <div className="category-form-grid category-quantity">
-          <label className="category-field">{text("Current level", "Cấp hiện tại")}<NumberInput type="number" min={0} max={max - 1} value={start} onChange={(event) => { const value = Math.max(0, Math.min(max - 1, Math.floor(Number(event.target.value) || 0))); setStart(value); setGoal(Math.max(goal, value + 1)); }} /></label>
+          <label className="category-field">{text("Current level", "Cấp hiện tại")}<NumberInput type="number" min={minLevel} max={max - 1} value={start} onChange={(event) => { const value = Math.max(minLevel, Math.min(max - 1, Math.floor(Number(event.target.value) || minLevel))); setStart(value); setGoal(Math.max(goal, value + 1)); }} /></label>
           <label className="category-field">{text("Target level", "Cấp mục tiêu")}<NumberInput type="number" min={start + 1} max={max} value={goal} onChange={(event) => setGoal(Math.max(start + 1, Math.min(max, Math.floor(Number(event.target.value) || start + 1))))} /></label>
         </div> : !account && <div className="category-quantity">
           <label htmlFor={`quantity-${productId}`}>{text("Number of", "Số lượng")} {unit}</label>
@@ -245,6 +254,11 @@ export function CategoryConfigurator({ game, productId }: { game: string; produc
         </div>}
 
         {account && <div className="category-availability"><ShieldCheck size={22} aria-hidden="true" /><div><strong>{text("Find a matching account", "Tìm tài khoản phù hợp")}</strong><p>{text("Send your preferences to confirm stock, account details and a final price.", "Gửi tiêu chí để xác nhận tài khoản sẵn có, thông tin tài khoản và giá cuối cùng.")}</p></div></div>}
+        {!account && priceRows.length > 0 && <details className="category-optional category-price-table" open>
+          <summary>{text("Price table", "Bảng giá")}<small>{s.region} · {money.currency}</small></summary>
+          <p>{text("Prices follow the selected mode and preferences. Express priority adds 20%.", "Giá theo chế độ và lựa chọn hiện tại. Ưu tiên xử lý cộng 20%.")}</p>
+          <table><thead><tr><th scope="col">{progression ? text("Levels", "Cấp") : text("Quantity", "Số lượng")}</th><th scope="col">{text("Price", "Giá")}</th></tr></thead><tbody>{priceRows.map(row => <tr key={row.label}><th scope="row">{row.label}</th><td>{money.format(row.quote.price)}</td></tr>)}</tbody></table>
+        </details>}
         <details className="category-optional"><summary>{text("Additional preferences", "Yêu cầu bổ sung")}<small>{notes ? text("Added", "Đã thêm") : text("Optional", "Không bắt buộc")}</small></summary>
           <label className="category-field category-notes">{text("Your notes", "Ghi chú của bạn")}<textarea rows={3} value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={500} placeholder={text("Schedule, preferred role or other details…", "Thời gian, vị trí hoặc yêu cầu khác…")} /><span className="category-field-hint">{notes.length}/500</span></label>
         </details>

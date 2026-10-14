@@ -7,7 +7,7 @@ export function CTA() {
   const { t } = useLanguage();
   return (
     <section className="final-cta" id="final-cta">
-      <div className="site-container">
+      <div className="site-container" data-reveal>
         <p className="eyebrow">{t("ctaEyebrow")}</p>
         <h2>
           {t("ctaLead")}
@@ -16,12 +16,12 @@ export function CTA() {
         </h2>
         <p>{t("ctaDescription")}</p>
         <div className="hero-buttons">
-          <Link href="/#services" className="button">
+          <Link href="/services#configure" className="button">
             {t("startClimb")} <ArrowUpRight size={18} />
           </Link>
-          <Link href="#services" className="text-link">
+          <a href="#services" className="text-link">
             {t("exploreServices")} <ArrowRight size={16} />
-          </Link>
+          </a>
         </div>
       </div>
     </section>
