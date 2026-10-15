@@ -6,7 +6,6 @@ import { Dialogs } from "@/components/ui/Dialogs";
 import { Experience } from "@/components/ui/Experience";
 import { SceneLoader } from "@/components/three/SceneLoader";
 import { PointerEffects } from "@/components/ui/PointerEffects";
-import { InitialLoader } from "@/components/ui/InitialLoader";
 import { CurrencyProvider } from "@/components/ui/Currency";
 import { LanguageProvider } from "@/components/ui/LanguageProvider";
 import { SkipLink } from "@/components/ui/SkipLink";
@@ -28,7 +27,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <CurrencyProvider />
         {isAuthRoute ? <main id="main">{children}</main> : <>
           {path === "/" && <SceneLoader />}
-          {path === "/" && <InitialLoader />}
           <PointerEffects />
           <Header key={path} />
           <Experience><main id="main" tabIndex={-1}>{children}</main></Experience>

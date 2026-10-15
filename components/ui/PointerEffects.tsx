@@ -33,23 +33,30 @@ export function PointerEffects() {
       ".auth-aside",
       ".footer a",
     ].join(",");
-    const move = (e: PointerEvent) => {
+    let frame = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    let pointerTarget: EventTarget | null = null;
+    const paint = () => {
+      frame = 0;
+      const x = pointerX;
+      const y = pointerY;
       const header = document.querySelector<HTMLElement>(".header");
       if (header) {
         const headerRect = header.getBoundingClientRect();
-        header.style.setProperty("--shine-x", `${e.clientX - headerRect.left}px`);
-        header.style.setProperty("--shine-y", `${e.clientY - headerRect.top}px`);
+        header.style.setProperty("--shine-x", `${x - headerRect.left}px`);
+        header.style.setProperty("--shine-y", `${y - headerRect.top}px`);
       }
       if (reflection.current) {
-        reflection.current.style.setProperty("--pointer-x", `${e.clientX}px`);
-        reflection.current.style.setProperty("--pointer-y", `${e.clientY}px`);
+        reflection.current.style.setProperty("--pointer-x", `${x}px`);
+        reflection.current.style.setProperty("--pointer-y", `${y}px`);
         reflection.current.style.opacity = "1";
       }
       if (ref.current) {
-        ref.current.style.transform = `translate(${e.clientX - 100}px,${e.clientY - 100}px)`;
+        ref.current.style.transform = `translate(${x - 100}px,${y - 100}px)`;
         ref.current.style.opacity = ".6";
       }
-      const target = e.target;
+      const target = pointerTarget;
       const el =
         target instanceof Element
           ? target.closest<HTMLElement>(".magnetic,.game-card")
@@ -65,8 +72,8 @@ export function PointerEffects() {
       }
       if (surface) {
         const rect = surface.getBoundingClientRect();
-        surface.style.setProperty("--shine-x", `${e.clientX - rect.left}px`);
-        surface.style.setProperty("--shine-y", `${e.clientY - rect.top}px`);
+        surface.style.setProperty("--shine-x", `${x - rect.left}px`);
+        surface.style.setProperty("--shine-y", `${y - rect.top}px`);
         activeSurface = surface;
       }
       if (active && active !== el) {
@@ -75,16 +82,24 @@ export function PointerEffects() {
       }
       if (el) {
         const rect = el.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        const localX = (x - rect.left) / rect.width - 0.5;
+        const localY = (y - rect.top) / rect.height - 0.5;
         el.style.transform = el.classList.contains("magnetic")
-          ? `translate(${x * 7}px,${y * 5}px)`
-          : `perspective(900px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg) translateY(-5px)`;
+          ? `translate(${localX * 7}px,${localY * 5}px)`
+          : `perspective(900px) rotateX(${-localY * 3}deg) rotateY(${localX * 3}deg) translateY(-5px)`;
         active = el;
       }
     };
+    const move = (event: PointerEvent) => {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      pointerTarget = event.target;
+      if (!frame) frame = requestAnimationFrame(paint);
+    };
     let activeSurface: HTMLElement | null = null;
     const leave = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
       if (ref.current) ref.current.style.opacity = "0";
       if (reflection.current) reflection.current.style.opacity = "0";
       if (active) active.style.transform = "";
@@ -98,6 +113,7 @@ export function PointerEffects() {
     window.addEventListener("pointermove", move, { passive: true });
     document.addEventListener("pointerleave", leave);
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", move);
       document.removeEventListener("pointerleave", leave);
     };

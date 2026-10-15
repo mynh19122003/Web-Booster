@@ -13,6 +13,7 @@ export default function SceneCanvas() {
   const [active, setActive] = useState(true);
   const [heroActive, setHeroActive] = useState(true);
   const [lost, setLost] = useState(false);
+  const edge = /Edg\//.test(navigator.userAgent);
   const path = usePathname();
   const enabled = path === "/";
   useEffect(() => {
@@ -101,9 +102,9 @@ export default function SceneCanvas() {
       style={{ visibility: enabled && active ? "visible" : "hidden" }}
     >
       <Canvas
-        dpr={mobile ? 1 : [1, 1.25]}
+        dpr={mobile || edge ? 1 : [1, 1.25]}
         camera={{ position: [0, 0, 10], fov: 40 }}
-        gl={{ antialias: !mobile, alpha: true, powerPreference: "low-power" }}
+        gl={{ antialias: !mobile && !edge, alpha: true, powerPreference: "low-power" }}
         frameloop={!visible || !enabled || !active ? "never" : "demand"}
         onCreated={({ gl }) => {
           window.dispatchEvent(new Event("ascend-scene-ready"));
@@ -117,7 +118,7 @@ export default function SceneCanvas() {
         <Suspense fallback={null}>
           <RenderScheduler
             running={visible && enabled && heroActive && !reduced}
-            fps={mobile ? 20 : 24}
+            fps={edge ? 15 : mobile ? 20 : 24}
           />
           <BackgroundEnvironment />
           <HeroScene mobile={mobile} reduced={reduced} />

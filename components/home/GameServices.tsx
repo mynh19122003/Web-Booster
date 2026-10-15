@@ -69,10 +69,6 @@ function startPreview(card: HTMLElement) {
   video.preload = "auto";
   playPreview(video);
 }
-function preparePreview(card: HTMLElement) {
-  const video = card.querySelector<PreviewMedia>("video.game-preview");
-  if (video) video.preload = "auto";
-}
 export function GameServices() {
   const { card } = useInteractionMotion();
   const { language, t } = useLanguage();
@@ -83,21 +79,6 @@ export function GameServices() {
     const cards = Array.from(
       track.current?.querySelectorAll<HTMLElement>(".game-card") ?? [],
     );
-    const prepareAll = () => {
-      games.forEach((game) => router.prefetch("/games/" + game.slug));
-      cards.forEach(preparePreview);
-    };
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          prepareAll();
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "300px" },
-    );
-    if (track.current) observer.observe(track.current);
-
     const stopAll = () => {
       track.current
         ?.querySelectorAll<PreviewMedia>("video.game-preview")
@@ -112,7 +93,6 @@ export function GameServices() {
     window.addEventListener("pageshow", onPageShow);
     return () => {
       stopAll();
-      observer.disconnect();
       window.removeEventListener("pageshow", onPageShow);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
@@ -193,7 +173,7 @@ export function GameServices() {
                   muted
                   loop
                   playsInline
-                  preload="metadata"
+                  preload="none"
                   aria-hidden="true"
                   onLoadedData={(event) => playPreview(event.currentTarget)}
                   onCanPlay={(event) => playPreview(event.currentTarget)}

@@ -34,7 +34,8 @@ export function HeroBackgroundAnimation() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let isReducedMotion = mediaQuery.matches;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
+    let lastFrame = 0;
     let isVisible = true;
     let isPageVisible = !document.hidden;
     let isRunning = false;
@@ -43,12 +44,16 @@ export function HeroBackgroundAnimation() {
 
     const handleResize = () => {
       if (!container || !canvas) return;
-      width = canvas.width = container.offsetWidth;
-      height = canvas.height = container.offsetHeight;
+      const nextWidth = container.offsetWidth;
+      const nextHeight = container.offsetHeight;
+      if (nextWidth === width && nextHeight === height) return;
+      width = canvas.width = nextWidth;
+      height = canvas.height = nextHeight;
       initParticles();
     };
 
-    window.addEventListener("resize", handleResize);
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(container);
 
     // Track mouse over hero container for smooth spotlight
     const handleMouseMove = (e: MouseEvent) => {
@@ -67,6 +72,7 @@ export function HeroBackgroundAnimation() {
 
     const stop = () => {
       isRunning = false;
+      lastFrame = 0;
       cancelAnimationFrame(animationFrameId);
     };
     const start = () => {
@@ -121,7 +127,11 @@ export function HeroBackgroundAnimation() {
     initParticles();
 
     let frame = 0;
-    function render() {
+    function render(timestamp: number) {
+      if (!isRunning) return;
+      animationFrameId = requestAnimationFrame(render);
+      if (timestamp - lastFrame < 1000 / 30) return;
+      lastFrame = timestamp;
       const context = ctx;
       if (!context) return;
       frame++;
@@ -164,7 +174,6 @@ export function HeroBackgroundAnimation() {
         context.restore();
       }
 
-      if (isRunning) animationFrameId = requestAnimationFrame(render);
     }
 
     start();
@@ -173,7 +182,7 @@ export function HeroBackgroundAnimation() {
       cancelAnimationFrame(animationFrameId);
       visibilityObserver.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       container.removeEventListener("pointermove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       mediaQuery.removeEventListener("change", handleMotionChange);
