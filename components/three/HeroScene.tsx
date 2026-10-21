@@ -1,7 +1,6 @@
 "use client";
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { usePathname } from "next/navigation";
 import * as THREE from "three";
 import { RankCrystal } from "./RankCrystal";
 import { FloatingParticles } from "./FloatingParticles";
@@ -17,108 +16,22 @@ export function HeroScene({
   const artifact = useRef<THREE.Group>(null);
   const fragment = useRef(0);
   const pointer = useRef({ x: 0, y: 0 });
-  const { viewport, size, invalidate } = useThree();
-  const path = usePathname();
-  const sections = useRef<(HTMLElement | null)[]>([]);
-  const bounds = useRef<{ top: number; height: number }[]>([]);
-  const anchorBounds = useRef<{ left: number; top: number; width: number; height: number } | null>(null);
-  const scrollY = useRef(0);
+  const { viewport } = useThree();
   useEffect(() => {
-    sections.current = ["hero"].map((id) =>
-      document.getElementById(id),
-    );
-    const measure = () => {
-      scrollY.current = window.scrollY;
-      bounds.current = sections.current.map((el) => {
-        if (!el) return { top: Infinity, height: 0 };
-        const rect = el.getBoundingClientRect();
-        return { top: rect.top + window.scrollY, height: rect.height };
-      });
-      const anchor = document.getElementById("hero-artifact-anchor");
-      if (anchor) {
-        const rect = anchor.getBoundingClientRect();
-        anchorBounds.current = {
-          left: rect.left,
-          top: rect.top + window.scrollY,
-          width: rect.width,
-          height: rect.height,
-        };
-      } else {
-        anchorBounds.current = null;
-      }
-      invalidate();
-    };
-    const observer = new ResizeObserver(measure);
-    observer.observe(document.body);
-    sections.current.forEach((el) => el && observer.observe(el));
-    const anchor = document.getElementById("hero-artifact-anchor");
-    if (anchor) observer.observe(anchor);
-    measure();
-    const move = (e: PointerEvent) => {
+    if (mobile || reduced) return;
+    const move = (event: PointerEvent) => {
       pointer.current = {
-        x: e.clientX / window.innerWidth - 0.5,
-        y: e.clientY / window.innerHeight - 0.5,
+        x: event.clientX / window.innerWidth - 0.5,
+        y: event.clientY / window.innerHeight - 0.5,
       };
     };
-    if (!mobile && !reduced)
-      window.addEventListener("pointermove", move, { passive: true });
-    let scrollFrame = 0;
-    const onScroll = () => {
-      if (scrollFrame) return;
-      scrollFrame = requestAnimationFrame(() => {
-        scrollFrame = 0;
-        scrollY.current = window.scrollY;
-        invalidate();
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    invalidate();
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(scrollFrame);
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [path, mobile, reduced, invalidate]);
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => window.removeEventListener("pointermove", move);
+  }, [mobile, reduced]);
   useFrame(({ clock }) => {
     if (!root.current || !artifact.current) return;
-    const scroll = scrollY.current;
-    const index = bounds.current.findIndex(
-      (r) => r.top - scroll < size.height && r.top + r.height - scroll > 0,
-    );
-    if (index < 0) {
-      root.current.visible = false;
-      return;
-    }
-    root.current.visible = true;
-    const rect = {
-      top: bounds.current[index].top - scroll,
-      height: bounds.current[index].height,
-    };
-    const anchor = index === 0 ? anchorBounds.current : undefined;
-    const px = anchor ? anchor.left + anchor.width / 2 : mobile ? size.width * 0.55 : size.width * 0.745;
-    const offset =
-      index === 0
-        ? mobile
-          ? 665
-          : Math.min(rect.height * 0.44, 480)
-        : mobile
-            ? 460
-            : rect.height * 0.5;
-    const py = anchor ? anchor.top - scroll + anchor.height / 2 : rect.top + offset;
-    root.current.position.set(
-      (px / size.width - 0.5) * viewport.width,
-      (0.5 - py / size.height) * viewport.height,
-      0,
-    );
-    const scale =
-      (((anchor ? Math.min(anchor.width * 1.05, anchor.height * 1.05, 680) : mobile
-        ? Math.min(size.width * 0.85, 380)
-        : Math.min(size.width * 0.36, rect.height * 0.72, 520)) /
-        size.width) *
-        viewport.width) /
-      4.2;
-    root.current.scale.setScalar(scale);
+    // The browser scrolls the canvas with its anchor; WebGL only animates the model.
+    root.current.scale.setScalar(Math.min(viewport.width, viewport.height) / 5.8);
     fragment.current = 0;
     const time = clock.elapsedTime;
     artifact.current.rotation.y = reduced
@@ -128,10 +41,6 @@ export function HeroScene({
       ? 0.05
       : Math.sin(time * 0.17) * 0.04 + pointer.current.y * 0.1;
     artifact.current.position.y = reduced ? 0 : Math.sin(time * 0.75) * 0.065;
-    if (index === 0 && !reduced) {
-      root.current.position.z =
-        -Math.min(Math.max(-rect.top / size.height, 0), 1) * 0.5;
-    }
   });
   return (
     <>

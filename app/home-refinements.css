@@ -113,3 +113,13 @@ body:has(#hero) .feature-showcase .feature-card:hover { transform: translateY(-3
   body:has(#hero) .feature-showcase .feature-card:hover { transform: none; }
   body:has(#hero) .feature-dial-fill, body:has(#hero) .feature-switch span { transition: none; }
 }
+
+/* Keep decorative WebGL in the artifact's own scroll and paint area. */
+#hero-artifact-anchor .scene-layer,
+#hero-artifact-anchor .scene-fallback {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  contain: layout paint;
+}

@@ -1,0 +1,112 @@
+/* Presentation-only refinements shared across the public site and workspaces. */
+html body {
+  background-attachment: scroll;
+  background-size: 100% 1400px;
+  background-repeat: no-repeat;
+}
+
+/* Opaque surfaces avoid repeatedly sampling the moving page behind them. */
+[data-public-site] > header {
+  background-color: #141311f5;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition-property: background-color, border-color, box-shadow;
+}
+body [data-public-site] :is(.dashboard, .config-panel, .catalog-banner, .content-card, .support-form, .glass-panel, .faq-surface) {
+  background: linear-gradient(145deg, #24211e, #171615 85%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body [data-public-site] :is(.dashboard, .config-panel, .catalog-banner, .content-card, .support-form, .glass-panel)::before {
+  display: none;
+}
+body [data-public-site] :is(.feature-card, .review-card, .player-card, .catalog-item, .faq-item, .blog-card, .step-card, .security-card) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body [data-public-site] :is(.auth-form, .config-panel, .recruitment-form, .support-form) :is(input, select, textarea),
+body [data-public-site] :is(.button.ghost, .auth-provider, .division-picker button, .rank-arrow) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Keep keyboard focus visible even when an inner input has no outline. */
+[data-public-site] :is(.coach-search, .br-cosmetic-search, .booster-chat-search, .password-field, .phone-number-field):focus-within {
+  outline: 2px solid var(--prime-gold);
+  outline-offset: 3px;
+}
+[data-public-site] :is(.page-intro nav, .section-heading, .coach-card-title, .wallet-checkout-product) {
+  overflow-wrap: anywhere;
+}
+[data-public-site] .page-intro nav { flex-wrap: wrap; }
+body [data-public-site] .faq-preview-row h3 > button { min-height: 44px; }
+body [data-public-site] .faq-preview-row { transition-property: background-color; }
+/* Change accordion layout once; animate only the answer's composited content. */
+.faq-answer[hidden] { display: none; }
+.faq-answer:not([hidden]) > div { animation: faq-answer-enter 160ms ease-out; }
+@keyframes faq-answer-enter {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-answer:not([hidden]) > div { animation: none; }
+}
+body [data-public-site] :is(button, a)[aria-disabled="true"] { cursor: not-allowed; }
+
+@media (max-width: 767px) {
+  /* A 44px target fits the existing 80px navigation bar without crowding it. */
+  [data-public-site] > header > .site-container { gap: 6px; }
+  [data-public-site] > header :is(button, a[aria-label]) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  body [data-public-site] :is(.coach-filter-chip, .rank-gain-options button, .faq-help-card a[aria-label]) {
+    min-height: 44px;
+  }
+  body [data-public-site] .faq-help-card a[aria-label] { min-width: 44px; }
+  /* Prevent iOS from zooming the page when a text field receives focus. */
+  body [data-public-site] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea),
+  .ap-root :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+    font-size: 16px;
+  }
+  /* Bring the actual sign-in form closer to the first screen. */
+  body [data-public-site] .auth-aside {
+    min-height: 0;
+    padding: 20px 24px;
+    gap: 16px;
+  }
+  body [data-public-site] .auth-aside-copy { margin: 0; }
+  body [data-public-site] .auth-aside-copy h1 { font-size: 24px; line-height: 1.25; }
+  body [data-public-site] .auth-aside-copy .eyebrow,
+  body [data-public-site] .auth-aside-index { display: none; }
+  body [data-public-site] .auth-aside-copy > p:last-child { margin-top: 8px; }
+  body [data-public-site] .auth-content { padding: 24px 20px; }
+  body [data-public-site] .auth-tabs { margin-bottom: 22px; }
+  .ap-root .ap-password-input button {
+    min-width: 44px;
+    min-height: 44px;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+  }
+  .ap-root .ap-login-help button { min-height: 44px; }
+  .ap-root .ap-password-input input { padding-right: 56px !important; }
+  .ap-root :is(.ap-icon-button, .ap-mobile-toggle) { min-width: 44px; min-height: 44px; }
+  .ap-root .ap-table-wrap { overscroll-behavior-x: contain; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ap-root *, .ap-root *::before, .ap-root *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :is([data-public-site], .ap-root) :focus-visible {
+    outline: 2px solid Highlight;
+  }
+}

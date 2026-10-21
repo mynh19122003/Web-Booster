@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Compass,
 } from "lucide-react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useLanguage } from "@/components/ui/LanguageProvider";
 
@@ -35,7 +35,10 @@ export function FAQ() {
     <section className="relative isolate overflow-hidden" id="faq">
       {/* Ambient amber backlight */}
       <div
-        className="bg-[#D97706]/15 blur-[160px] w-[500px] h-[400px] pointer-events-none rounded-full absolute -top-10 right-1/4 -z-10"
+        className="w-[500px] h-[400px] pointer-events-none absolute -top-10 right-1/4 -z-10"
+        style={{
+          background: "radial-gradient(ellipse, #d977061a, transparent 70%)",
+        }}
         aria-hidden="true"
       />
 
@@ -55,7 +58,8 @@ export function FAQ() {
             {/* Topic Navigation */}
             <div className="mb-8">
               <span className="flex items-center gap-2 text-[10px] font-heading font-bold tracking-widest text-zinc-500 uppercase mb-3">
-                <Compass size={14} className="text-[#FF9F3C]" /> {t("faqTopics")}
+                <Compass size={14} className="text-[#FF9F3C]" />{" "}
+                {t("faqTopics")}
               </span>
               <div className="flex flex-wrap gap-2.5">
                 {[
@@ -84,7 +88,7 @@ export function FAQ() {
             </div>
 
             {/* "NEED A HAND?" Card: Compact glass widget */}
-            <div className="faq-help-card bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-xl p-5 hover:border-[#FF9F3C]/40 transition-all flex items-center justify-between mt-8 group">
+            <div className="faq-help-card bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:border-[#FF9F3C]/40 transition-colors flex items-center justify-between mt-8 group">
               <div className="flex items-center gap-3.5">
                 <div className="w-10 h-10 rounded-lg bg-[#FF9F3C]/10 border border-[#FF9F3C]/20 flex items-center justify-center text-[#FF9F3C] shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                   <Headphones size={20} />
@@ -121,16 +125,14 @@ export function FAQ() {
 
           {/* 3. RIGHT COLUMN (MIRROR GLASS FAQ CONTAINER) */}
           <div className="h-full lg:col-span-7">
-            <div className="faq-surface h-full bg-gradient-to-b from-white/[0.04] via-white/[0.015] to-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_20px_50px_rgba(0,0,0,0.6)]">
+            <div className="faq-surface h-full bg-gradient-to-b from-white/[0.04] via-white/[0.015] to-transparent border border-white/10 rounded-3xl p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_20px_50px_rgba(0,0,0,0.6)]">
               <div className="divide-y divide-white/[0.06]">
                 {faqs.map((f, i) => {
                   const isOpen = open === i;
                   return (
                     <div
                       key={f.q}
-                      className={`faq-preview-row transition-all duration-200 ${
-                        isOpen ? "bg-white/[0.02] rounded-xl px-4 -mx-4" : "px-2"
-                      } py-4`}
+                      className={`faq-preview-row rounded-xl px-2 py-4 ${isOpen ? "bg-white/[0.02]" : ""}`}
                     >
                       <h3>
                         <button
@@ -145,7 +147,8 @@ export function FAQ() {
                             {f.q}
                           </span>
                           <div
-                            className={`w-8 h-8 rounded-lg bg-white/[0.04] border border-white/5 flex items-center justify-center shrink-0 transition-transform duration-300 ${
+                            aria-hidden="true"
+                            className={`w-8 h-8 rounded-lg bg-white/[0.04] border border-white/5 flex items-center justify-center shrink-0 transition-transform duration-150 motion-reduce:transition-none ${
                               isOpen
                                 ? "rotate-45 text-[#FF9F3C] bg-[#FF9F3C]/10 border-[#FF9F3C]/20 shadow-[0_0_10px_rgba(255,159,60,0.2)]"
                                 : "text-zinc-400 group-hover:text-white group-hover:border-white/20"
@@ -156,30 +159,17 @@ export function FAQ() {
                         </button>
                       </h3>
 
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            id={`faq-${i}`}
-                            role="region"
-                            aria-labelledby={`question-${i}`}
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{
-                              height: {
-                                duration: reduced ? 0 : 0.28,
-                                ease: [0.25, 0.1, 0.25, 1],
-                              },
-                              opacity: { duration: reduced ? 0 : 0.2 },
-                            }}
-                            className="overflow-hidden"
-                          >
-                            <div className="pt-3 pb-2 text-sm leading-relaxed text-zinc-300 font-normal">
-                              <p>{f.a}</p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <div
+                        id={`faq-${i}`}
+                        role="region"
+                        aria-labelledby={`question-${i}`}
+                        hidden={!isOpen}
+                        className="faq-answer"
+                      >
+                        <div className="pt-3 pb-2 text-sm leading-relaxed text-zinc-300 font-normal">
+                          <p>{f.a}</p>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

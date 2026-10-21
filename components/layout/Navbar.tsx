@@ -190,7 +190,7 @@ export function Navbar() {
   return (
     <header
       ref={headerRef}
-      className={`fixed top-0 left-0 right-0 z-50 h-20 w-full transition-all duration-300 backdrop-blur-2xl -webkit-backdrop-blur-2xl border-b ${
+      className={`fixed top-0 left-0 right-0 z-50 h-20 w-full transition-colors duration-300 border-b ${
         scrolled
           ? "bg-black/40 border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.12)]"
           : "bg-black/20 border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]"

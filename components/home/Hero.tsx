@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import type { MouseEvent } from "react";
 import { AscendLogo } from "@/components/ui/AscendLogo";
+import { SceneLoader } from "@/components/three/SceneLoader";
 import { HeroBackgroundAnimation } from "@/components/home/HeroBackgroundAnimation";
 
 import { HeroTrustRibbon } from "@/components/home/HeroTrustRibbon";
@@ -51,7 +52,7 @@ export function Hero() {
             </div>
           </div>
           <div className="relative flex min-w-0 flex-col items-center justify-center lg:col-span-5">
-            <div id="hero-artifact-anchor" className="pointer-events-none relative flex h-[520px] w-full max-w-[620px] items-center justify-center aspect-square lg:h-[600px] lg:max-w-[660px]" aria-hidden="true" />
+            <div id="hero-artifact-anchor" className="pointer-events-none relative flex h-[520px] w-full max-w-[620px] items-center justify-center aspect-square lg:h-[600px] lg:max-w-[660px]" aria-hidden="true"><SceneLoader /></div>
             <div className="hero-artifact-caption relative z-10 mt-6 mb-6 flex w-full max-w-[440px] items-center gap-4 border-t border-white/[0.08] py-5">
               <AscendLogo variant="icon" size="sm" className="shrink-0" />
               <div className="flex min-w-0 flex-col gap-2"><p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-300">{t("artifact")}</p><p className="text-xs text-zinc-400">{t("artifactDescription")}</p></div>
